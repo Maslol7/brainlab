@@ -520,6 +520,17 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .prem{background:var(--panel);border:1px dashed var(--edge2);border-radius:16px;padding:10px 14px}
 .prem p{margin:3px 0;font-weight:600;line-height:1.5}
 .ctx{margin:0 0 8px;color:var(--muted);font-size:.92rem}
+/* v11 */
+.praise{display:flex;gap:8px;align-items:center;margin:8px 0 2px;padding:8px 12px;border-radius:12px;background:linear-gradient(120deg,rgba(255,200,69,.22),rgba(255,138,61,.12));border:1px solid rgba(255,200,69,.55);font-weight:700;font-size:.92rem;animation:rin .35s ease}
+.praise svg,.imp svg{width:18px;height:18px;flex:none;color:var(--gold)}
+.imp{border-color:rgba(255,200,69,.5)}
+.imp .row{gap:8px;padding:4px 0;font-weight:600;align-items:flex-start}
+.imp .row svg{margin-top:3px}
+.love{display:flex;gap:8px;align-items:center;margin-top:10px;padding:10px 14px;border-radius:14px;background:rgba(255,122,168,.1);border:1px solid rgba(255,122,168,.35);font-weight:600;font-size:.95rem;color:#FFD3E2}
+.love svg{width:20px;height:20px;flex:none}
+.friend{gap:12px;align-items:center}
+.friend .fi{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;background:var(--acc-soft);color:var(--acc)}
+.friend .fi svg{width:22px;height:22px}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -1786,6 +1797,7 @@ function viewParent() {
     <div class="muted small">רעיונות (לחיצה ממלאת):</div><div class="chips">${REWARD_IDEAS.map(([t, p], i) => `<button class="chip" data-idea="${i}">${t} · ${p}</button>`).join('')}</div></div></div></section>
   <section class="card tip"><h4>איך ${ME.name} מרוויח יהלומים</h4><ul>${DIA_RULES.map(r => `<li>${r}</li>`).join('')}</ul><p class="small muted" style="margin-top:8px">בקצב הצטיינות טוב זה בערך 5-8 יהלומים בשבוע. כדאי לתמחר פרס גדול כך שיידרשו 3-4 שבועות של עבודה רצינית.</p></section>
   <section><div class="sec-h"><h3>היסטוריה</h3></div><div class="card small">${(S.diaLog || []).slice(0, 15).map(l => `<div class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--edge)"><span>${esc(l.why)}</span><span style="color:${l.n > 0 ? 'var(--good)' : 'var(--bad)'}">${l.n === 0 ? '✓' : (l.n > 0 ? '+' : '') + l.n} · ${l.d.slice(5).split('-').reverse().join('.')}</span></div>`).join('') || '<span class="muted">עוד אין.</span>'}</div></section>
+  ${isSbx() ? '' : dadMsgSection()}
   ${cloudSection()}
   ${backupSection()}
   ${isSbx() ? '' : `<section class="card stack" style="gap:8px"><h4 style="font-size:1.15rem">מצב בדיקה</h4><p class="small muted" style="margin:0">משחק בעותק נפרד של האפליקציה: כל המשימות פתוחות, ואפשר לקפוץ לכל יום, לתת מטבעות ולבדוק פרסים. הנתונים של ${ME.name} לא משתנים. קיצור נסתר: 5 לחיצות מהירות על "ימים למבחן" במסך הבית.</p><button class="btn btn-gold" data-act="sbxenter">כניסה למצב בדיקה</button></section>`}
@@ -1890,7 +1902,7 @@ function sbxBadge() {
   document.documentElement.classList.toggle('sbx', isSbx());
   let el = document.getElementById('sbxbar');
   if (!isSbx()) { if (el) el.remove(); return; }
-  if (!el) { el = document.createElement('div'); el.id = 'sbxbar'; el.innerHTML = '<span>מצב בדיקה · הנתונים של יונתן לא משתנים</span><button type="button" data-b="tools">כלים</button><button type="button" data-b="exit">יציאה</button>'; document.body.appendChild(el); el.querySelector('[data-b="exit"]').onclick = exitSandbox; el.querySelector('[data-b="tools"]').onclick = openSbxTools; }
+  if (!el) { el = document.createElement('div'); el.id = 'sbxbar'; el.innerHTML = `<span>מצב בדיקה · הנתונים של ${ME.name} לא משתנים</span><button type="button" data-b="tools">כלים</button><button type="button" data-b="exit">יציאה</button>`; document.body.appendChild(el); el.querySelector('[data-b="exit"]').onclick = exitSandbox; el.querySelector('[data-b="tools"]').onclick = openSbxTools; }
 }
 function sbxFresh() { try { localStorage.removeItem(SBX_KEY); } catch (e) { } S = load(); S.sbxInit = 1; S.start = addDays(todayStr(), -(TOTAL - 1)); S.pin = 'sbx'; S.coins = 300; }
 function sbxCopy() { let o = null; try { o = JSON.parse(localStorage.getItem(MAIN_KEY)); } catch (e) { } if (!o || !o.start) return sbxFresh(); o.cur = null; o.view = 'home'; o.pin = 'sbx'; o.sbxInit = 1; o.copied = todayStr(); try { localStorage.setItem(SBX_KEY, JSON.stringify(o)); } catch (e) { } S = load(); }
@@ -1921,7 +1933,7 @@ let tapN = 0, tapT = 0;
 function secretTap() { const now = Date.now(); tapN = now - tapT < 700 ? tapN + 1 : 1; tapT = now; if (tapN >= 5) { tapN = 0; isSbx() ? exitSandbox() : askPinForSandbox(); } }
 function sbxTools() {
   if (!isSbx()) return '';
-  return `<section class="card stack sbx-tools" style="gap:10px"><h4 style="font-size:1.2rem">כלי בדיקה</h4><p class="small muted" style="margin:0">הכל כאן קורה בעותק נפרד. הנתונים של יונתן לא נגעו.</p>
+  return `<section class="card stack sbx-tools" style="gap:10px"><h4 style="font-size:1.2rem">כלי בדיקה</h4><p class="small muted" style="margin:0">הכל כאן קורה בעותק נפרד. הנתונים של ${ME.name} לא נגעו.</p>
   <div class="chips"><button class="chip" data-sbx="copy">עותק טרי של ${ME.name}</button><button class="chip" data-sbx="unlock">פתח את כל המשימות</button><button class="chip" data-sbx="coins">+500 מטבעות</button><button class="chip" data-sbx="dia">+20 יהלומים</button><button class="chip" data-sbx="gear">פתח את כל הציוד</button><button class="chip" data-sbx="bday">יום הולדת היום</button><button class="chip" data-sbx="jokes">פתח את כל הבדיחות</button></div>
   <div class="row"><input class="txt" id="sbxday" type="number" min="1" max="${TOTAL}" placeholder="קפיצה למשימה (1-${TOTAL})" style="flex:1"><button class="btn btn-primary" data-sbx="jump" style="min-height:44px">קפוץ</button></div>
   <div class="row"><button class="btn btn-ghost" data-sbx="reset" style="flex:1;min-height:44px">איפוס הבדיקה</button><button class="btn btn-gold" data-sbx="exit" style="flex:1;min-height:44px">יציאה</button></div></section>`;
@@ -1965,7 +1977,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '10';
+const APP_VER = '11';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -2397,7 +2409,7 @@ function viewMeTab() {
   <section><div class="sec-h"><h3>ציוד</h3><span class="muted small">נפתח לבד כשמשיגים הישגים</span></div><div class="stack" style="gap:8px">${gear}</div></section>
   <section><div class="sec-h"><h3>ספר הבדיחות</h3><span class="muted small">${S.jokes || 0}/${JOKES.length} · בדיחה חדשה בכל משימה</span></div>${(S.jokes || 0) ? `<div class="card jokes">${JOKES.slice(0, S.jokes).map(([q, a]) => `<details><summary>${jokeTxt(q)}</summary><p>${jokeTxt(a)}</p></details>`).reverse().join('')}</div>` : '<div class="card muted small">הבדיחה הראשונה נפתחת אחרי המשימה הראשונה.</div>'}</section>
   <section><div class="sec-h"><h3>תגים</h3><span class="muted small">${S.badges.length}/${BADGES.length}</span></div>${badges}</section>
-  <div class="card row">${IC.cake.replace('<svg', '<svg style="width:40px;height:40px;flex:none"')}<div class="grow">${isBday() ? '<b>היום יום ההולדת!</b>' : `<b>עוד ${daysToBday()} ימים ליום ההולדת</b><div class="muted small">13 בדצמבר. מחכה שם הפתעה.</div>`}</div></div>
+  ${ME.bd ? `<div class="card row">${IC.cake.replace('<svg', '<svg style="width:40px;height:40px;flex:none"')}<div class="grow">${isBday() ? '<b>היום יום ההולדת!</b>' : `<b>עוד ${daysToBday()} ימים ליום ההולדת</b><div class="muted small">13 בדצמבר. מחכה שם הפתעה.</div>`}</div></div>` : ''}
   <button class="btn btn-gold btn-wide" data-share="summary">${IC.share} שתף סיכום בקבוצה של המשפחה</button>
   </div>`;
 }
@@ -2522,7 +2534,7 @@ function renderQuiz() {
     const tchip = `<span class="tchip ${r.secs <= 60 ? 'ok' : ''}">${Math.round(r.secs)} שנ׳</span>`;
     const ansTxt = q.type === 'order' ? 'הסדר הנכון למעלה' : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
     const LS = LESSONS[lessonFor(q)] || LESSONS.logic;
-    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4><div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span>${LS[1]}</div>${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}</div>`;
+    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4>${r.praise ? `<div class="praise">${IC.bolt}<span>${r.praise}</span></div>` : ''}<div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span>${LS[1]}</div>${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}${dadHTML(r.love)}</div>`;
   }
   const tried = !answered && c.tried && c.tried.i === c.i;
   const hint = tried ? retryBox(q, c.tried) : q.twin && !answered ? `<div class="hintbox"><b>הכלל:</b> ${(LESSONS[lessonFor(q)] || LESSONS.logic)[1]}</div>` : c.hint && !answered ? `<div class="hintbox"><b>טריק:</b> ${CATS[q.cat].tip}</div>` : '';
@@ -2590,7 +2602,8 @@ function answer(i, val) {
   c.res[c.i] = { sel: typed || q.type === 'order' ? -1 : i, val: q.type === 'order' ? val : typed ? String(val) : undefined, ok, gain, secs, second: !first, sel1: first ? null : c.tried.sel };
   c.pts += gain;
   if (!prev) c.res[c.i].newRule = noteLesson(q).first;
-  if (!prev && first) rateQ(q, ok, secs, c);
+  if (!prev && first) { const r0 = S.rat[q.cat]; rateQ(q, ok, secs, c); c.res[c.i].praise = praiseFor(q, ok, secs, c, r0); }
+  if (!prev) c.res[c.i].love = loveOnStreak(c, ok, first);
   noteMist(q, ok, c, first);
   c.tin = ''; c.ord = [];
   const btn = typed ? document.getElementById('tin') : app.querySelector(`[data-opt="${i}"]`);
@@ -2639,6 +2652,7 @@ function finish() {
   const newGear = GEAR.filter(g => gearOn()[g.id] && !gearBefore.includes(g.id)).map(g => g.n);
   S.last = { dia, joke, champOk, chapters, size: c.size, mod: c.mod, kind: c.kind, day: c.day, cat: c.cat, correct, n, pts: c.pts, coins, won, chest: (c.kind === 'daily' || c.kind === 'boss' || c.kind === 'sim') ? 0 : -1, newB: S.badges.filter(b => !before.includes(b)), newGear, newWorld: curWorld().k !== worldBefore ? curWorld().n : null, rankUp: rankOf(S.xp).r[1] !== rankBefore ? rankOf(S.xp).r[1] : null,
     review: c.qs.map((q, i) => ({ lk: lessonFor(q), q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.type === 'order' ? q.correct.map(ix => q.items[ix].replace(/<[^>]+>/g, '')).join(' ← ') : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : q.options[q.answer], ex: q.ex })).filter(x => deferred(c.kind) || !x.ok) };
+  S.last.imp = improveNotes(c, correct, n); S.last.love = loveLine(c, correct, n);
   S.cur = null; S.openW = null; go('result');
   const st = starsOf(correct, n);
   if (won || st >= 2) { SFX.win(); later(() => burst(st === 3 || won ? 160 : 80), 250); }
@@ -2680,7 +2694,7 @@ function viewResult() {
   const chest = L0.chest === 0 ? `<button class="card chest" data-act="chest">${chestSVG(false)}<div><b style="font-family:var(--f-display);font-size:1.2rem">תיבת אוצר!</b><div class="muted small">לחץ כדי לפתוח</div></div></button>` : L0.chest > 0 ? `<div class="card chest open">${chestSVG(true)}<div><b style="font-family:var(--f-display);font-size:1.2rem;color:var(--gold)">+${L0.chest} מטבעות</b><div class="muted small">נכנסו לארנק. בחנות יש ערכות צבע, מגני רצף ורמזים.</div></div></div>` : '';
   const rev = L0.review.length ? `<section><div class="sec-h"><h3>${deferred(L0.kind) ? 'כל השאלות' : 'לחזור עליהן'}</h3></div><div class="rev">${L0.review.map(x => `<details class="card item"><summary><span class="tag">${CATS[x.cat].n}</span> ${x.ok ? '<b style="color:var(--good)">✓</b>' : '<b style="color:var(--bad)">✗</b>'} ${x.q.replace(/<[^>]+>/g, '')}</summary><div class="a">התשובה: <b>${x.a}</b></div>${x.lk && LESSONS[x.lk] ? `<div class="rule small"><span class="rt">הכלל</span>${LESSONS[x.lk][1]}</div>` : ''}<div class="e">${x.ex}</div></details>`).join('')}</div></section>` : '';
   const dv = (L0.dia || []).length ? `<div class="banner" style="background:linear-gradient(120deg,rgba(143,227,255,.22),rgba(169,139,255,.2));border-color:rgba(143,227,255,.5)">${diaS(44)}<div class="grow"><b>+${L0.dia.reduce((a, x) => a + x[0], 0)} יהלומים של אבא!</b><div class="small muted">${L0.dia.map(x => x[1]).join(' · ')}</div></div></div>` : '';
-  return `<div class="stack">${hud()}<section class="card res-hero"><div class="eyebrow">${title}</div><div class="who">${who}</div><div class="stars">${stars}</div><div class="score">${L0.correct}/${L0.n}</div><p class="muted" style="margin:4px 0 0">${msg}</p><div class="gains"><span class="gain">+${L0.pts} נק׳</span><span class="gain c">+${L0.coins} מטבעות</span></div></section>${L0.chapters ? `<section class="card"><div class="eyebrow" style="margin-bottom:8px">לפי פרקים</div><div class="bars">${L0.chapters.map(ch => `<div class="bar ${ch.c / ch.t < .6 ? 'weak' : ''}"><div class="rw"><span>${ch.n}</span><span>${ch.c}/${ch.t}</span></div><div class="track"><i style="width:${Math.round(ch.c / ch.t * 100)}%"></i></div></div>`).join('')}</div></section>` : ''}${L0.champOk != null ? `<div class="card row small" style="border-color:rgba(255,200,69,.5)">${IC.star.replace('<svg', '<svg style="width:26px;height:26px;color:var(--gold);flex:none"')}<span>שאלת האלוף: ${L0.champOk ? '<b style="color:var(--good)">נכון! הרווחת יהלום.</b>' : 'הפעם לא. ההסבר נמצא למטה.'}</span></div>` : ''}${dv}${chest}${jokeCard(L0.joke)}${nw}${ng}${ru}${nb}${['daily', 'boss', 'sim'].includes(L0.kind) ? `<button class="btn btn-gold btn-wide" data-share="result">${IC.share} שתף בקבוצה של המשפחה</button>` : ''}<button class="btn btn-primary btn-wide" data-go="home">חזרה למסע</button>${rev}</div>`;
+  return `<div class="stack">${hud()}<section class="card res-hero"><div class="eyebrow">${title}</div><div class="who">${who}</div><div class="stars">${stars}</div><div class="score">${L0.correct}/${L0.n}</div><p class="muted" style="margin:4px 0 0">${msg}</p><div class="gains"><span class="gain">+${L0.pts} נק׳</span><span class="gain c">+${L0.coins} מטבעות</span></div></section>${impHTML(L0)}${L0.chapters ? `<section class="card"><div class="eyebrow" style="margin-bottom:8px">לפי פרקים</div><div class="bars">${L0.chapters.map(ch => `<div class="bar ${ch.c / ch.t < .6 ? 'weak' : ''}"><div class="rw"><span>${ch.n}</span><span>${ch.c}/${ch.t}</span></div><div class="track"><i style="width:${Math.round(ch.c / ch.t * 100)}%"></i></div></div>`).join('')}</div></section>` : ''}${L0.champOk != null ? `<div class="card row small" style="border-color:rgba(255,200,69,.5)">${IC.star.replace('<svg', '<svg style="width:26px;height:26px;color:var(--gold);flex:none"')}<span>שאלת האלוף: ${L0.champOk ? '<b style="color:var(--good)">נכון! הרווחת יהלום.</b>' : 'הפעם לא. ההסבר נמצא למטה.'}</span></div>` : ''}${dv}${chest}${jokeCard(L0.joke)}${nw}${ng}${ru}${nb}${['daily', 'boss', 'sim'].includes(L0.kind) ? `<button class="btn btn-gold btn-wide" data-share="result">${IC.share} שתף בקבוצה של המשפחה</button>` : ''}<button class="btn btn-primary btn-wide" data-go="home">חזרה למסע</button>${rev}</div>`;
 }
 
 /* ---------- ARCADE ---------- */
@@ -2994,7 +3008,7 @@ function viewStats() {
   const t = S.ptab || 'me';
   const seg = `<div class="seg">${PT.map(([k, n]) => `<button data-ptab="${k}" class="${t === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   let body;
-  if (t === 'me') body = viewMeTab();
+  if (t === 'me') body = viewMeTab() + friendCard();
   else if (t === 'data') { const weak = Object.keys(CATS).filter(k => (S.rat[k] ?? 9) < 1.8 && (S.stats[k] || { t: 0 }).t >= 5); body = `${viewDataTab()}<section><div class="sec-h"><h3>תרגול לפי נושא</h3><span class="muted small">6 שאלות</span></div><div class="chips">${Object.keys(CATS).map(k => `<button class="chip ${weak.includes(k) ? 'hot' : ''}" data-practice="${k}">${CATS[k].n}</button>`).join('')}</div></section>`; }
   else if (t === 'rules') body = viewRulesTab();
   else body = `<section class="card stack" style="gap:14px">
@@ -3009,9 +3023,116 @@ function bindNav() {
   app.querySelectorAll('[data-ptab]').forEach(b => b.onclick = () => { S.ptab = b.dataset.ptab; SFX.tap(); save(); render(); });
   const sk = app.querySelector('[data-act="skipbonus"]'); if (sk) sk.onclick = () => { S.bonusDay = todayStr(); save(); render(); };
   const es = app.querySelector('[data-act="extsave"]'); if (es) es.onclick = () => { const v = parseInt(document.getElementById('extscore').value); if (!(v >= 0 && v <= 100)) return toast('ציון בין 0 ל-100'); S.ext = (S.ext || []).concat({ d: todayStr(), v }); S.extLast = todayStr(); if (v >= 85) giveDia(1, 'מבחן חיצוני 85+', []); SFX.coin(); save(); render(); toast(v >= 85 ? 'נשמר. +1 יהלום!' : 'נשמר'); };
+  bindV11();
   const ek = app.querySelector('[data-act="extskip"]'); if (ek) ek.onclick = () => { S.extSkip = todayStr(); save(); render(); };
 }
-render();
+/* ================= V11: PRAISE FOR PROGRESS, DAD'S NOTES, SHARE WITH A FRIEND ================= */
+IC.heart = '<svg viewBox="0 0 24 24" fill="#FF7AA8"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.3 3.2 5 6.6 5c2 0 3.6 1.1 5.4 3 1.8-1.9 3.4-3 5.4-3 3.4 0 5.6 3.3 4.1 6.8C19.5 16.4 12 21 12 21z"/></svg>';
+const APP_URL = 'https://maslol7.github.io/brainlab/';
+
+/* ---------- friend (guest) mode: same app, clean slate, no family stuff ---------- */
+function applyGuest() { if (S.guest && S.guest.name) { ME.name = S.guest.name; ME.bd = null; } }
+const _daysToBday = daysToBday; daysToBday = () => ME.bd ? _daysToBday() : 999;
+const _cloudSection = cloudSection; cloudSection = () => S.guest ? '' : _cloudSection();
+const _render = render; render = function () { applyGuest(); return _render.apply(this, arguments); };
+function guestOnboard() {
+  let isFriend = false; try { isFriend = /[?&]friend\b/.test(location.search); } catch (e) { }
+  if (!isFriend || S.guest || isSbx() || Object.keys(S.missions).length || S.xp) return;
+  try { history.replaceState(null, '', location.pathname); } catch (e) { }
+  ME.name = ''; render();
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card" role="dialog" aria-modal="true"><h4>ברוך הבא למעבדת המוח</h4><p>אימון יומי למבחן המחוננים. ההתקדמות שלך נשמרת רק בטלפון שלך.</p><input class="txt" id="gname" maxlength="14" placeholder="איך קוראים לך?" style="width:100%;margin-bottom:12px"><button class="btn btn-primary btn-wide" data-m="ok">יאללה</button></div>`;
+  app.appendChild(m);
+  const inp = m.querySelector('#gname'); setTimeout(() => inp.focus(), 50);
+  const ok = () => { const n = inp.value.trim().replace(/[<>&"]/g, ''); if (!n) { inp.style.borderColor = 'var(--bad)'; return; } S.guest = { name: n }; S.start = todayStr(); save(); m.remove(); render(); };
+  inp.onkeydown = e => { if (e.key === 'Enter') ok(); };
+  m.querySelector('[data-m="ok"]').onclick = ok;
+}
+function friendCard() {
+  return `<section class="card row friend"><span class="fi">${IC.share}</span><div class="grow"><b>שתף עם חבר</b><div class="muted small">החבר מקבל אפליקציה נקייה משלו. ההתקדמות שלך נשארת רק אצלך.</div></div><button class="btn btn-primary" data-act="sharefriend" style="min-height:42px">שתף</button></section>`;
+}
+async function shareFriend() {
+  const url = APP_URL + '?friend=1', text = 'מעבדת המוח: משימה קצרה כל יום לקראת מבחן המחוננים. חידות, סדרות, צורות וקרבות בוסים. נסה:';
+  try { if (navigator.share) { await navigator.share({ title: 'מעבדת המוח', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card" style="max-width:420px"><h4>שתף עם חבר</h4><p class="small ltr" dir="ltr" style="word-break:break-all">${url}</p><div class="stack" style="gap:8px"><a class="btn btn-primary" href="https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}" target="_blank" rel="noopener">שלח בוואטסאפ</a><button class="btn btn-ghost" data-m="copy">העתק קישור</button><button class="btn btn-ghost" data-m="no">סגור</button></div></div>`;
+  app.appendChild(m);
+  m.addEventListener('click', async e => { const b = e.target.closest('[data-m]'); if (e.target === m || (b && b.dataset.m === 'no')) return m.remove(); if (b && b.dataset.m === 'copy') { try { await navigator.clipboard.writeText(url); toast('הקישור הועתק'); } catch (er) { toast('לא הצלחתי להעתיק'); } } });
+}
+
+/* ---------- dad's notes: rare, short, never during a hard moment more than once ---------- */
+const DAD_DEF = ['תזכור, אבא אוהב אותך.', 'אבא גאה בך. לא בגלל הציון, בגלל שאתה מתאמן.', 'גם בימים שקשה, אבא איתך.', 'אבא אוהב אותך. עכשיו לך לשתות מים ולזוז קצת.', 'הכי חשוב שאתה לא מוותר. אבא אוהב אותך.', 'אבא סומך עליך.'];
+const DAD_HARD = ['קשה? זה בסדר. אבא אוהב אותך, וזה לא תלוי בציון.', 'נשימה עמוקה. אבא איתך.', 'גם אלופים מפספסים. אבא אוהב אותך.'];
+const dadList = () => (S.dadMsgs && S.dadMsgs.length) ? S.dadMsgs : S.guest ? null : DAD_DEF;
+function dadNext(list) { if (!list) return ''; S.loveI = ((S.loveI || 0) + 1) % list.length; return list[S.loveI]; }
+const dadHTML = t => t ? `<div class="love">${IC.heart || '♥'}<span>${t}</span></div>` : '';
+function loveLine(c, correct, n) {
+  if (!['daily', 'boss', 'sim'].includes(c.kind)) return '';
+  const lost = c.kind === 'boss' && correct / n < .7, low = correct / n < .5;
+  const every = (doneCount(S) % 4) === 2;
+  return (lost || low || every) ? dadNext(dadList()) : '';
+}
+function loveOnStreak(c, ok, first) {
+  if (deferred(c.kind)) return '';
+  if (ok && first) { c.wrongRun = 0; return ''; }
+  c.wrongRun = (c.wrongRun || 0) + 1;
+  if (c.wrongRun < 3 || c.loveShown) return '';
+  const l = (S.dadMsgs && S.dadMsgs.length) ? S.dadMsgs : S.guest ? null : DAD_HARD;
+  if (!l) return '';
+  c.loveShown = true; return pick(l);
+}
+function dadMsgSection() {
+  const cur = (S.dadMsgs && S.dadMsgs.length ? S.dadMsgs : S.guest ? [] : DAD_DEF).join('\n');
+  return `<section class="card stack" style="gap:8px"><h4 style="font-size:1.15rem">הודעות מאבא</h4><p class="small muted" style="margin:0">מופיעות מדי פעם בסוף משימה, וגם כשיש רצף של טעויות (פעם אחת במשימה). שורה לכל הודעה.</p><textarea class="txt" id="dadmsgs" style="width:100%;height:130px;line-height:1.6">${cur}</textarea><button class="btn btn-primary" data-act="dadsave" style="min-height:44px">שמור</button></section>`;
+}
+
+/* ---------- praise for real improvement ---------- */
+function praiseFor(q, ok, secs, c, r0) {
+  if (!ok || deferred(c.kind)) return '';
+  const nm2 = CATS[q.cat].n, out = [];
+  const r1 = S.rat[q.cat];
+  if (r0 != null && Math.floor(r1) > Math.floor(r0) && Math.floor(r1) >= 2) out.push(`עלית לרמה ${Math.floor(r1)} ב${nm2}!`);
+  S.firstD = S.firstD || (doneCount(S) >= 3 ? Object.fromEntries(Object.keys(CATS).map(k => [k + 3, 1])) : {});
+  if (q.d >= 3 && !S.firstD[q.cat + q.d]) { S.firstD[q.cat + q.d] = 1; out.push(`פעם ראשונה שפתרת ${nm2} ברמה ${q.d}!`); }
+  S.pb = S.pb || {};
+  const key = q.cat + (q.d >= 3 ? 'h' : ''), pb = S.pb[key];
+  if (secs >= 3) {
+    if (!pb) S.pb[key] = { best: secs, n: 1 };
+    else { pb.n++; if (secs < pb.best - 1) { if (pb.n >= 4) out.push(`שיא מהירות ב${nm2}${q.d >= 3 ? ' (רמה גבוהה)' : ''}: ${Math.round(secs)} שניות. השיא הקודם: ${Math.round(pb.best)}.`); pb.best = secs; } }
+  }
+  if (!out.length) { const t = S.times[q.cat]; if (t && t.n >= 8 && secs >= 4 && secs < (t.s / t.n) * .6) out.push(`מהיר בהרבה מהממוצע שלך ב${nm2} (${Math.round(t.s / t.n)} שנ׳).`); }
+  if (!out.length) return '';
+  const lvl = /רמה|פעם ראשונה/.test(out[0]);
+  if (!lvl && c.lastPraise != null && c.i - c.lastPraise < 3) return '';
+  c.lastPraise = c.i; c.praises = (c.praises || 0) + 1;
+  return out[0];
+}
+function improveNotes(c, correct, n) {
+  if (!['daily', 'boss', 'sim'].includes(c.kind) || !n) return [];
+  const rs = c.qs.map((q, i) => c.res[i]).filter(Boolean);
+  const acc = correct / n, sp = rs.length ? rs.reduce((a, r) => a + Math.min(r.secs, 300), 0) / rs.length : 0;
+  const H = S.mh = S.mh || [], out = [];
+  if (H.length >= 3) {
+    const aA = H.reduce((a, h) => a + h.acc, 0) / H.length, aS = H.reduce((a, h) => a + h.sp, 0) / H.length, best = Math.max(...H.map(h => h.acc));
+    if (acc > best && acc >= .8) out.push(`הדיוק הכי גבוה שלך עד היום: ${Math.round(acc * 100)}%.`);
+    else if (acc >= aA + .1) out.push(`דיוק ${Math.round(acc * 100)}%, לעומת ${Math.round(aA * 100)}% בממוצע שלך.`);
+    if (sp && sp <= aS * .85 && acc >= aA - .05) out.push(`מהר יותר: ${Math.round(sp)} שניות לשאלה, לעומת ${Math.round(aS)} בממוצע. בלי לאבד דיוק.`);
+  }
+  if ((c.praises || 0) >= 2) out.push(`${c.praises} שיאים אישיים במשימה אחת.`);
+  if (S.fixedToday === todayStr() && (S.fixedN || 0) >= 2) out.push(`${S.fixedN} שאלות יצאו היום מהמחברת. ככה בונים שליטה.`);
+  H.push({ acc, sp }); if (H.length > 10) H.shift();
+  return out.slice(0, 2);
+}
+const impHTML = L0 => `${(L0.imp || []).length ? `<section class="card imp"><div class="eyebrow">השתפרת</div>${L0.imp.map(t => `<div class="row">${IC.bolt}<span>${t}</span></div>`).join('')}</section>` : ''}${dadHTML(L0.love)}`;
+const _noteMist10 = noteMist;
+noteMist = function (q, ok, c, first) { const before = S.fixed || 0; _noteMist10(q, ok, c, first); if ((S.fixed || 0) > before) { if (S.fixedToday !== todayStr()) { S.fixedToday = todayStr(); S.fixedN = 0; } S.fixedN++; } };
+
+function bindV11() {
+  const on = (a, fn) => { const e = app.querySelector(`[data-act="${a}"]`); if (e) e.onclick = fn; };
+  on('sharefriend', shareFriend);
+  on('dadsave', () => { const v = (document.getElementById('dadmsgs').value || '').split('\n').map(s => s.trim().replace(/[<>]/g, '')).filter(Boolean).slice(0, 30); S.dadMsgs = v; S.loveI = 0; save(); toast('נשמר'); });
+}
+render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
 </body></html>
