@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2B59C3">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>מעבדת המוח של יונתן</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Karantina:wght@400;700&family=Rubik:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column phone workbook on graph paper; sticky top bar, fixed bottom tab bar */
+:root{
+  --paper:#F2F5FB; --grid:rgba(43,89,195,.08); --card:#FFFFFF; --ink:#16233F; --muted:#5A6888; --line:#D3DCEE;
+  --blue:#2B59C3; --on-blue:#FFFFFF; --blue-soft:#E2E9FA; --marker:#FFD84D; --on-marker:#2E2400;
+  --good:#1D8456; --good-soft:#DCF2E6; --bad:#CF3A45; --bad-soft:#FBE2E4; --boss:#6E3BC6; --boss-soft:#EEE6FB;
+  --shadow:0 1px 0 rgba(22,35,63,.06),0 6px 18px -10px rgba(22,35,63,.25);
+  --f-display:'Karantina','Rubik','Arial Hebrew',system-ui,sans-serif;
+  --f-body:'Rubik','Arial Hebrew','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0D1424; --grid:rgba(126,166,255,.06); --card:#161F36; --ink:#E6ECF9; --muted:#97A5C4; --line:#283657;
+  --blue:#82A8FF; --on-blue:#0D1424; --blue-soft:#1C2A4A; --marker:#FFD84D; --on-marker:#2E2400;
+  --good:#4CC38A; --good-soft:#12301F; --bad:#FF6B74; --bad-soft:#3A1A20; --boss:#B892FF; --boss-soft:#271C44;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 8px 20px -12px rgba(0,0,0,.7); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#0D1424; --grid:rgba(126,166,255,.06); --card:#161F36; --ink:#E6ECF9; --muted:#97A5C4; --line:#283657;
+  --blue:#82A8FF; --on-blue:#0D1424; --blue-soft:#1C2A4A; --marker:#FFD84D; --on-marker:#2E2400;
+  --good:#4CC38A; --good-soft:#12301F; --bad:#FF6B74; --bad-soft:#3A1A20; --boss:#B892FF; --boss-soft:#271C44;
+  --shadow:0 1px 0 rgba(0,0,0,.3),0 8px 20px -12px rgba(0,0,0,.7); color-scheme:dark }
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+#app{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px calc(96px + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{margin:0;text-wrap:balance}
+.disp{font-family:var(--f-display);font-weight:700;letter-spacing:.01em;line-height:.95}
+.mark{background:linear-gradient(transparent 58%,var(--marker) 58%, var(--marker) 92%, transparent 92%);color:inherit;padding:0 .08em}
+.muted{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:16px}
+
+/* top */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 4px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand h1{font-family:var(--f-display);font-size:2.3rem;font-weight:700;line-height:.9}
+.brand p{margin:0;font-size:.82rem;color:var(--muted)}
+.logo{width:42px;height:42px;flex:none;color:var(--blue)}
+.rank{font-size:.78rem;font-weight:600;background:var(--blue-soft);color:var(--blue);padding:6px 10px;border-radius:999px;white-space:nowrap}
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.hero{position:relative;overflow:hidden;padding:20px 18px}
+.hero.boss{border-color:var(--boss);background:linear-gradient(160deg,var(--boss-soft),var(--card) 70%)}
+.eyebrow{font-size:.78rem;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+.hero h2{font-family:var(--f-display);font-size:3rem;margin-top:4px}
+.hero p{margin:6px 0 14px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:13px 20px;font-weight:600;min-height:48px;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--blue);color:var(--on-blue)}
+.btn-boss{background:var(--boss);color:var(--on-blue)}
+.btn-ghost{background:var(--blue-soft);color:var(--blue)}
+.btn-wide{width:100%}
+.stats3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{padding:12px 10px;text-align:center}
+.stat .big{font-family:var(--f-display);font-size:2.4rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stat .lbl{font-size:.75rem;color:var(--muted);margin-top:4px}
+.stat svg{width:22px;height:22px;display:block;margin:0 auto 2px}
+.xpbar{height:10px;border-radius:99px;background:var(--blue-soft);overflow:hidden;margin-top:8px}
+.xpbar i{display:block;height:100%;background:var(--blue);border-radius:99px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:6px 2px 8px}
+.sec-h h3{font-family:var(--f-display);font-size:1.9rem}
+
+/* map */
+.week{display:grid;grid-template-columns:52px repeat(7,minmax(0,1fr));gap:6px;align-items:center;margin-bottom:6px}
+.week .wl{font-size:.72rem;color:var(--muted);font-weight:600}
+.node{aspect-ratio:1;max-width:44px;width:100%;justify-self:center;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:600;border:2px solid var(--line);background:var(--card);color:var(--muted);font-variant-numeric:tabular-nums;position:relative}
+.node.done{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.node.done.s1{background:var(--blue-soft);color:var(--blue)}
+.node.open{border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 4px var(--blue-soft);animation:pulse 1.6s ease-in-out infinite}
+.node.boss{border-radius:10px;border-color:var(--boss);color:var(--boss)}
+.node.boss.done{background:var(--boss);color:var(--on-blue)}
+.node.locked{opacity:.55}
+.node .st{position:absolute;bottom:-7px;font-size:.55rem;letter-spacing:-1px;color:var(--marker);text-shadow:0 0 2px rgba(0,0,0,.5)}
+@keyframes pulse{50%{box-shadow:0 0 0 7px var(--blue-soft)}}
+
+/* badges */
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px}
+.badge{text-align:center;font-size:.72rem;line-height:1.25;padding:10px 6px}
+.badge svg{width:46px;height:46px;display:block;margin:0 auto 6px}
+.badge.off{opacity:.38;filter:grayscale(1)}
+.badge b{display:block;font-size:.78rem}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:.85rem;font-weight:500;padding:9px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.chip.hot{border-color:var(--marker);background:var(--marker);color:var(--on-marker)}
+
+/* quiz */
+.qbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:10px;padding:10px 0;background:var(--paper)}
+.icon-btn{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);flex:none}
+.icon-btn svg{width:18px;height:18px}
+.pdots{flex:1;display:flex;gap:4px;min-width:0}
+.pdots i{flex:1;height:7px;border-radius:9px;background:var(--line)}
+.pdots i.ok{background:var(--good)}.pdots i.no{background:var(--bad)}.pdots i.cur{background:var(--blue)}.pdots i.ans{background:var(--muted)}
+.qmeta{display:flex;flex-direction:column;align-items:flex-end;font-size:.78rem;font-variant-numeric:tabular-nums;line-height:1.2;flex:none}
+.qmeta .pts{font-weight:700;color:var(--blue)}
+.qmeta .tm.warn{color:var(--bad);font-weight:700}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.tag{font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--blue-soft);color:var(--blue)}
+.lvl{font-size:.72rem;color:var(--muted);display:flex;gap:3px;align-items:center}
+.lvl i{width:7px;height:7px;border-radius:50%;background:var(--line)}.lvl i.on{background:var(--marker)}
+.combo{font-size:.75rem;font-weight:700;color:var(--on-marker);background:var(--marker);padding:3px 9px;border-radius:999px}
+.qprompt{font-size:1.12rem;font-weight:500;margin:0 0 12px;line-height:1.55}
+.qvis{margin-bottom:14px}
+.qvis:empty{display:none}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opts.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(30%,120px),1fr));gap:9px}
+.opt{display:flex;align-items:center;gap:10px;text-align:start;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:11px 12px;min-height:52px;font-size:1.02rem;transition:border-color .15s,background .15s}
+.opts.grid .opt{flex-direction:column;justify-content:center;padding:8px 6px 6px}
+.opt .lt{flex:none;width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:.78rem;font-weight:700;background:var(--blue-soft);color:var(--blue)}
+.opt .ob{min-width:0;flex:1;display:flex;justify-content:flex-start;align-items:center}
+.opts.grid .opt .ob{justify-content:center;width:100%}
+.opt:not([disabled]):active{border-color:var(--blue)}
+.opt.sel{border-color:var(--blue);background:var(--blue-soft)}
+.opt.ok{border-color:var(--good);background:var(--good-soft)}
+.opt.ok .lt{background:var(--good);color:var(--card)}
+.opt.no{border-color:var(--bad);background:var(--bad-soft)}
+.opt.no .lt{background:var(--bad);color:var(--card)}
+.opt[disabled]{cursor:default}
+.fb{margin-top:14px;border-radius:12px;padding:14px;border:1px solid var(--line)}
+.fb.ok{background:var(--good-soft);border-color:var(--good)}
+.fb.no{background:var(--bad-soft);border-color:var(--bad)}
+.fb h4{margin:0 0 4px;font-size:1.05rem}
+.fb p{margin:0;font-size:.95rem}
+.fb .why{font-size:.75rem;font-weight:700;letter-spacing:.05em;color:var(--muted);display:block;margin-top:8px}
+.hintbox{margin-top:12px;background:var(--marker);color:var(--on-marker);border-radius:12px;padding:12px 14px;font-size:.92rem}
+.qfoot{position:fixed;inset:auto 0 0 0;z-index:6;background:var(--paper);border-top:1px solid var(--line);padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.qfoot .in{max-width:560px;margin:0 auto;display:flex;gap:10px}
+.qfoot .btn{flex:1}
+
+/* visuals */
+.analogy{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;padding:14px 8px;background:var(--card);border:1px dashed var(--line);border-radius:12px}
+.analogy .w{font-weight:600;font-size:1.08rem;padding:4px 10px;border-radius:8px;background:var(--blue-soft)}
+.analogy .w.q{background:var(--marker);color:var(--on-marker);min-width:40px;text-align:center}
+.analogy .sep{font-weight:700;color:var(--muted)}
+.analogy .like{font-size:.85rem;color:var(--muted);padding:0 6px}
+.series{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;direction:rtl}
+.series .cell{min-width:44px;padding:8px 6px;text-align:center;font-weight:700;font-size:1.15rem;background:var(--card);border:2px solid var(--line);border-radius:10px;font-variant-numeric:tabular-nums}
+.series .cell.q{background:var(--marker);border-color:var(--marker);color:var(--on-marker)}
+.series .arr{color:var(--muted);font-size:.8rem}
+.matrix{display:grid;grid-template-columns:repeat(3,1fr);max-width:270px;margin:0 auto;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:var(--card)}
+.mbox{aspect-ratio:1;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink)}
+.mbox.q{background:var(--marker);color:var(--on-marker);font-family:var(--f-display);font-size:2.4rem;font-weight:700}
+.mcell{width:100%;max-width:80px;height:auto;display:block;color:var(--ink)}
+.opts.grid .mcell{max-width:72px}
+.polybig{display:flex;justify-content:center}
+.polybig .poly{width:130px}
+.poly{width:84px;max-width:100%;height:auto;display:block}
+.poly .pc{fill:var(--blue);stroke:var(--card);stroke-width:2}
+.polybig .pc{fill:var(--ink)}
+.netwrap{display:flex;justify-content:center}
+.net{width:100%;height:auto}
+.net .nc{fill:var(--card);stroke:var(--ink);stroke-width:2}
+.net .nc.hl{fill:var(--marker)}
+.net .nt{font-size:24px;fill:var(--ink);font-family:system-ui,sans-serif}
+.net .nt.hl{fill:var(--on-marker)}
+.sym{font-size:1.6rem;line-height:1;font-family:system-ui,sans-serif}
+.eqs{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;background:var(--card);border:1px dashed var(--line);border-radius:12px}
+.eq{font-size:1.25rem;font-weight:600;font-variant-numeric:tabular-nums}
+.clues{margin:0;padding:12px 14px 12px 12px;padding-inline-start:30px;background:var(--card);border:1px dashed var(--line);border-radius:12px;display:flex;flex-direction:column;gap:4px}
+
+/* results */
+.res-hero{text-align:center;padding:26px 16px}
+.stars{display:flex;justify-content:center;gap:8px;margin-bottom:8px}
+.stars svg{width:52px;height:52px}
+.stars .on{color:var(--marker)}.stars .offs{color:var(--line)}
+.stars svg.pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:scale(0)}}
+.res-hero .score{font-family:var(--f-display);font-size:4rem;font-weight:700;line-height:1}
+.res-hero .xp{display:inline-block;margin-top:8px;font-weight:700;color:var(--on-marker);background:var(--marker);padding:4px 12px;border-radius:999px}
+.rev{display:flex;flex-direction:column;gap:10px}
+.rev .item{padding:12px 14px}
+.rev .item .q{font-weight:500;margin-bottom:6px;font-size:.95rem}
+.rev .item .a{font-size:.88rem}
+.rev .item .a .mcell,.rev .item .a .poly{width:48px;display:inline-block;vertical-align:middle}
+.rev .item .e{font-size:.85rem;color:var(--muted);margin-top:6px}
+.newb{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-top:8px;border:2px solid var(--marker)}
+.newb svg{width:40px;height:40px;flex:none}
+
+/* stats */
+.bars{display:flex;flex-direction:column;gap:12px}
+.bar .row{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:4px;gap:8px}
+.bar .row span:last-child{font-variant-numeric:tabular-nums;color:var(--muted)}
+.bar .track{height:12px;border-radius:99px;background:var(--blue-soft);overflow:hidden}
+.bar .track i{display:block;height:100%;border-radius:99px;background:var(--blue)}
+.bar.weak .track i{background:var(--bad)}
+.spark{width:100%;height:auto;display:block}
+.spark .b{fill:var(--blue)}.spark .b.boss{fill:var(--boss)}.spark .gl{stroke:var(--line);stroke-width:1}
+.spark text{fill:var(--muted);font-size:9px;font-family:var(--f-body)}
+.field{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.field input{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+
+/* tips */
+.tip h4{margin:0 0 6px;font-size:1.05rem}
+.tip p{margin:0;font-size:.95rem}
+.tip ol,.tip ul{margin:6px 0 0;padding-inline-start:20px;font-size:.95rem}
+
+/* nav */
+.nav{position:fixed;inset:auto 0 0 0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0 8px;font-size:.74rem;color:var(--muted)}
+.nav button svg{width:24px;height:24px}
+.nav button.on{color:var(--blue);font-weight:600}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:20;background:rgba(10,16,30,.55);display:grid;place-items:center;padding:20px}
+.modal .card{max-width:360px;width:100%}
+.modal h4{margin:0 0 6px;font-size:1.15rem}
+.modal p{margin:0 0 14px;color:var(--muted)}
+.modal .row{display:flex;gap:10px}.modal .row .btn{flex:1}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:380px){.hero h2{font-size:2.5rem}.stat .big{font-size:2rem}.week{grid-template-columns:40px repeat(7,minmax(0,1fr));gap:4px}}
+</style>
+<div id="app" dir="rtl" lang="he"></div>
+<canvas id="fx" hidden></canvas>
+<script>
+/* ================= QUESTION ENGINE ================= */
+let SEEN = {};
+const R = Math.random;
+const ri = (a, b) => a + Math.floor(R() * (b - a + 1));
+const pick = a => a[Math.floor(R() * a.length)];
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function mc(opts) { const idx = shuffle(opts.map((_, i) => i)); return { options: idx.map(i => opts[i]), answer: idx.indexOf(0) }; }
+function numCands(ans, cands, n = 4) {
+  const out = [ans];
+  for (const c of cands) { if (out.length >= n) break; if (Number.isFinite(c) && c >= 0 && !out.some(o => Math.abs(o - c) < 1e-9)) out.push(c); }
+  let t = 0;
+  while (out.length < n && t++ < 200) { const s = Math.max(2, Math.round(Math.abs(ans) * 0.15)); const c = ans + ri(1, s) * (R() < .5 ? -1 : 1); if (c >= 0 && !out.includes(c)) out.push(c); }
+  return out;
+}
+const fmt = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
+const L = s => `<span class="ltr" dir="ltr">${s}</span>`;
+const numQ = (cat, d, prompt, vis, ans, cands, ex, unit = '') => {
+  const m = mc(numCands(ans, cands).map(v => L(fmt(v)) + unit));
+  return { cat, d, prompt, vis, options: m.options, answer: m.answer, ex };
+};
+function pickBank(bank, key, d) {
+  if (!SEEN[key]) SEEN[key] = [];
+  const all = bank.map((it, i) => ({ it, i })).filter(o => o.it.d <= d);
+  let pool = all.filter(o => !SEEN[key].includes(o.i));
+  if (!pool.length) { SEEN[key] = SEEN[key].filter(i => bank[i].d > d); pool = all; }
+  const pref = pool.filter(o => o.it.d === d);
+  const o = (pref.length && R() < .7) ? pick(pref) : pick(pool);
+  SEEN[key].push(o.i);
+  return o.it;
+}
+const PEOPLE = [['יונתן', 'm'], ['נועה', 'f'], ['אורי', 'm'], ['מאיה', 'f'], ['דניאל', 'm'], ['תמר', 'f'], ['איתי', 'm'], ['שירה', 'f'], ['עידו', 'm'], ['רוני', 'f']];
+const g = (p, m, f) => p[1] === 'm' ? m : f;
+
+/* ---------- VERBAL ---------- */
+const AN = [
+ ['ציפור','קן','דבורה',['כוורת','דבש','פרח','עוקץ'],'זה המקום שבו בעל החיים גר: ציפור גרה בקן, דבורה גרה בכוורת.',1],
+ ['רופא','בית חולים','מורה',['בית ספר','תלמיד','ספר','לוח'],'מקום עבודה: רופא עובד בבית חולים, מורה עובד בבית ספר.',1],
+ ['עיפרון','לכתוב','מספריים',['לגזור','נייר','חד','לשרטט'],'כלי והפעולה שעושים איתו.',1],
+ ['גור','כלב','עגל',['פרה','חלב','גדר','סוס'],'צאצא והבוגר: גור גדל להיות כלב, עגל גדל להיות פרה.',1],
+ ['חם','קר','גבוה',['נמוך','ארוך','רחוק','גדול'],'מילים הפוכות.',1],
+ ['כפפה','יד','גרב',['רגל','נעל','כותנה','חורף'],'פריט לבוש והאיבר שהוא מכסה.',1],
+ ['דג','סנפיר','ציפור',['כנף','נוצה','מקור','שמיים'],'האיבר שבעזרתו בעל החיים נע.',1],
+ ['ספר','עמוד','רכבת',['קרון','מסילה','תחנה','נוסע'],'חלק מהשלם: ספר בנוי מעמודים, רכבת בנויה מקרונות.',1],
+ ['רעב','לאכול','עייף',['לישון','לשבת','לרוץ','מיטה'],'מצב והפעולה שפותרת אותו.',1],
+ ['אופה','לחם','נגר',['רהיט','עץ','מסור','מסמר'],'בעל מקצוע והמוצר שהוא מייצר. עץ הוא חומר הגלם, לא המוצר.',1],
+ ['עין','לראות','אוזן',['לשמוע','להריח','רעש','אוזניות'],'איבר והחוש שלו.',1],
+ ['שעון','זמן','מדחום',['טמפרטורה','קדחת','רופא','כספית'],'מכשיר ומה שהוא מודד.',1],
+ ['לילה','ירח','יום',['שמש','אור','בוקר','כוכב'],'הגוף השמימי שבולט בכל חלק של היממה.',1],
+ ['מנעול','מפתח','שאלה',['תשובה','חידה','סימן שאלה','מבחן'],'הדבר שפותר או "פותח" את הדבר הראשון.',1],
+ ['סופר','ספר','צייר',['ציור','מכחול','צבע','מוזיאון'],'יוצר והיצירה שלו. מכחול הוא כלי, לא היצירה.',1],
+ ['ראשון','אחרון','התחלה',['סוף','אמצע','שני','ראש'],'מילים הפוכות.',1],
+ ['ספרייה','ספר','יער',['עץ','ציפור','ירוק','שביל'],'אוסף והפריטים שהוא בנוי מהם.',1],
+ ['צפון','דרום','מזרח',['מערב','שמש','ימין','אסיה'],'כיוונים הפוכים.',1],
+ ['אתמול','מחר','קודם',['אחר כך','היום','עכשיו','עבר'],'הפכים בזמן: עבר מול עתיד.',1],
+ ['ספינה','נמל','מטוס',['שדה תעופה','טייס','שמיים','כנף'],'המקום שבו כלי התחבורה עוגן או נוחת.',1],
+ ['מנצח','תזמורת','מאמן',['קבוצה','מגרש','משרוקית','שחקן'],'מי שמוביל קבוצה והקבוצה שהוא מוביל. שחקן הוא רק אחד מהקבוצה.',2],
+ ['חרק','שש','עכביש',['שמונה','ארבע','עשר','קורים'],'מספר הרגליים: לחרק 6, לעכביש 8.',2],
+ ['זחל','פרפר','ראשן',['צפרדע','דג','ביצה','לטאה'],'שלב צעיר ובעל החיים הבוגר שהוא הופך להיות.',2],
+ ['צמא','מים','רעב',['אוכל','שובע','בטן','צלחת'],'צורך והדבר שממלא אותו.',2],
+ ['מהיר','איטי','רועש',['שקט','חזק','צעקה','אוזן'],'מילים הפוכות.',2],
+ ['טפטוף','מבול','בריזה',['סופה','ענן','קרירות','עלה'],'חלש מול חזק מאוד: טפטוף הוא גשם חלש ומבול גשם עצום; בריזה היא רוח חלשה וסופה רוח עצומה.',2],
+ ['לחישה','צעקה','חיוך',['צחוק','בכי','פה','שמחה'],'אותו דבר בעוצמה חלשה מול עוצמה חזקה.',2],
+ ['שנה','חודש','שעה',['דקה','יום','שעון','זמן'],'יחידה גדולה ויחידה קטנה שבתוכה. יום גדול משעה, לכן הוא לא מתאים.',2],
+ ['פסנתר','קלידים','גיטרה',['מיתרים','תווים','נגן','עץ'],'כלי נגינה והחלק שעליו מנגנים.',2],
+ ['מילה','משפט','לבנה',['קיר','טיט','אדום','בנאי'],'יחידה קטנה ומה שבונים ממנה.',2],
+ ['זהב','מתכת','ורד',['פרח','קוץ','אדום','ריח'],'פריט והקבוצה שהוא שייך אליה.',2],
+ ['מכונית','דלק','מנורה',['חשמל','אור','נורה','מתג'],'מכשיר ומקור האנרגיה שלו. אור הוא התוצאה, לא מקור האנרגיה.',2],
+ ['כבשה','עדר','דבורה',['נחיל','כוורת','דבש','מלכה'],'בעל חיים ושם הקבוצה שלו. כוורת היא בית, לא קבוצה.',2],
+ ['מדען','ניסוי','שופט',['משפט','חוק','פטיש','כלא'],'בעל תפקיד והפעולה העיקרית שהוא מנהל.',2],
+ ['מלך','ממלכה','ראש עיר',['עיר','מדינה','כפר','בחירות'],'מנהיג והשטח שהוא מנהל.',2],
+ ['שומר','לשמור','שופט',['לשפוט','לבחור','להעניש','משפט'],'בעל תפקיד והפועל שממנו נגזר שמו.',2],
+ ['גשם','מטרייה','שמש',['כובע','קיץ','חום','ים'],'תופעה והחפץ שמגן מפניה.',2],
+ ['בורג','מברג','מסמר',['פטיש','קיר','ברזל','חד'],'חפץ והכלי שבעזרתו מכניסים אותו.',2],
+ ['אגודל','יד','בוהן',['רגל','ציפורן','נעל','גרב'],'האצבע הגדולה והאיבר שהיא שייכת אליו.',2],
+ ['זריחה','שקיעה','הגעה',['עזיבה','הליכה','נסיעה','תחנה'],'הפכים: התחלה וסוף, בוא ולכת.',2],
+ ['נדיב','קמצן','אמיץ',['פחדן','גיבור','חזק','אביר'],'תכונות הפוכות.',3],
+ ['אופטימי','פסימי','שקדן',['עצלן','חרוץ','מתמיד','תלמיד'],'תכונות הפוכות. "חרוץ" ו"מתמיד" הם מילים נרדפות לשקדן, לא הפכים.',3],
+ ['שעון חול','זמן','מאזניים',['משקל','צדק','צלחת','מסחר'],'מכשיר מדידה ומה שהוא מודד.',3],
+ ['זמר','מקהלה','חייל',['פלוגה','נשק','מפקד','מלחמה'],'יחיד והקבוצה המאורגנת שהוא חבר בה.',3],
+ ['בצורת','מים','חושך',['אור','לילה','שחור','צל'],'מצב ומה שחסר בו: בבצורת חסרים מים, בחושך חסר אור.',3],
+ ['ענף','עץ','אצבע',['יד','ציפורן','טבעת','גוף'],'חלק שיוצא מהשלם הקרוב אליו. האצבע יוצאת מהיד (הגוף רחוק מדי).',3],
+ ['מיקרוסקופ','קטן','טלסקופ',['רחוק','כוכב','גדול','עדשה'],'מכשיר ומה שהוא עוזר לראות: מיקרוסקופ עוזר לראות דברים קטנים, טלסקופ דברים רחוקים.',3],
+ ['אגם','אוקיינוס','גבעה',['הר','עמק','סלע','מישור'],'קטן מול גדול מאותו סוג.',3],
+ ['סופר','רומן','מלחין',['סימפוניה','פסנתר','תו','מנצח'],'יוצר ויצירה גדולה בתחום שלו. תו הוא רק חלק מיצירה.',3],
+ ['ארכיאולוג','עתיקות','אסטרונום',['כוכבים','חלל','טלסקופ','עתיד'],'חוקר ומה שהוא חוקר. טלסקופ הוא הכלי שלו.',3],
+ ['חיסון','מחלה','קסדה',['פגיעה','ראש','אופניים','פלסטיק'],'אמצעי הגנה וממה הוא מגן.',3],
+ ['לעיתים רחוקות','לעיתים קרובות','מעט',['הרבה','אף פעם','קצת','תמיד'],'הפכים בכמות או בתדירות.',3],
+ ['לב','דם','משאבה',['מים','צינור','חשמל','באר'],'מה שהמכונה מזיזה: הלב שואב דם, משאבה שואבת מים.',3],
+ ['דיו','עט','גרפיט',['עיפרון','מחק','מחדד','נייר'],'החומר שכותב והכלי שבתוכו הוא נמצא.',3],
+ ['שיר','בית','ספר',['פרק','כריכה','ספרייה','סופר'],'יחידה שהיצירה מחולקת אליה: שיר מחולק לבתים, ספר מחולק לפרקים.',3],
+ ['נחש','זוחל','לווייתן',['יונק','דג','ים','ענק'],'בעל חיים והמחלקה שלו. לווייתן חי בים אבל הוא יונק, לא דג!',3],
+ ['עטלף','יונק','פינגווין',['עוף','דג','יונק','קרח'],'בעל חיים והמחלקה שלו. עטלף עף אבל הוא יונק; פינגווין לא עף אבל הוא עוף.',3],
+ ['לנשנש','לזלול','ללכת',['לדהור','לזחול','לשבת','לטייל'],'אותה פעולה בעוצמה חלשה מול עוצמה קיצונית.',3],
+ ['אמבולנס','חולה','כבאית',['שריפה','מים','סולם','כבאי'],'רכב חירום ומה שהוא מטפל בו.',3],
+].map(([a, b, c, o, ex, d]) => ({ a, b, c, o, ex, d }));
+
+const OD = [
+ [['כרוב','תפוח','אגס','בננה','ענבים'],'כרוב הוא ירק, כל השאר פירות.',1],
+ [['מעגל','משולש','ריבוע','מחומש'],'למעגל אין צלעות ישרות.',1],
+ [['פריז','איטליה','ספרד','יוון'],'פריז היא עיר, השאר מדינות.',1],
+ [['אופניים','מכונית','אוטובוס','משאית'],'לאופניים אין מנוע.',1],
+ [['ירח','מאדים','צדק','שבתאי','נוגה'],'הירח אינו כוכב לכת, הוא מקיף את כדור הארץ.',1],
+ [['מצרים','ספרד','צרפת','איטליה','גרמניה'],'מצרים נמצאת באפריקה, השאר באירופה.',1],
+ [['עצוב','שמח','עליז','מאושר','צוהל'],'עצוב הוא רגש שלילי, השאר מילים נרדפות לשמחה.',1],
+ [['מטר','שקל','דולר','יורו','ין'],'מטר הוא יחידת אורך, השאר מטבעות.',1],
+ [['ירוק','לרוץ','לקפוץ','לשחות','לטפס'],'ירוק הוא צבע, השאר פעלים.',1],
+ [['ברזיל','אנגלית','צרפתית','ספרדית','עברית'],'ברזיל היא מדינה, השאר שפות.',1],
+ [['תות','תפוז','לימון','אשכולית','קלמנטינה'],'תות אינו פרי הדר.',1],
+ [['ביצה','חלב','גבינה','יוגורט','חמאה'],'ביצה אינה מוצר חלב.',1],
+ [['אדום','שמאל','ימין','למעלה','למטה'],'אדום הוא צבע, השאר כיוונים.',1],
+ [['לחם','קפה','תה','מיץ','חלב'],'לחם אינו משקה.',1],
+ [['מדבר','אגם','נהר','נחל','מעיין'],'במדבר אין מים, השאר מקורות מים.',1],
+ [['ינואר','ראשון','שני','שבת','חמישי'],'ינואר הוא חודש, השאר ימים בשבוע.',1],
+ [['34','7','14','21','28'],'34 לא מתחלק ב-7. השאר כפולות של 7.',1],
+ [['24','3','9','15','21'],'24 זוגי, השאר אי-זוגיים.',1],
+ [['דולפין','כריש','טונה','סלמון'],'דולפין הוא יונק, השאר דגים.',2],
+ [['21','17','23','29','31'],'21 מתחלק ב-3 וב-7. השאר מספרים ראשוניים.',2],
+ [['חליל','כינור','צ\'לו','נבל','גיטרה'],'חליל הוא כלי נשיפה, השאר כלי מיתר.',2],
+ [['זאב','אריה','נמר','חתול','ברדלס'],'זאב שייך למשפחת הכלביים, השאר חתוליים.',2],
+ [['48','16','25','36','49'],'48 אינו ריבוע של מספר שלם. 16=4², 25=5², 36=6², 49=7².',2],
+ [['יען','נשר','עיט','ינשוף','בז'],'יען לא יכול לעוף.',2],
+ [['משושה','ריבוע','מעוין','מלבן','טרפז'],'למשושה 6 צלעות, השאר מרובעים.',2],
+ [['בטהובן','ניוטון','איינשטיין','גלילאו','דרווין'],'בטהובן היה מלחין, השאר מדענים.',2],
+ [['ליטר','קילוגרם','גרם','טון','מיליגרם'],'ליטר מודד נפח, השאר משקל.',2],
+ [['זכוכית','ברזל','נחושת','זהב','כסף'],'זכוכית אינה מתכת.',2],
+ [['עכביש','נמלה','דבורה','זבוב','חיפושית'],'עכביש אינו חרק (יש לו 8 רגליים).',2],
+ [['32','12','18','24','30'],'32 לא מתחלק ב-6. השאר כפולות של 6.',2],
+ [['אמא','סבא','דוד','אח','בן'],'אמא היא אישה, השאר גברים.',2],
+ [['מספריים','שעון','מדחום','סרגל','מאזניים'],'מספריים אינם מכשיר מדידה.',2],
+ [['הים התיכון','האוקיינוס האטלנטי','האוקיינוס השקט','האוקיינוס ההודי'],'הים התיכון הוא ים, לא אוקיינוס.',2],
+ [['ריבוע','פירמידה','קובייה','כדור','גליל'],'ריבוע הוא צורה שטוחה (דו-ממדית), השאר גופים.',2],
+ [['יוני','ינואר','מרץ','מאי','יולי'],'ביוני 30 ימים, בשאר 31.',3],
+ [['100','8','27','64','125'],'100 אינו חזקה שלישית. 8=2³, 27=3³, 64=4³, 125=5³.',3],
+ [['ירוק','אדום','צהוב','כחול'],'בציור, אדום, צהוב וכחול הם צבעי יסוד. ירוק נוצר מערבוב כחול וצהוב.',3],
+ [['200','121','144','169','196'],'200 אינו ריבוע. 121=11², 144=12², 169=13², 196=14².',3],
+ [['0.25','0.5','½','50%','2/4'],'כל השאר שווים לחצי. 0.25 הוא רבע.',3],
+ [['5/16','1/3','2/6','3/9','4/12'],'כל השאר שווים לשליש. 5/16 לא.',3],
+].map(([o, ex, d]) => ({ o, ex, d }));
+
+function genVerbal(d) {
+  if (R() < .6) {
+    const it = pickBank(AN, 'an', d); const m = mc(it.o);
+    return { cat: 'verbal', d, prompt: 'השלם את האנלוגיה. איזו מילה מתאימה במקום סימן השאלה?',
+      vis: `<div class="analogy"><span class="w">${it.a}</span><span class="sep">:</span><span class="w">${it.b}</span><span class="like">כמו</span><span class="w">${it.c}</span><span class="sep">:</span><span class="w q">?</span></div>`,
+      options: m.options, answer: m.answer, ex: it.ex };
+  }
+  const it = pickBank(OD, 'od', d); const m = mc(it.o.map(w => /^[\d./%½]+$/.test(w) ? L(w) : w));
+  return { cat: 'verbal', d, prompt: 'איזה פריט לא שייך לקבוצה?', vis: '', options: m.options, answer: m.answer, ex: it.ex };
+}
+
+/* ---------- NUMBER SERIES ---------- */
+function genSeries(d) {
+  let t = [], rule = '';
+  const T = d === 1 ? pick(['arith', 'arith', 'geom', 'alt']) : d === 2 ? pick(['incdiff', 'squares', 'interleave', 'muladd', 'alt2', 'decdiff']) : pick(['fib', 'diffgeom', 'cubes', 'interleave2', 'primes', 'alt3', 'muladd']);
+  switch (T) {
+    case 'arith': { const k = pick([3, 4, 6, 7, 8, 9, 11, 12, 15, -3, -4, -6, -7]); const a = ri(2, 40) + (k < 0 ? 60 : 0); for (let i = 0; i < 6; i++) t.push(a + k * i); rule = k > 0 ? `כל מספר גדול מהקודם ב-${k}.` : `כל מספר קטן מהקודם ב-${-k}.`; break; }
+    case 'geom': { const a = ri(1, 5), r = pick([2, 2, 3]); for (let i = 0; i < 6; i++) t.push(a * r ** i); rule = `כל מספר גדול פי ${r} מהקודם.`; break; }
+    case 'alt': { const a = ri(5, 12), b = ri(2, a - 2); let x = ri(1, 20); for (let i = 0; i < 7; i++) { t.push(x); x += i % 2 === 0 ? a : -b; } rule = `לסירוגין: מוסיפים ${a}, ואז מחסירים ${b}.`; break; }
+    case 'incdiff': { let x = ri(1, 20); const s = ri(1, 4), gg = pick([1, 2]); for (let i = 0; i < 6; i++) { t.push(x); x += s + gg * i; } rule = `ההפרשים גדלים: +${s}, +${s + gg}, +${s + 2 * gg}... (בכל פעם ב-${gg} יותר).`; break; }
+    case 'decdiff': { let x = ri(80, 120); const s = ri(9, 13); for (let i = 0; i < 6; i++) { t.push(x); x -= s - i; } rule = `ההפרשים קטנים: −${s}, −${s - 1}, −${s - 2}...`; break; }
+    case 'squares': { const c = pick([0, 0, 1, -1, 2]), st = ri(1, 4); for (let i = 0; i < 6; i++) { const n = st + i; t.push(n * n + c); } rule = c === 0 ? `ריבועים: ${st}×${st}, ${st + 1}×${st + 1}, ${st + 2}×${st + 2}...` : `ריבוע של מספר ${c > 0 ? 'ועוד ' + c : 'פחות ' + (-c)}: ${st}×${st}${c > 0 ? '+' + c : c}, ${st + 1}×${st + 1}${c > 0 ? '+' + c : c}...`; break; }
+    case 'interleave': { let x = ri(1, 10), y = ri(25, 40); const a = ri(2, 5), b = ri(2, 4); for (let i = 0; i < 8; i++) { if (i % 2 === 0) { t.push(x); x += a; } else { t.push(y); y -= b; } } rule = `שתי סדרות שזורות: המספרים במקום 1, 3, 5... עולים ב-${a}, והמספרים במקום 2, 4, 6... יורדים ב-${b}.`; break; }
+    case 'muladd': { const v = pick([[2, 1], [2, -1], [3, -1], [2, 2], [3, 1], [2, -2]]); let x = ri(3, 5); for (let i = 0; i < 6; i++) { t.push(x); x = x * v[0] + v[1]; } rule = `כל מספר = הקודם כפול ${v[0]} ${v[1] > 0 ? 'ועוד ' + v[1] : 'פחות ' + (-v[1])}.`; break; }
+    case 'alt2': { const m = pick([2, 3]), p = ri(1, 6); let x = ri(1, 5); for (let i = 0; i < 7; i++) { t.push(x); x = i % 2 === 0 ? x * m : x + p; } rule = `לסירוגין: כפול ${m}, ואז ועוד ${p}.`; break; }
+    case 'fib': { const a = ri(1, 5), b = ri(a, a + 5); t = [a, b]; while (t.length < 7) t.push(t[t.length - 1] + t[t.length - 2]); rule = 'כל מספר הוא סכום שני המספרים שלפניו.'; break; }
+    case 'diffgeom': { let x = ri(1, 10), dd = ri(1, 3); const r = pick([2, 3]); for (let i = 0; i < 6; i++) { t.push(x); x += dd; dd *= r; } rule = `ההפרשים גדלים פי ${r} בכל פעם.`; break; }
+    case 'cubes': { if (R() < .5) { for (let n = 1; n <= 6; n++) t.push(n * n * n); rule = 'חזקות שלישיות: 1×1×1, 2×2×2, 3×3×3...'; } else { for (let n = 1; n <= 6; n++) t.push(n * (n + 1)); rule = 'מכפלת שני מספרים עוקבים: 1×2, 2×3, 3×4... (וגם: ההפרשים 4, 6, 8...)'; } break; }
+    case 'interleave2': { let x = ri(1, 4), y = ri(40, 60); const b = ri(3, 7); for (let i = 0; i < 8; i++) { if (i % 2 === 0) { t.push(x); x *= 2; } else { t.push(y); y -= b; } } rule = `שתי סדרות שזורות: במקומות האי-זוגיים כל מספר כפול 2, ובמקומות הזוגיים יורדים ב-${b}.`; break; }
+    case 'primes': { const P = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]; const s = ri(0, 4), add = pick([0, 0, 1]); t = P.slice(s, s + 6).map(p => p + add); rule = add ? 'מספרים ראשוניים ועוד 1. (ראשוני = מתחלק רק ב-1 ובעצמו)' : 'מספרים ראשוניים: מתחלקים רק ב-1 ובעצמם.'; break; }
+    case 'alt3': { let x = ri(1, 3), k = 1; for (let i = 0; i < 7; i++) { t.push(x); if (i % 2 === 0) { x += k; k++; } else x *= 2; } rule = 'לסירוגין: מוסיפים (1, אחר כך 2, אחר כך 3...) וכופלים ב-2.'; break; }
+  }
+  const hide = (d === 3 && R() < .35 && !T.startsWith('interleave')) ? ri(2, t.length - 2) : t.length - 1;
+  const ans = t[hide], prev = t[hide - 1], prev2 = t[hide - 2];
+  const cont = prev + (prev - prev2);
+  const vis = '<div class="series">' + t.map((v, i) => `<span class="cell${i === hide ? ' q' : ''}">${i === hide ? '?' : v}</span>`).join('<span class="arr">←</span>') + '</div>';
+  return numQ('series', d, 'איזה מספר מתאים במקום סימן השאלה?', vis, ans, [cont, ans + 1, ans - 1, ans + Math.abs(ans - prev), ans + 2, ans - 2], rule);
+}
+
+/* ---------- MATRICES ---------- */
+const SHAPES = ['circle', 'square', 'triangle', 'diamond', 'star', 'hex'];
+function shapeEl(s, cx, cy, r, fill) {
+  const f = fill === 0 ? 'none' : 'currentColor', fo = fill === 1 ? .32 : 1;
+  const a = `fill="${f}" fill-opacity="${fo}" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"`;
+  const P = pts => `<polygon points="${pts.map(p => p.map(v => v.toFixed(1)).join(',')).join(' ')}" ${a}/>`;
+  if (s === 'circle') return `<circle cx="${cx}" cy="${cy}" r="${r * .9}" ${a}/>`;
+  if (s === 'square') return `<rect x="${cx - r * .8}" y="${cy - r * .8}" width="${r * 1.6}" height="${r * 1.6}" ${a}/>`;
+  if (s === 'triangle') return P([[cx, cy - r], [cx + r * .95, cy + r * .75], [cx - r * .95, cy + r * .75]]);
+  if (s === 'diamond') return P([[cx, cy - r], [cx + r * .85, cy], [cx, cy + r], [cx - r * .85, cy]]);
+  if (s === 'hex') return P([0, 1, 2, 3, 4, 5].map(i => [cx + r * Math.cos(Math.PI / 3 * i), cy + r * Math.sin(Math.PI / 3 * i)]));
+  const pts = []; for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * .45 : r; const an = -Math.PI / 2 + i * Math.PI / 5; pts.push([cx + rr * Math.cos(an), cy + rr * Math.sin(an)]); } return P(pts);
+}
+function cellSVG(c) {
+  const pos = { 1: [[40, 40]], 2: [[23, 40], [57, 40]], 3: [[40, 22], [22, 57], [58, 57]] }[c.count];
+  const r = c.count === 1 ? 21 : c.count === 2 ? 14 : 13;
+  return `<svg viewBox="0 0 80 80" class="mcell" aria-hidden="true">${pos.map(p => shapeEl(c.shape, p[0], p[1], r, c.fill)).join('')}</svg>`;
+}
+const ANAME = { shape: ['הצורה', 'צורה'], count: ['מספר הצורות', 'כמות'], fill: ['המילוי', 'סוג מילוי'] };
+function genMatrix(d) {
+  const attrs = ['shape', 'count', 'fill'];
+  const vals = { shape: shuffle(SHAPES).slice(0, 3), count: shuffle([1, 2, 3]), fill: shuffle([0, 1, 2]) };
+  let rules = {};
+  if (d === 1) { attrs.forEach(a => rules[a] = 'const'); const v = shuffle(attrs); rules[v[0]] = pick(['bycol', 'byrow']); if (R() < .6) rules[v[1]] = pick(['bycol', 'byrow', 'latin']); }
+  else if (d === 2) { const v = shuffle(attrs); rules[v[0]] = 'latin'; rules[v[1]] = pick(['bycol', 'byrow', 'latin2']); rules[v[2]] = pick(['const', 'bycol', 'byrow']); }
+  else { const v = shuffle(attrs); rules[v[0]] = 'latin'; rules[v[1]] = 'latin2'; rules[v[2]] = pick(['latin', 'latin2', 'bycol', 'byrow']); }
+  const idx = (rule, r, c) => rule === 'const' ? 0 : rule === 'bycol' ? c : rule === 'byrow' ? r : rule === 'latin' ? (r + c) % 3 : (r + 2 * c) % 3;
+  const cell = (r, c) => { const o = {}; attrs.forEach(a => o[a] = vals[a][idx(rules[a], r, c)]); return o; };
+  const ans = cell(2, 2);
+  const key = c => c.shape + c.count + c.fill;
+  const cands = [];
+  const varying = attrs.filter(a => rules[a] !== 'const'), fixed = attrs.filter(a => rules[a] === 'const');
+  for (const a of [...shuffle(varying), ...fixed]) for (const v of shuffle(vals[a].concat(a === 'shape' ? [pick(SHAPES.filter(s => !vals.shape.includes(s)))] : []))) { if (v !== ans[a]) cands.push(Object.assign({}, ans, { [a]: v })); }
+  // two-attribute change for variety
+  const a2 = shuffle(varying); if (a2.length >= 2) { const o = Object.assign({}, ans); o[a2[0]] = pick(vals[a2[0]].filter(v => v !== ans[a2[0]])); o[a2[1]] = pick(vals[a2[1]].filter(v => v !== ans[a2[1]])); cands.splice(2, 0, o); }
+  const n = d === 1 ? 4 : 5; const opts = [ans]; const seen = new Set([key(ans)]);
+  for (const c of cands) { if (opts.length >= n) break; if (!seen.has(key(c))) { seen.add(key(c)); opts.push(c); } }
+  let grid = '<div class="matrix">';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) grid += (r === 2 && c === 2) ? '<div class="mbox q">?</div>' : `<div class="mbox">${cellSVG(cell(r, c))}</div>`;
+  grid += '</div>';
+  const rt = a => { const [n1, n2] = ANAME[a]; const r = rules[a]; return r === 'const' ? `${n1} זהה בכל המשבצות.` : r === 'bycol' ? `${n1} קבוע בכל עמודה (כל שורה חוזרת על אותו רצף).` : r === 'byrow' ? `${n1} קבוע בכל שורה.` : `בכל שורה ובכל עמודה, כל ${n2} מופיע בדיוק פעם אחת.`; };
+  const m = mc(opts.map(cellSVG));
+  return { cat: 'matrix', d, prompt: 'איזו משבצת משלימה את הטבלה?', vis: grid, options: m.options, answer: m.answer, ex: attrs.map(rt).join(' ') };
+}
+
+/* ---------- SPATIAL ---------- */
+const normP = cs => { const mx = Math.min(...cs.map(c => c[0])), my = Math.min(...cs.map(c => c[1])); return cs.map(c => [c[0] - mx, c[1] - my]).sort((a, b) => a[0] - b[0] || a[1] - b[1]); };
+const keyP = cs => JSON.stringify(normP(cs));
+const rotP = cs => cs.map(([x, y]) => [-y, x]);
+const mirP = cs => cs.map(([x, y]) => [-x, y]);
+function polySVG(cs, mark) {
+  cs = normP(cs); const u = 18, W = Math.max(...cs.map(c => c[0])) + 1, H = Math.max(...cs.map(c => c[1])) + 1, S = Math.max(W, H) * u + 8;
+  const ox = (S - W * u) / 2, oy = (S - H * u) / 2;
+  return `<svg viewBox="0 0 ${S} ${S}" class="poly" aria-hidden="true">${cs.map(c => `<rect x="${ox + c[0] * u}" y="${oy + c[1] * u}" width="${u}" height="${u}" class="pc"/>`).join('')}</svg>`;
+}
+function genRotation(d) {
+  const n = d === 1 ? 5 : d === 2 ? 6 : 7;
+  for (let tries = 0; tries < 500; tries++) {
+    const cs = [[0, 0]];
+    while (cs.length < n) { const [x, y] = pick(cs), [dx, dy] = pick([[1, 0], [-1, 0], [0, 1], [0, -1]]); if (!cs.some(c => c[0] === x + dx && c[1] === y + dy)) cs.push([x + dx, y + dy]); }
+    const rs = [cs]; for (let i = 1; i < 4; i++) rs.push(rotP(rs[i - 1]));
+    const rk = new Set(rs.map(keyP)); if (rk.size < 4) continue;
+    const ms = rs.map(mirP); if (ms.some(m => rk.has(keyP(m)))) continue;
+    const W = Math.max(...cs.map(c => c[0])) - Math.min(...cs.map(c => c[0])), H = Math.max(...cs.map(c => c[1])) - Math.min(...cs.map(c => c[1]));
+    if (W > 3 || H > 3) continue;
+    const correct = rs[ri(1, 3)];
+    const wrong = shuffle(ms).slice(0, 3);
+    const m = mc([correct, ...wrong].map(c => polySVG(c)));
+    return { cat: 'spatial', d, prompt: 'איזו צורה היא אותה צורה בדיוק, רק מסובבת? (בלי להפוך אותה כמו במראה)', vis: `<div class="polybig">${polySVG(cs)}</div>`, options: m.options, answer: m.answer, ex: 'שלוש הצורות האחרות הן תמונת מראה של המקורית: כדי לקבל אותן צריך "להפוך" את הצורה, לא רק לסובב. טריק: מצא חלק בולט (זנב או פינה) ובדוק לאיזה צד הוא פונה ביחס לשאר הצורה.' };
+  }
+  return genSeries(d);
+}
+const vk = v => v.join(',');
+const neg = v => v.map(x => -x || 0);
+function foldNet(cells) {
+  const st = { [vk(cells[0])]: { n: [0, 0, -1], e: [1, 0, 0], u: [0, 1, 0] } };
+  const q = [cells[0]];
+  const has = (x, y) => cells.some(c => c[0] === x && c[1] === y);
+  while (q.length) {
+    const [x, y] = q.shift(); const s = st[vk([x, y])];
+    const moves = [[1, 0, { n: s.e, e: neg(s.n), u: s.u }], [-1, 0, { n: neg(s.e), e: s.n, u: s.u }], [0, -1, { n: s.u, e: s.e, u: neg(s.n) }], [0, 1, { n: neg(s.u), e: s.e, u: s.n }]];
+    for (const [dx, dy, ns] of moves) { const k = vk([x + dx, y + dy]); if (has(x + dx, y + dy) && !st[k]) { st[k] = ns; q.push([x + dx, y + dy]); } }
+  }
+  return cells.map(c => st[vk(c)].n);
+}
+function genNet(d) {
+  const SY = ['★', '●', '▲', '■', '◆', '✚'];
+  for (let tries = 0; tries < 2000; tries++) {
+    const cs = [[0, 0]];
+    while (cs.length < 6) { const [x, y] = pick(cs), [dx, dy] = pick([[1, 0], [-1, 0], [0, 1], [0, -1]]); if (!cs.some(c => c[0] === x + dx && c[1] === y + dy)) cs.push([x + dx, y + dy]); }
+    const ns = foldNet(cs); if (new Set(ns.map(vk)).size !== 6) continue;
+    const nc = normP(cs); const W = Math.max(...nc.map(c => c[0])) + 1, H = Math.max(...nc.map(c => c[1])) + 1; if (W > 5 || H > 5) continue;
+    const ns2 = foldNet(nc); const sy = shuffle(SY);
+    // hard version: pick a pair that is NOT in a straight line with one gap
+    let ai = ri(0, 5); const opp = i => ns2.findIndex(n => vk(n) === vk(neg(ns2[i])));
+    if (d === 3) { for (let k = 0; k < 6; k++) { const j = opp(k); const a = nc[k], b = nc[j]; if (!(a[0] === b[0] || a[1] === b[1])) { ai = k; break; } } }
+    const bi = opp(ai);
+    const others = [0, 1, 2, 3, 4, 5].filter(i => i !== ai && i !== bi);
+    const m = mc([sy[bi], ...shuffle(others).slice(0, 3).map(i => sy[i])].map(s => `<span class="sym">${s}</span>`));
+    const u = 46, S = { w: W * u + 6, h: H * u + 6 };
+    const svg = `<svg viewBox="0 0 ${S.w} ${S.h}" class="net" style="max-width:${Math.min(320, S.w * 1.15)}px" aria-hidden="true">${nc.map((c, i) => `<rect x="${3 + c[0] * u}" y="${3 + c[1] * u}" width="${u}" height="${u}" class="nc${i === ai ? ' hl' : ''}"/><text x="${3 + c[0] * u + u / 2}" y="${3 + c[1] * u + u / 2 + 8}" text-anchor="middle" class="nt${i === ai ? ' hl' : ''}">${sy[i]}</text>`).join('')}</svg>`;
+    return { cat: 'spatial', d, prompt: `מקפלים את הפריסה לקובייה. איזה סימן יהיה בפאה שמול ${sy[ai]}?`, vis: `<div class="netwrap">${svg}</div>`, options: m.options, answer: m.answer, ex: `${sy[ai]} ו-${sy[bi]} נמצאים בפאות נגדיות. כלל: פאות נגדיות אף פעם לא נוגעות זו בזו בפריסה. בשורה ישרה, משבצת ועוד משבצת אחריה ("דילוג על אחת") הן נגדיות. אם לא בשורה ישרה, נסה לדמיין את הקיפול צעד אחרי צעד מהפאה שמסומנת.` };
+  }
+  return genRotation(d);
+}
+function genSpatial(d) { return R() < .5 ? genRotation(d) : genNet(d); }
+
+/* ---------- CODES & SYMBOLS ---------- */
+const DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+const OPS = [
+  { t: 'a × b + a', f: (a, b) => a * b + a }, { t: '2 × a − b', f: (a, b) => 2 * a - b }, { t: 'a × a − b', f: (a, b) => a * a - b },
+  { t: '(a + b) × 2', f: (a, b) => (a + b) * 2 }, { t: 'a × b − b', f: (a, b) => a * b - b }, { t: 'a + 3 × b', f: (a, b) => a + 3 * b }];
+function genSym(d) {
+  const a = ri(2, 9), b = ri(2, 9), c = ri(2, 9);
+  const eq = s => `<div class="eq">${L(s)}</div>`;
+  if (d === 1) return numQ('code', d, 'כל סמל מייצג מספר. איזה מספר מייצג ●?', `<div class="eqs">${eq(`▲ + ▲ = ${2 * a}`)}${eq(`▲ + ● = ${a + b}`)}</div>`, b, [a, a + b, 2 * a - b, b + 1], `מהשורה הראשונה: ▲ = ${2 * a} ÷ 2 = ${a}. מהשורה השנייה: ● = ${a + b} − ${a} = ${b}.`);
+  if (d === 2) return numQ('code', d, 'כל סמל מייצג מספר. איזה מספר מייצג ■?', `<div class="eqs">${eq(`▲ + ▲ + ▲ = ${3 * a}`)}${eq(`▲ + ● = ${a + b}`)}${eq(`● + ■ = ${b + c}`)}</div>`, c, [b, a, b + c - a, c + 1], `▲ = ${3 * a} ÷ 3 = ${a}. ● = ${a + b} − ${a} = ${b}. ■ = ${b + c} − ${b} = ${c}.`);
+  return numQ('code', d, 'כל סמל מייצג מספר. כמה זה ■ + ▲?', `<div class="eqs">${eq(`▲ × ▲ = ${a * a}`)}${eq(`● − ▲ = ${b}`)}${eq(`● × ■ = ${(a + b) * c}`)}</div>`, c + a, [c, a * c, c + a + 1, a + b + c], `▲ = ${a} (כי ${a}×${a} = ${a * a}). ● = ${b} + ${a} = ${a + b}. ■ = ${(a + b) * c} ÷ ${a + b} = ${c}. לכן ■ + ▲ = ${c} + ${a} = ${c + a}.`);
+}
+function genOp(d) {
+  const op = pick(OPS); const def = `<div class="eqs"><div class="eq">${L(`a ◆ b = ${op.t}`)}</div></div>`;
+  if (d === 1) { const x = ri(2, 9), y = ri(2, 6); const ans = op.f(x, y); return numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`${x} ◆ ${y}`)}?`, def, ans, [op.f(y, x), ans + y, x * y], `מציבים a = ${x} ו-b = ${y} בהגדרה: ${L(op.t.replace(/a/g, x).replace(/b/g, y))} = ${ans}.`); }
+  if (d === 2) { for (let k = 0; k < 100; k++) { const x = ri(1, 6), y = ri(1, 5), z = ri(1, 4); const in1 = op.f(x, y); if (in1 < 0) continue; const ans = op.f(in1, z); if (ans < 0 || ans > 300) continue; return numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`(${x} ◆ ${y}) ◆ ${z}`)}?`, def, ans, [op.f(x, op.f(y, z)), in1, op.f(z, in1)], `קודם הסוגריים: ${L(`${x} ◆ ${y}`)} = ${in1}. אחר כך: ${L(`${in1} ◆ ${z}`)} = ${ans}.`); } }
+  for (let k = 0; k < 100; k++) { const x = ri(2, 9), y = ri(2, 6); const R0 = op.f(x, y); if (R0 < 0) continue; return numQ('code', 3, `הפעולה ◆ מוגדרת כך. אם ${L(`x ◆ ${y} = ${R0}`)}, מה x?`, def, x, [x + 1, x - 1, R0 - y, y], `מציבים x = ${x}: ${L(op.t.replace(/a/g, x).replace(/b/g, y))} = ${R0} ✓. טיפ: כשיש תשובות לבחירה, לפעמים הכי מהיר להציב אותן ולבדוק.`); }
+  return genSym(d);
+}
+function genCal(d) {
+  const s = ri(0, 6);
+  if (d === 3 && R() < .5) { const D = ri(15, 31); const ans = (s + D - 1) % 7; const m = mc([ans, (ans + 1) % 7, (ans + 6) % 7, (ans + 2) % 7].map(i => DAYS[i])); return { cat: 'code', d, prompt: `ה-1 בחודש יצא ביום ${DAYS[s]}. באיזה יום בשבוע יצא ה-${D} באותו חודש?`, vis: '', options: m.options, answer: m.answer, ex: `מה-1 עד ה-${D} עוברים ${D - 1} ימים. ${D - 1} = 7×${Math.floor((D - 1) / 7)} + ${(D - 1) % 7}. שבועות שלמים מחזירים לאותו יום, אז מתקדמים רק ${(D - 1) % 7} ימים מיום ${DAYS[s]}: יום ${DAYS[ans]}.` }; }
+  const N = d === 1 ? ri(9, 30) : ri(40, 150); const ans = (s + N) % 7;
+  const m = mc([ans, (ans + 1) % 7, (ans + 6) % 7, (ans + 2) % 7].map(i => DAYS[i]));
+  return { cat: 'code', d, prompt: `היום יום ${DAYS[s]}. איזה יום יהיה בעוד ${N} ימים?`, vis: '', options: m.options, answer: m.answer, ex: `${N} = 7×${Math.floor(N / 7)} + ${N % 7}. כל 7 ימים חוזרים לאותו יום, אז רק השארית ${N % 7} חשובה: מיום ${DAYS[s]} מתקדמים ${N % 7} ימים ומגיעים ליום ${DAYS[ans]}.` };
+}
+function genClock(d) {
+  const h = ri(1, 11), m = pick([10, 20, 30, 40, 50]);
+  let a = Math.abs(30 * h - 5.5 * m); a = Math.min(a, 360 - a);
+  let naive = Math.abs(30 * h - 6 * m); naive = Math.min(naive, 360 - naive);
+  return numQ('code', d, `מה הזווית הקטנה בין מחוג השעות למחוג הדקות בשעה ${L(`${h}:${String(m).padStart(2, '0')}`)}?`, '', a, [naive, a + 15, a + 30, Math.abs(a - 30)], `מחוג הדקות: ${m}×6° = ${6 * m}°. מחוג השעות זז 30° בכל שעה ועוד חצי מעלה בכל דקה: ${h}×30 + ${m}×0.5 = ${30 * h + m / 2}°. ההפרש: ${Math.abs(30 * h + m / 2 - 6 * m)}°${Math.abs(30 * h + m / 2 - 6 * m) > 180 ? `, והזווית הקטנה היא 360 פחות זה = ${a}°` : ''}. המלכודת: לשכוח שגם מחוג השעות זז!`, '°');
+}
+function genCode(d) {
+  const T = d === 1 ? pick(['sym', 'op', 'cal']) : d === 2 ? pick(['sym', 'op', 'cal', 'clock']) : pick(['sym', 'op', 'cal', 'clock']);
+  return T === 'sym' ? genSym(d) : T === 'op' ? genOp(d) : T === 'cal' ? genCal(d) : genClock(d);
+}
+
+/* ---------- MATH WORD PROBLEMS ---------- */
+const FR = { '1/2': 'חצי', '1/3': 'שליש', '1/4': 'רבע', '2/5': 'שתי חמישיות' };
+const TM = (m) => { const H = 8 + Math.floor(m / 60), M = m % 60; return L(`${H}:${String(M).padStart(2, '0')}`); };
+const MT = {
+  consec(d) { if (d === 1) { const x = ri(10, 60); return numQ('math', d, `סכום שלושה מספרים שלמים עוקבים הוא ${3 * x + 3}. מהו הגדול מביניהם?`, '', x + 2, [x + 1, x, x + 3], `בשלושה מספרים עוקבים, האמצעי הוא הממוצע: ${3 * x + 3} ÷ 3 = ${x + 1}. לכן הגדול הוא ${x + 2}.`); }
+    const x = ri(5, 30) * 2; return numQ('math', d, `סכום חמישה מספרים זוגיים עוקבים הוא ${5 * x + 20}. מהו הקטן מביניהם?`, '', x, [x + 4, x + 2, x - 2], `האמצעי הוא הממוצע: ${5 * x + 20} ÷ 5 = ${x + 4}. הקטן נמצא שני צעדים (של 2) לפניו: ${x + 4} − 4 = ${x}.`); },
+  ratio(d) { const [a, b] = pick([[2, 3], [3, 4], [3, 5], [4, 5], [5, 7], [1, 2]]), k = ri(3, 6), T = (a + b) * k; return numQ('math', d, `בכיתה ${T} תלמידים. על כל ${a} בנים יש בכיתה ${b} בנות. כמה בנות בכיתה?`, '', b * k, [a * k, T / 2, b * k + a], `כל "קבוצה" של ${a} בנים ו-${b} בנות מכילה ${a + b} ילדים. ${T} ÷ ${a + b} = ${k} קבוצות. בנות: ${k} × ${b} = ${b * k}.`); },
+  legs(d) { const r = ri(3, 15), c = ri(3, 15), H = r + c, Lg = 4 * r + 2 * c; return numQ('math', d, `בחצר יש תרנגולות וארנבים. סופרים ${H} ראשים ו-${Lg} רגליים. כמה ארנבים יש?`, '', r, [c, Math.round(H / 2), Math.round(Lg / 4)], `אם כולם היו תרנגולות היו ${H}×2 = ${2 * H} רגליים. יש ${Lg - 2 * H} רגליים "עודפות", וכל ארנב מוסיף 2 רגליים. ${Lg - 2 * H} ÷ 2 = ${r} ארנבים.`); },
+  average(d) { for (;;) { const n = ri(3, 5), A = ri(72, 88), B = A + ri(2, 4), need = B * (n + 1) - n * A; if (need <= 100) { const p = pick(PEOPLE); return numQ('math', d, `הממוצע של ${p[0]} ב-${n} מבחנים הוא ${A}. איזה ציון ${g(p, 'הוא צריך', 'היא צריכה')} לקבל במבחן הבא כדי שהממוצע יעלה ל-${B}?`, '', need, [B, B + (B - A), 100], `סכום הציונים עכשיו: ${n}×${A} = ${n * A}. כדי שהממוצע של ${n + 1} מבחנים יהיה ${B} צריך סכום ${n + 1}×${B} = ${B * (n + 1)}. חסר: ${B * (n + 1)} − ${n * A} = ${need}.`); } } },
+  handshake(d) { const n = ri(6, 12); const ans = n * (n - 1) / 2; return numQ('math', d, `בטורניר שחמט משתתפים ${n} שחקנים. כל שחקן משחק נגד כל שחקן אחר פעם אחת בדיוק. כמה משחקים יהיו בסך הכל?`, '', ans, [n * (n - 1), n * n / 2 | 0, n * (n + 1) / 2], `כל שחקן משחק נגד ${n - 1} אחרים: ${n}×${n - 1} = ${n * (n - 1)}. אבל כך כל משחק נספר פעמיים (פעם לכל שחקן), לכן מחלקים ב-2: ${ans}.`); },
+  ages(d) { const p = pick(PEOPLE); const [m1, m2] = pick([[4, 3], [3, 2], [5, 3]]); const k = m1 === 4 ? ri(3, 7) : ri(6, 12); const x = k * (m2 - 1) / (m1 - m2);
+    return numQ('math', d, `היום אבא של ${p[0]} מבוגר ${g(p, 'ממנו', 'ממנה')} פי ${m1}. בעוד ${k} שנים, אבא יהיה מבוגר ${g(p, 'ממנו', 'ממנה')} פי ${m2}. ${g(p, 'בן', 'בת')} כמה ${p[0]} היום?`, '', x, [k, x + k, 2 * x, m1 * x], `נבדוק: היום ${p[0]} ${g(p, 'בן', 'בת')} ${x} ואבא ${m1 * x}. בעוד ${k} שנים: ${x + k} ו-${m1 * x + k}, ובאמת ${m1 * x + k} = ${m2}×${x + k}. בפתרון: ${m1}x + ${k} = ${m2}(x + ${k}).`); },
+  trains(d) { const t = ri(2, 5), v1 = ri(4, 12) * 10, v2 = ri(4, 12) * 10, D = t * (v1 + v2); return numQ('math', d, `שתי רכבות יוצאות באותו רגע משתי ערים שהמרחק ביניהן ${D} ק"מ, ונוסעות זו לקראת זו. מהירות אחת ${v1} קמ"ש ומהירות השנייה ${v2} קמ"ש. אחרי כמה שעות ייפגשו?`, '', t, [t + 1, 2 * t, t - 1], `בכל שעה הרכבות מתקרבות ב-${v1} + ${v2} = ${v1 + v2} ק"מ. ${D} ÷ ${v1 + v2} = ${t} שעות.`, ' שעות'); },
+  chase(d) { for (;;) { const t = ri(1, 6), rel = ri(1, 4) * 10, h = ri(1, 3), head = t * rel; if (head % h) continue; const v1 = head / h; if (v1 < 30 || v1 > 90) continue; const v2 = v1 + rel;
+    return numQ('math', d, `מכונית א' יוצאת לדרך במהירות ${v1} קמ"ש. כעבור ${h} ${h === 1 ? 'שעה' : 'שעות'} יוצאת אחריה מכונית ב', באותה דרך, במהירות ${v2} קמ"ש. כמה שעות אחרי שיצאה תשיג מכונית ב' את מכונית א'?`, '', t, [t + h, t + 1, Math.max(1, t - 1)], `כשמכונית ב' יוצאת, מכונית א' כבר רחוקה ${v1}×${h} = ${head} ק"מ. בכל שעה ב' מצמצמת ${v2} − ${v1} = ${rel} ק"מ. ${head} ÷ ${rel} = ${t}.`, ' שעות'); } },
+  work(d) { const [a, b, ans] = pick([[3, 6, 2], [4, 12, 3], [6, 12, 4], [10, 15, 6], [12, 24, 8], [20, 30, 12], [6, 3, 2], [12, 4, 3], [15, 10, 6]]); return numQ('math', d, `ברז א' ממלא בריכה ב-${a} שעות, וברז ב' ממלא אותה ב-${b} שעות. אם פותחים את שניהם יחד, תוך כמה שעות תתמלא הבריכה?`, '', ans, [(a + b) / 2, Math.min(a, b), a + b], `בשעה ברז א' ממלא 1/${a} מהבריכה וברז ב' 1/${b}. יחד: 1/${a} + 1/${b} = 1/${ans} בשעה, לכן ${ans} שעות. בדיקה מהירה: התשובה חייבת להיות קטנה מהברז המהיר לבד (${Math.min(a, b)}).`, ' שעות'); },
+  percent(d) { for (;;) { const P = pick([100, 200, 400, 500, 800]), a = pick([10, 20, 25, 50]), b = pick([10, 20, 25, 50]); const ans = P * (100 + a) * (100 - b) / 10000; if (!Number.isInteger(ans) || !Number.isInteger(P * (100 + a) / 100) || ans === P) continue;
+    return numQ('math', d, `מחיר של משחק היה ${P} ₪. המחיר עלה ב-${a}%, ואחר כך ירד ב-${b}%. מה המחיר עכשיו?`, '', ans, [P + P * (a - b) / 100, P, P * (100 + a) / 100], `אחרי העלייה: ${P} + ${a}% = ${P * (100 + a) / 100}. הירידה של ${b}% מחושבת מהמחיר החדש (לא מ-${P}!): ${P * (100 + a) / 100} − ${b}% = ${ans}.`, ' ₪'); } },
+  fraction(d) { const [f1, f2, nu, de, base] = pick([['1/3', '1/4', 1, 2, 12], ['1/2', '1/3', 1, 3, 6], ['1/4', '1/3', 1, 2, 12], ['2/5', '1/2', 3, 10, 10], ['1/3', '1/2', 1, 3, 6]]); const O = base * ri(3, 12), X = O * nu / de; const p = pick(PEOPLE);
+    return numQ('math', d, `${p[0]} ${g(p, 'הוציא', 'הוציאה')} ${FR[f1]} מהכסף ${g(p, 'שלו', 'שלה')} על ספר, ואחר כך ${FR[f2]} ממה שנשאר על משחק. נשארו ${g(p, 'לו', 'לה')} ${X} ₪. כמה כסף היה ${g(p, 'לו', 'לה')} בהתחלה?`, '', O, [2 * X, X * 3, O / 2, O + X], `נשאר אחרי הספר: ${f1 === '1/3' ? 'שני שליש' : f1 === '1/2' ? 'חצי' : f1 === '1/4' ? 'שלושה רבעים' : 'שלוש חמישיות'} מהכסף. אחרי המשחק נשאר ${nu}/${de} מהסכום ההתחלתי, וזה ${X} ₪. לכן ההתחלה: ${X} ÷ ${nu} × ${de} = ${O}. כדאי לבדוק מהסוף להתחלה.`, ' ₪'); },
+  buses(d) { const [a, b, l] = pick([[12, 18, 36], [15, 20, 60], [10, 25, 50], [12, 16, 48], [20, 30, 60], [6, 15, 30], [18, 24, 72]]); const opts = [l, a * b, a + b, Math.max(a, b) * 2].filter((v, i, s) => s.indexOf(v) === i && v < 600); while (opts.length < 4) opts.push(l + 10 * opts.length);
+    const m = mc(opts.map(TM)); return { cat: 'math', d, prompt: `קו 5 יוצא מהתחנה כל ${a} דקות, וקו 9 יוצא כל ${b} דקות. בשעה ${L('8:00')} יצאו שניהם יחד. באיזו שעה ייצאו שוב יחד לראשונה?`, vis: '', options: m.options, answer: m.answer, ex: `צריך את המספר הקטן ביותר שמתחלק גם ב-${a} וגם ב-${b} (כפולה משותפת קטנה ביותר): ${l} דקות. ${L('8:00')} + ${l} דקות = ${TM(l)}.` }; },
+  pages(d) { const N = ri(60, 250); const D = N < 100 ? 9 + 2 * (N - 9) : 189 + 3 * (N - 99); return numQ('math', d, `כדי למספר את כל העמודים בספר (מעמוד 1) השתמשו ב-${D} ספרות בסך הכל. כמה עמודים יש בספר?`, '', N, [Math.round(D / 3), Math.round(D / 2), N + 9], `עמודים 1-9: 9 ספרות. עמודים 10-99: 90×2 = 180 ספרות. ${N >= 100 ? `עד עמוד 99: 189 ספרות. נשארו ${D - 189} ספרות, כל עמוד תלת-ספרתי לוקח 3: ${(D - 189) / 3} עמודים. 99 + ${(D - 189) / 3} = ${N}.` : `נשארו ${D - 9} ספרות לעמודים דו-ספרתיים: ${(D - 9) / 2} עמודים. 9 + ${(D - 9) / 2} = ${N}.`}`); },
+  workers(d) { for (;;) { const w = pick([4, 6, 8, 10, 12]), t = ri(3, 12), w2 = pick([2, 3, 4, 5, 6, 8, 15, 16, 20, 24]); if (w2 === w || (w * t) % w2) continue; const ans = w * t / w2; if (ans > 60) continue;
+    return numQ('math', d, `${w} פועלים בונים קיר ב-${t} ימים. בכמה ימים יבנו את אותו קיר ${w2} פועלים שעובדים באותו קצב?`, '', ans, [t * w2 / w, t + (w - w2), t], `כמות העבודה היא ${w}×${t} = ${w * t} "ימי עבודה של פועל". עם ${w2} פועלים: ${w * t} ÷ ${w2} = ${ans} ימים. יותר פועלים = פחות ימים (יחס הפוך).`, ' ימים'); } },
+};
+const MPOOL = { 1: ['consec', 'ratio', 'legs', 'average', 'handshake'], 2: ['handshake', 'ages', 'trains', 'work', 'percent', 'fraction', 'buses', 'consec', 'legs'], 3: ['chase', 'pages', 'workers', 'ages', 'fraction', 'percent', 'work', 'buses'] };
+function genMath(d) { return MT[pick(MPOOL[d])](d); }
+
+/* ---------- LOGIC ---------- */
+const LG = [
+ ['כל החתולים אוהבים חלב. מיצי אוהב חלב. מה אפשר להסיק בוודאות?',['שום דבר: אי אפשר לדעת אם מיצי חתול','מיצי הוא חתול','מיצי הוא לא חתול','כל מי שאוהב חלב הוא חתול'],'"כל החתולים אוהבים חלב" לא אומר שרק חתולים אוהבים חלב. גם כלב יכול לאהוב חלב.',1],
+ ['במגירה 10 גרביים שחורות ו-10 לבנות, והחדר חשוך. כמה גרביים צריך להוציא כדי להיות בטוח שיש זוג באותו צבע?',['3','2','11','20'],'במקרה הגרוע שתי הראשונות בצבעים שונים. השלישית חייבת להתאים לאחת מהן.',1],
+ ['לאבא של דנה יש 5 בנות: ננה, נני, נינו ונונו. מה שם הבת החמישית?',['דנה','נונה','ננו','אי אפשר לדעת'],'כתוב "לאבא של דנה", אז דנה היא אחת הבנות. קרא כל מילה!',1],
+ ['בתחרות ריצה עקפת את הרץ שהיה במקום השני. באיזה מקום אתה עכשיו?',['שני','ראשון','שלישי','אי אפשר לדעת'],'תפסת את המקום שלו, השני. הראשון עדיין לפניך.',1],
+ ['אורי, מאיה ותמר אוהבים כל אחד פרי אחר: תפוח, בננה או ענבים. אורי לא אוהב בננה ולא ענבים. מאיה לא אוהבת ענבים. מה אוהבת תמר?',['ענבים','בננה','תפוח','אי אפשר לדעת'],'אורי אוהב תפוח (נשאר לו רק זה). מאיה לא ענבים, ותפוח תפוס, אז בננה. לתמר נשארו ענבים.',1],
+ ['לכל אחת משלוש אחיות יש אח אחד. כמה ילדים במשפחה?',['4','6','3','5'],'לכולן אותו אח! 3 בנות ובן אחד.',1],
+ ['יונתן עומד בתור. הוא השביעי מההתחלה והשניים-עשר מהסוף. כמה אנשים בתור?',['18','19','17','20'],'6 לפניו, 11 אחריו, והוא עצמו: 6 + 11 + 1 = 18.',1],
+ ['רכבת יוצאת כל 15 דקות, החל מ-6:00. יונתן מגיע לתחנה ב-7:38. מתי הרכבת הבאה?',['7:45','7:40','7:50','8:00'],'הרכבות יוצאות ב-7:00, 7:15, 7:30, 7:45... הבאה אחרי 7:38 היא 7:45.',1],
+ ['סבתא מבשלת 3 ביצים בסיר אחד ב-12 דקות. כמה זמן ייקח לה לבשל 6 ביצים באותו סיר, יחד?',['12 דקות','24 דקות','6 דקות','18 דקות'],'הביצים מתבשלות במקביל. יותר ביצים בסיר לא מאריך את הזמן.',1],
+ ['כל הזרגים הם פלימים. חלק מהפלימים כחולים. האם בהכרח חלק מהזרגים כחולים?',['לא בהכרח','כן, בהכרח','אף זרג אינו כחול','כל הזרגים כחולים'],'הפלימים הכחולים יכולים להיות דווקא אלה שאינם זרגים. צייר שני עיגולים וראה.',2],
+ ['במגירה 10 גרביים שחורות ו-10 לבנות, בחושך. כמה צריך להוציא כדי להיות בטוח שיש זוג שחור?',['12','3','11','10'],'במקרה הגרוע מוציאים קודם את כל 10 הלבנות. אחר כך צריך עוד 2 שחורות: 12.',2],
+ ['אם היום יום שלישי, איזה יום היה "שלשום" של "מחרתיים"?',['שלישי','רביעי','ראשון','חמישי'],'מחרתיים = יומיים קדימה. שלשום = יומיים אחורה. חזרנו להיום.',2],
+ ['בכיתה 30 תלמידים. 18 אוהבים כדורגל, 15 אוהבים כדורסל, ו-5 לא אוהבים אף אחד מהם. כמה אוהבים את שניהם?',['8','3','13','10'],'25 תלמידים אוהבים לפחות אחד. 18 + 15 = 33, כלומר 8 נספרו פעמיים: הם אוהבים את שניהם.',2],
+ ['שעון מאחר 5 דקות בכל שעה. כיוונו אותו נכון בשעה 12:00. מה הוא יראה כשהשעה האמיתית היא 18:00?',['17:30','17:55','18:30','17:00'],'עברו 6 שעות. 6×5 = 30 דקות איחור.',2],
+ ['חבל באורך 12 מטר נחתך לחתיכות של 2 מטר. כל חיתוך לוקח דקה. כמה דקות זה ייקח?',['5','6','12','4'],'יוצאות 6 חתיכות, אבל צריך רק 5 חיתוכים (החתיכה האחרונה כבר מוכנה).',2],
+ ['גדר ישרה באורך 20 מטר. מציבים עמוד כל 4 מטר, כולל בשני הקצוות. כמה עמודים?',['6','5','4','7'],'20 ÷ 4 = 5 רווחים, ויש עמוד אחד יותר מרווחים: 6.',2],
+ ['5 מכונות מייצרות 5 צעצועים ב-5 דקות. כמה זמן ייקח ל-100 מכונות לייצר 100 צעצועים?',['5 דקות','100 דקות','20 דקות','1 דקה'],'כל מכונה מייצרת צעצוע ב-5 דקות. 100 מכונות עובדות במקביל ומייצרות 100 צעצועים באותן 5 דקות.',2],
+ ['שושן מים מכפיל את גודלו כל יום. ביום ה-30 הוא מכסה את כל האגם. באיזה יום הוא כיסה חצי מהאגם?',['29','15','20','28'],'אם מכפילים כל יום, יום לפני שהאגם מלא הוא היה בדיוק חצי.',2],
+ ['מחבט וכדור עולים יחד 110 ₪. המחבט יקר מהכדור ב-100 ₪. כמה עולה הכדור?',['5 ₪','10 ₪','15 ₪','1 ₪'],'אם הכדור 10, המחבט 110 והיחד 120. הכדור x, המחבט x+100: 2x + 100 = 110, x = 5.',2],
+ ['אם יורד גשם, יונתן לוקח מטרייה. היום יונתן לא לקח מטרייה. מה נכון בוודאות?',['היום לא ירד גשם','היום ירד גשם','יונתן שכח את המטרייה','אי אפשר לדעת כלום'],'אם היה גשם, הוא היה לוקח מטרייה. הוא לא לקח, לכן לא היה גשם.',2],
+ ['דלי מלא מים שוקל 10 ק"ג. כשהוא חצי מלא הוא שוקל 6 ק"ג. כמה שוקל הדלי הריק?',['2 ק"ג','4 ק"ג','5 ק"ג','3 ק"ג'],'חצי מהמים שוקל 10 − 6 = 4 ק"ג, אז כל המים 8 ק"ג. הדלי: 10 − 8 = 2.',2],
+ ['אם כל הפלורבים הם גלונים, ואף גלון אינו טרומי, מה נכון?',['אף פלורב אינו טרומי','חלק מהפלורבים טרומיים','כל הטרומיים פלורבים','אי אפשר לדעת'],'הפלורבים נמצאים בתוך הגלונים, והגלונים לגמרי מחוץ לטרומיים.',2],
+ ['5 בתים בשורה, כל אחד בצבע אחר. הירוק באמצע. הצהוב בקצה הימני. הלבן צמוד לצהוב. האדום צמוד לכחול, משמאלו. איזה בית בקצה השמאלי?',['אדום','כחול','לבן','ירוק'],'מימין: צהוב (5), לבן (4), ירוק (3). נשארו מקומות 1 ו-2 לאדום ולכחול, והאדום משמאל לכחול: אדום בקצה השמאלי.',2],
+ ['שני אבות ושני בנים הלכו לדוג. כל אחד דג דג אחד, ובסך הכל דגו 3 דגים. איך זה ייתכן?',['הם סבא, אבא ונכד','אחד לא דג','דג אחד ברח','זה לא ייתכן'],'האבא הוא גם אב (של הנכד) וגם בן (של הסבא). שלושה אנשים בלבד.',2],
+ ['מהו המספר הקטן ביותר שמתחלק ב-2, 3, 4, 5 וגם ב-6?',['60','120','30','720'],'מספיק לבדוק 4, 3 ו-5 (כי 2 ו-6 כבר נכללים): 4×3×5 = 60.',2],
+ ['באי יש אבירים שתמיד דוברים אמת ונוכלים שתמיד משקרים. א\' אומר: "שנינו נוכלים". מי הם א\' וב\'?',['א\' נוכל, ב\' אביר','שניהם נוכלים','א\' אביר, ב\' נוכל','שניהם אבירים'],'אביר לא יכול לומר "אני נוכל", אז א\' נוכל והמשפט שלו שקר. לכן לא נכון ששניהם נוכלים: ב\' אביר.',3],
+ ['אם יורד גשם, יונתן לוקח מטרייה. היום יונתן לקח מטרייה. מה נכון בוודאות?',['אי אפשר לדעת אם ירד גשם','ירד גשם','לא ירד גשם','יונתן תמיד לוקח מטרייה'],'יונתן יכול לקחת מטרייה גם בלי גשם (למשל נגד שמש). הכלל עובד רק בכיוון אחד.',3],
+ ['אחד משלושה ילדים שבר חלון. אבי: "דני שבר". דני: "לא אני". גיל: "לא אני". רק אחד מהם דובר אמת. מי שבר?',['גיל','דני','אבי','אי אפשר לדעת'],'נבדוק כל אפשרות. אם דני שבר: אבי וגיל צודקים (שניים). אם אבי שבר: דני וגיל צודקים (שניים). אם גיל שבר: רק דני צודק. ✓',3],
+ ['כמה פעמים מופיעה הספרה 7 כשכותבים את כל המספרים מ-1 עד 100?',['20','10','11','19'],'בספרת האחדות: 7, 17, ... 97 = 10 פעמים. בספרת העשרות: 70-79 = 10 פעמים. ב-77 היא נספרה פעמיים, וזה נכון: יש בו שתי ספרות 7. סה"כ 20.',3],
+ ['שלוש קופסאות עם תוויות: "תפוחים", "תפוזים", "מעורב". כל התוויות שגויות. מאיזו קופסה מספיק להוציא פרי אחד כדי לדעת מה יש בכל הקופסאות?',['"מעורב"','"תפוחים"','"תפוזים"','חייבים לפתוח שתיים'],'הקופסה "מעורב" לא מעורבת, אז יש בה רק סוג אחד. אם יצא תפוח, זו קופסת התפוחים. הקופסה "תפוזים" לא יכולה להיות תפוזים, אז היא המעורבת, ו"תפוחים" היא התפוזים.',3],
+ ['יש 9 כדורים זהים במראה, ואחד מהם כבד יותר. במאזני כפות, מה מספר השקילות הקטן ביותר שמבטיח למצוא את הכבד?',['2','3','4','1'],'מחלקים ל-3 קבוצות של 3. שוקלים שתיים: הכבדה מגלה איזו קבוצה (או שהשלישית). אחר כך שוקלים 2 מתוך ה-3 באותה דרך.',3],
+ ['בשנה רגילה (365 ימים) ה-1 בינואר יצא ביום ראשון. באיזה יום יצא ה-1 בינואר בשנה שאחריה?',['שני','ראשון','שלישי','שבת'],'365 = 52 שבועות + יום אחד. לכן מתקדמים יום אחד: שני.',3],
+ ['רינה אומרת: "שלשום הייתי בת 10, ובשנה הבאה אהיה בת 13". באיזה תאריך היא אומרת את זה?',['1 בינואר','31 בדצמבר','1 בדצמבר','זה בלתי אפשרי'],'יום ההולדת שלה ב-31 בדצמבר. שלשום (30/12) הייתה בת 10, אתמול הפכה ל-11, בסוף השנה הזו תהיה 12, ובשנה הבאה 13.',3],
+].map(([q, o, ex, d]) => ({ q, o, ex, d }));
+const ATTR = [
+  { more: { m: 'גבוה', f: 'גבוהה' }, less: { m: 'נמוך', f: 'נמוכה' }, top: 'מי הכי גבוה בקבוצה?', bottom: 'מי הכי נמוך בקבוצה?', second: 'מי השני בגובה (מהגבוה לנמוך)?', mid: 'מי נמצא בדיוק באמצע בסדר הגובה?' },
+  { more: { m: 'מבוגר', f: 'מבוגרת' }, less: { m: 'צעיר', f: 'צעירה' }, top: 'מי המבוגר ביותר?', bottom: 'מי הצעיר ביותר?', second: 'מי השני בגילו (מהמבוגר לצעיר)?', mid: 'מי נמצא בדיוק באמצע בסדר הגילים?' },
+  { more: { m: 'מהיר', f: 'מהירה' }, less: { m: 'איטי', f: 'איטית' }, top: 'מי הרץ המהיר ביותר?', bottom: 'מי הרץ האיטי ביותר?', second: 'מי השני במהירות (מהמהיר לאיטי)?', mid: 'מי נמצא בדיוק באמצע בסדר המהירות?' }];
+function genOrder(d) {
+  const n = d === 1 ? 4 : 5, ppl = shuffle(PEOPLE).slice(0, n), A = pick(ATTR);
+  const clue = (i, j) => R() < .5 ? `${ppl[i][0]} ${A.more[ppl[i][1]]} מ${ppl[j][0]}` : `${ppl[j][0]} ${A.less[ppl[j][1]]} מ${ppl[i][0]}`;
+  let clues = []; for (let i = 0; i < n - 1; i++) clues.push(clue(i, i + 1));
+  if (d === 3) clues.push(clue(0, ri(2, n - 1)));
+  clues = shuffle(clues);
+  const qt = d === 1 ? pick(['top', 'bottom']) : d === 2 ? pick(['second', 'bottom', 'mid']) : pick(['second', 'mid']);
+  const id = { top: 0, bottom: n - 1, second: 1, mid: (n - 1) / 2 }[qt];
+  const m = mc([ppl[id][0], ...ppl.filter((_, i) => i !== id).map(p => p[0])]);
+  return { cat: 'logic', d, prompt: A[qt], vis: `<ul class="clues">${clues.map(c => `<li>${c}</li>`).join('')}</ul>`, options: m.options, answer: m.answer, ex: `כשמסדרים את כולם בשורה לפי הרמזים: ${ppl.map(p => p[0]).join(' ← ')}. טיפ: צייר קו ושים עליו כל שם, רמז אחרי רמז.` };
+}
+function genLogic(d) {
+  if (R() < .35) return genOrder(d);
+  const it = pickBank(LG, 'lg', d); const m = mc(it.o.map(o => /^[\d:]+$/.test(o) ? L(o) : o));
+  return { cat: 'logic', d, prompt: it.q, vis: '', options: m.options, answer: m.answer, ex: it.ex };
+}
+
+const GEN = { verbal: genVerbal, series: genSeries, matrix: genMatrix, spatial: genSpatial, math: genMath, logic: genLogic, code: genCode };
+/* ================= APP ================= */
+document.documentElement.setAttribute('dir', 'rtl');
+document.documentElement.setAttribute('lang', 'he');
+const KEY = 'brainlab-yonatan-v1';
+const TOTAL = 60;
+const isBoss = d => d % 7 === 0 || d === TOTAL;
+const CATS = {
+  verbal: { n: 'מילולי', tip: 'נסח את הקשר בין שתי המילים במשפט מלא ("רופא עובד בבית חולים"). עכשיו הצב את המילה השלישית: "מורה עובד ב...". אם שתי תשובות מתאימות, המשפט שלך כללי מדי: חדד אותו. ביוצא דופן: חפש תכונה שמשותפת לכולם חוץ מאחד (סוג, מקום, מספר, אורך).' },
+  series: { n: 'סדרות מספרים', tip: 'חשב את ההפרש בין כל שני מספרים צמודים. ההפרשים לא קבועים? חשב הפרשים של ההפרשים. המספרים גדלים מהר? בדוק כפל. עדיין לא? אולי שתי סדרות שזורות: בדוק כל מספר שני בנפרד.' },
+  matrix: { n: 'מטריצות', tip: 'אל תסתכל על הכל ביחד. בדוק כל תכונה לבד: צורה, כמות, מילוי. לכל תכונה שאל: קבועה בשורה? קבועה בעמודה? או שכל ערך מופיע פעם אחת בכל שורה? אחר כך פסול תשובות אחת-אחת.' },
+  spatial: { n: 'חשיבה מרחבית', tip: 'סיבוב לא הופך צורה. אם צריך להפוך אותה כמו במראה, זו לא התשובה. עקוב אחרי חלק בולט אחד. בפריסת קובייה: שתי משבצות בקו ישר עם משבצת אחת ביניהן הן פאות נגדיות, ופאות נגדיות אף פעם לא נוגעות.' },
+  math: { n: 'בעיות חשבון', tip: 'כתוב מה ידוע ומה שואלים. תן לנעלם שם (x). בסוף הצב את התשובה בחזרה בשאלה ובדוק שהיא עובדת. לפעמים הכי מהיר הוא לבדוק את התשובות המוצעות.' },
+  logic: { n: 'היגיון', tip: 'צייר! קו לסידור, טבלה להתאמות. ב"אם... אז..." רק דבר אחד בטוח: אם התוצאה לא קרתה, גם התנאי לא קרה. ההפך לא בטוח. וקרא כל מילה, יש מלכודות.' },
+  code: { n: 'צפנים וסמלים', tip: 'בסמלים: התחל מהשורה שיש בה סמל אחד בלבד. בפעולה מומצאת: הצב בדיוק לפי ההגדרה, ופתור קודם את הסוגריים. בימים ושעונים: חשוב רק השארית מחלוקה ב-7 (ימים) או ב-12 (שעות).' },
+};
+const RANKS = [[0, 'חוקר מתחיל'], [300, 'בלש מספרים'], [800, 'מפענח צפנים'], [1500, 'אסטרטג'], [2500, 'מוח־על'], [3800, 'גאון בהתהוות'], [5500, 'אלוף המעבדה']];
+const CATB = { verbal: 'מילון מהלך', series: 'אדון המספרים', matrix: 'עין חדה', spatial: 'מסובב עולמות', math: 'מחשבון אנושי', logic: 'בלש לוגי', code: 'מפצח צפנים' };
+const BADGES = [
+  { id: 'first', n: 'צעד ראשון', d: 'משימה ראשונה', t: s => doneCount(s) >= 1 },
+  { id: 'st3', n: 'רצף 3', d: '3 ימים ברצף', t: s => s.best >= 3 },
+  { id: 'st7', n: 'שבוע מלא', d: '7 ימים ברצף', t: s => s.best >= 7 },
+  { id: 'st14', n: 'מכונה', d: '14 ימים ברצף', t: s => s.best >= 14 },
+  { id: 'perfect', n: 'מושלם', d: 'משימה בלי טעויות', t: s => Object.values(s.missions).some(m => m.c === m.n) },
+  { id: 'boss', n: 'מנצח הבוס', d: '70% במבחן בוס', t: s => Object.entries(s.missions).some(([k, m]) => isBoss(+k) && m.c / m.n >= .7) },
+  ...Object.keys(CATB).map(k => ({ id: 'c_' + k, n: CATB[k], d: `25 נכונות ב${CATS[k].n}`, t: s => (s.stats[k] || { c: 0 }).c >= 25 })),
+  { id: 'half', n: 'חצי דרך', d: '30 משימות', t: s => doneCount(s) >= 30 },
+  { id: 'all', n: 'סיום המסע', d: 'כל 60 המשימות', t: s => doneCount(s) >= TOTAL },
+];
+const doneCount = s => Object.keys(s.missions).length;
+
+function todayStr(d = new Date()) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function dayDiff(a, b) { const [y1, m1, d1] = a.split('-').map(Number), [y2, m2, d2] = b.split('-').map(Number); return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 864e5); }
+function defState() { return { start: todayStr(), xp: 0, streak: 0, best: 0, lastDone: null, missions: {}, stats: {}, seen: {}, badges: [], exam: '2026-12-21', cur: null, view: 'home' }; }
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.start) return Object.assign(defState(), s); } catch (e) { } return defState(); }
+let S = load(); SEEN = S.seen;
+function save() { S.seen = SEEN; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+
+const unlocked = () => Math.min(TOTAL, dayDiff(S.start, todayStr()) + 1);
+const nextDay = () => { for (let k = 1; k <= TOTAL; k++) if (!S.missions[k]) return k; return null; };
+const rankOf = xp => { let r = RANKS[0], nx = null; for (let i = 0; i < RANKS.length; i++) { if (xp >= RANKS[i][0]) { r = RANKS[i]; nx = RANKS[i + 1] || null; } } return { r, nx }; };
+const curStreak = () => { if (!S.lastDone) return 0; const g = dayDiff(S.lastDone, todayStr()); return g <= 1 ? S.streak : 0; };
+const baseDiff = d => d <= 14 ? 1 : d <= 35 ? 2 : 3;
+function qDiff(b) { const r = R(); if (b === 1) return r < .75 ? 1 : 2; if (b === 2) return r < .2 ? 1 : r < .85 ? 2 : 3; return r < .25 ? 2 : 3; }
+const starsOf = (c, n) => { const p = c / n; return p >= .9 ? 3 : p >= .7 ? 2 : p >= .4 ? 1 : 0; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* icons */
+const IC = {
+  logo: '<svg viewBox="0 0 48 48" class="logo" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6h12M20 6v12L9 38a4 4 0 0 0 3.5 6h23a4 4 0 0 0 3.5-6L28 18V6"/><path d="M13.5 30h21" /><circle cx="21" cy="36" r="2.2" fill="currentColor"/><circle cx="28" cy="33" r="1.6" fill="currentColor"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="#F08C2B"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3-1-4 1-7 1-9.5z"/></svg>',
+  flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 21V4m0 0h11l-2 4 2 4H5"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
+};
+function medal(on, i) {
+  const hues = ['var(--blue)', 'var(--boss)', 'var(--good)', '#F08C2B'];
+  const c = on ? hues[i % 4] : 'var(--line)';
+  return `<svg viewBox="0 0 48 48"><path d="M24 3 42 13v22L24 45 6 35V13z" fill="${c}"/><path d="M24 9 37 16.5v15L24 39 11 31.5v-15z" fill="none" stroke="var(--card)" stroke-width="1.6" opacity=".7"/><path d="m24 14 3 6.2 6.8.9-5 4.7 1.3 6.7L24 29.3l-6.1 3.2 1.3-6.7-5-4.7 6.8-.9z" fill="var(--card)"/></svg>`;
+}
+
+const app = document.getElementById('app');
+let timerH = null;
+function go(view) { S.view = view; save(); render(); window.scrollTo(0, 0); }
+function render() {
+  clearInterval(timerH);
+  if (S.cur && S.view === 'quiz') return renderQuiz();
+  if (S.view === 'quiz') S.view = 'home';
+  const v = S.view;
+  let html = v === 'stats' ? viewStats() : v === 'tips' ? viewTips() : v === 'result' ? viewResult() : viewHome();
+  html += nav(v === 'result' ? 'home' : v);
+  app.innerHTML = html;
+  bind();
+}
+function nav(v) {
+  const it = [['home', 'משימות', IC.home], ['stats', 'התקדמות', IC.chart], ['tips', 'טריקים', IC.bulb]];
+  return `<nav class="nav"><div class="in">${it.map(([k, n, ic]) => `<button data-go="${k}" class="${v === k ? 'on' : ''}">${ic}${n}</button>`).join('')}</div></nav>`;
+}
+function topBar() {
+  const { r } = rankOf(S.xp);
+  return `<header class="top"><div class="brand">${IC.logo}<div><h1>מעבדת המוח</h1><p>החוברת של יונתן · הכנה למבחן המחוננים</p></div></div><span class="rank">${r[1]}</span></header>`;
+}
+
+/* ---------- HOME ---------- */
+function viewHome() {
+  const nd = nextDay(), un = unlocked(), cur = S.cur;
+  let hero;
+  if (cur) {
+    const lbl = cur.kind === 'practice' ? 'אימון' : (cur.kind === 'boss' ? 'מבחן בוס' : 'משימה') + ' ' + cur.day;
+    hero = `<section class="card hero ${cur.kind === 'boss' ? 'boss' : ''}"><div class="eyebrow">באמצע ${lbl}</div><h2>ממשיכים מאיפה שעצרנו</h2><p>שאלה ${cur.i + 1} מתוך ${cur.qs.length}</p><button class="btn btn-primary btn-wide" data-act="resume">להמשיך</button></section>`;
+  } else if (!nd) {
+    hero = `<section class="card hero"><div class="eyebrow">המסע הושלם</div><h2>כל 60 המשימות מאחוריך</h2><p>אתה מוכן. אפשר להמשיך להתאמן בחופשי למטה.</p></section>`;
+  } else if (nd <= un) {
+    const b = isBoss(nd);
+    hero = `<section class="card hero ${b ? 'boss' : ''}"><div class="eyebrow">${b ? (nd === TOTAL ? 'מבחן הגמר' : 'מבחן בוס · סוף שבוע ' + Math.ceil(nd / 7)) : 'משימה ' + nd + ' מתוך ' + TOTAL}</div>
+      <h2>${b ? 'הבוס מחכה לך' : missionTitle(nd)}</h2>
+      <p>${b ? '15 שאלות, 20 דקות, בלי רמזים. כמו במבחן האמיתי. נקודות כפול 1.5.' : '10 שאלות מעורבות · בערך 15 דקות' + (nd >= 15 ? ' · בונוס מהירות פעיל' : '')}</p>
+      <button class="btn ${b ? 'btn-boss' : 'btn-primary'} btn-wide" data-act="start">${b ? 'להילחם בבוס' : 'יאללה, מתחילים'}</button></section>`;
+  } else {
+    hero = `<section class="card hero"><div class="eyebrow">המשימה של היום הושלמה</div><h2><span class="mark">כל הכבוד!</span></h2><p>משימה ${nd} תיפתח מחר. רוצה עוד? יש אימון חופשי למטה.</p></section>`;
+  }
+  const { r, nx } = rankOf(S.xp);
+  const pct = nx ? Math.round((S.xp - r[0]) / (nx[0] - r[0]) * 100) : 100;
+  const toExam = Math.max(0, dayDiff(todayStr(), S.exam));
+  const stats = `<section class="stats3">
+    <div class="card stat">${IC.flame}<div class="big">${curStreak()}</div><div class="lbl">ימים ברצף</div></div>
+    <div class="card stat"><span style="color:var(--blue)">${IC.bolt}</span><div class="big">${S.xp.toLocaleString('he-IL')}</div><div class="lbl">נקודות</div></div>
+    <div class="card stat"><span style="color:var(--boss)">${IC.flag}</span><div class="big">${toExam}</div><div class="lbl">ימים למבחן</div></div>
+  </section>
+  <div class="card" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;font-size:.85rem;gap:8px"><b>${r[1]}</b><span class="muted">${nx ? `עוד ${nx[0] - S.xp} נק׳ לדרגת ${nx[1]}` : 'הדרגה הגבוהה ביותר!'}</span></div><div class="xpbar"><i style="width:${pct}%"></i></div></div>`;
+  // map
+  let map = '';
+  for (let w = 0; w < Math.ceil(TOTAL / 7); w++) {
+    let row = `<div class="week"><span class="wl">שבוע ${w + 1}</span>`;
+    for (let k = w * 7 + 1; k <= Math.min(TOTAL, w * 7 + 7); k++) {
+      const m = S.missions[k], b = isBoss(k);
+      const st = m ? starsOf(m.c, m.n) : 0;
+      const cls = ['node', b ? 'boss' : '', m ? 'done s' + Math.max(1, st) : (k === nd && k <= un && !S.cur ? 'open' : k > un ? 'locked' : '')].join(' ');
+      row += `<button class="${cls}" data-node="${k}" aria-label="משימה ${k}">${b && !m ? '★' : k}${m ? `<span class="st">${'★'.repeat(st)}</span>` : ''}</button>`;
+    }
+    map += row + '</div>';
+  }
+  const weak = weakCats();
+  const practice = `<section><div class="sec-h"><h3>אימון חופשי</h3><span class="muted" style="font-size:.8rem">6 שאלות · חצי נקודות</span></div>
+    <div class="chips">${Object.keys(CATS).map(k => `<button class="chip ${weak.includes(k) ? 'hot' : ''}" data-practice="${k}">${CATS[k].n}</button>`).join('')}</div>
+    ${weak.length ? '<p class="muted" style="font-size:.8rem;margin:8px 2px 0">מסומן בצהוב: תחומים שכדאי לחזק.</p>' : ''}</section>`;
+  const badges = `<section><div class="sec-h"><h3>תגים</h3><span class="muted" style="font-size:.8rem">${S.badges.length}/${BADGES.length}</span></div><div class="badges">${BADGES.map((b, i) => { const on = S.badges.includes(b.id); return `<div class="card badge ${on ? '' : 'off'}">${medal(on, i)}<b>${b.n}</b>${b.d}</div>`; }).join('')}</div></section>`;
+  return `<div class="stack">${topBar()}${hero}${stats}<section><div class="sec-h"><h3>המסלול</h3><span class="muted" style="font-size:.8rem">${doneCount(S)}/${TOTAL} משימות</span></div><div class="card" style="padding:14px 10px">${map}</div></section>${practice}${badges}</div>`;
+}
+function missionTitle(d) { const t = ['אימון בסיסי', 'מחממים מנועים', 'בונים שרירי מוח', 'רמה עולה', 'אתגר מתקדם', 'מצב מומחה', 'הכנה סופית']; return t[Math.min(6, Math.floor((d - 1) / 9))]; }
+function weakCats() { return Object.keys(CATS).filter(k => { const s = S.stats[k]; return s && s.t >= 6 && s.c / s.t < .65; }); }
+
+/* ---------- MISSION ---------- */
+function startMission(kind, day, cat) {
+  const base = baseDiff(day || nextDay() || TOTAL);
+  let slots;
+  if (kind === 'daily') slots = ['verbal', 'verbal', 'series', 'matrix', 'spatial', 'math', 'math', 'logic', 'code', pick(['series', 'matrix', 'spatial', 'logic', 'code'])];
+  else if (kind === 'boss') slots = ['verbal', 'verbal', 'series', 'series', 'matrix', 'matrix', 'spatial', 'spatial', 'math', 'math', 'math', 'logic', 'logic', 'code', 'code'];
+  else slots = Array(6).fill(cat);
+  const qs = shuffle(slots).map(c => { let q; try { q = GEN[c](kind === 'boss' ? Math.max(qDiff(base), Math.min(3, base)) : qDiff(base)); } catch (e) { q = genSeries(1); } q.cat = c; return q; });
+  S.cur = { kind, day: day || 0, cat: cat || null, qs, i: 0, res: [], pts: 0, combo: 0, hint: false, qStart: Date.now(), deadline: kind === 'boss' ? Date.now() + 20 * 60000 : null };
+  go('quiz');
+}
+function renderQuiz() {
+  const c = S.cur, q = c.qs[c.i], r = c.res[c.i];
+  const answered = !!r && c.kind !== 'boss';
+  const dots = c.qs.map((_, i) => { const x = c.res[i]; return `<i class="${i === c.i && !x ? 'cur' : x ? (c.kind === 'boss' ? 'ans' : x.ok ? 'ok' : 'no') : ''}"></i>`; }).join('');
+  const letters = ['א', 'ב', 'ג', 'ד', 'ה'];
+  const gridOpts = q.options.some(o => o.includes('<svg') || o.includes('class="sym"'));
+  const opts = q.options.map((o, i) => {
+    let cls = 'opt';
+    if (answered) { if (i === q.answer) cls += ' ok'; else if (i === r.sel) cls += ' no'; }
+    return `<button class="${cls}" data-opt="${i}" ${answered ? 'disabled' : ''}><span class="lt">${letters[i]}</span><span class="ob">${o}</span></button>`;
+  }).join('');
+  const lvl = [1, 2, 3].map(n => `<i class="${n <= q.d ? 'on' : ''}"></i>`).join('');
+  let fb = '';
+  if (answered) {
+    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? pick(['נכון!', 'מעולה!', 'בול!', 'יפה מאוד!']) + (r.gain ? ` +${r.gain}` : '') : 'לא הפעם. התשובה הנכונה: ' + letters[q.answer]}</h4><span class="why">למה?</span><p>${q.ex}</p></div>`;
+  }
+  const hint = c.hint && !answered ? `<div class="hintbox"><b>טריק:</b> ${CATS[q.cat].tip}</div>` : '';
+  const comboTag = c.combo >= 2 && c.kind !== 'boss' ? `<span class="combo">רצף ${c.combo}</span>` : '';
+  app.innerHTML = `<div class="qbar"><button class="icon-btn" data-act="quit" aria-label="יציאה">${IC.x}</button><div class="pdots">${dots}</div><div class="qmeta"><span class="pts">${c.pts} נק׳</span><span class="tm" id="tm"></span></div></div>
+  <div class="card"><div class="qtop"><span class="tag">${CATS[q.cat].n}</span>${comboTag}<span class="lvl">רמה ${lvl}</span></div>
+  <p class="qprompt">${q.prompt}</p><div class="qvis">${q.vis}</div><div class="opts ${gridOpts ? 'grid' : ''}">${opts}</div>${hint}${fb}</div>
+  <div class="qfoot"><div class="in">${answered ? `<button class="btn btn-primary" data-act="next">${c.i === c.qs.length - 1 ? 'לסיכום' : 'לשאלה הבאה'}</button>` : c.kind === 'boss' ? `<button class="btn btn-ghost" data-act="skip">דלג וחזור אחר כך</button>` : `<button class="btn btn-ghost" data-act="hint" ${c.hint ? 'disabled' : ''}>${c.hint ? 'רמז נפתח (−3)' : 'רמז (−3 נק׳)'}</button>`}</div></div>`;
+  bind();
+  const tm = document.getElementById('tm');
+  const tick = () => {
+    if (c.deadline) { const left = Math.max(0, c.deadline - Date.now()); const s = Math.ceil(left / 1000); tm.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; tm.classList.toggle('warn', s < 120); if (left <= 0) { clearInterval(timerH); finish(); } }
+    else if (!answered) { const s = Math.floor((Date.now() - c.qStart) / 1000); tm.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+    else tm.textContent = '';
+  };
+  tick(); timerH = setInterval(tick, 1000);
+}
+function answer(i) {
+  const c = S.cur, q = c.qs[c.i];
+  if (c.res[c.i] && c.kind !== 'boss') return;
+  const ok = i === q.answer, secs = (Date.now() - c.qStart) / 1000;
+  let gain = 0;
+  if (ok) {
+    c.combo++;
+    gain = { 1: 10, 2: 15, 3: 20 }[q.d] || 10;
+    if (c.kind === 'daily' && c.day >= 15 && secs < 45) gain += 5;
+    if (c.kind !== 'boss' && c.combo % 3 === 0) gain += 10;
+    if (c.hint) gain = Math.max(0, gain - 3);
+    if (c.kind === 'boss') gain = Math.round(gain * 1.5);
+    if (c.kind === 'practice') gain = Math.round(gain / 2);
+  } else c.combo = 0;
+  const prev = c.res[c.i];
+  if (prev) c.pts -= prev.gain; // boss: changed answer
+  c.res[c.i] = { sel: i, ok, gain, secs };
+  c.pts += gain;
+  if (c.kind === 'boss') {
+    save();
+    const nxt = c.qs.findIndex((_, k) => k > c.i && !c.res[k]); const any = c.qs.findIndex((_, k) => !c.res[k]);
+    const to = nxt >= 0 ? nxt : any;
+    if (to < 0) return finish();
+    setTimeout(() => { c.i = to; c.qStart = Date.now(); save(); renderQuiz(); }, 220);
+    document.querySelectorAll('.opt').forEach((b, k) => b.classList.toggle('sel', k === i));
+    return;
+  }
+  save(); renderQuiz();
+  if (ok && c.combo >= 3 && c.combo % 3 === 0) burst(40);
+}
+function nextQ() {
+  const c = S.cur; if (c.i >= c.qs.length - 1) return finish();
+  c.i++; c.hint = false; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
+}
+function finish() {
+  clearInterval(timerH);
+  const c = S.cur; const n = c.qs.length; let correct = 0;
+  c.qs.forEach((q, i) => { const r = c.res[i]; const s = S.stats[q.cat] || (S.stats[q.cat] = { c: 0, t: 0 }); s.t++; if (r && r.ok) { s.c++; correct++; } });
+  const before = S.badges.slice();
+  if (c.kind !== 'practice') {
+    S.missions[c.day] = { c: correct, n, pts: c.pts, date: todayStr() };
+    const t = todayStr();
+    if (S.lastDone !== t) { S.streak = (S.lastDone && dayDiff(S.lastDone, t) === 1) ? S.streak + 1 : 1; S.lastDone = t; }
+    S.best = Math.max(S.best, S.streak);
+  }
+  S.xp += c.pts;
+  BADGES.forEach(b => { if (!S.badges.includes(b.id) && b.t(S)) S.badges.push(b.id); });
+  S.last = { kind: c.kind, day: c.day, cat: c.cat, correct, n, pts: c.pts, newB: S.badges.filter(b => !before.includes(b)),
+    review: c.qs.map((q, i) => ({ q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.options[q.answer], ex: q.ex })).filter(x => c.kind === 'boss' || !x.ok) };
+  S.cur = null; go('result');
+  if (starsOf(correct, n) >= 2) setTimeout(() => burst(starsOf(correct, n) === 3 ? 140 : 70), 250);
+}
+
+/* ---------- RESULT ---------- */
+function viewResult() {
+  const L0 = S.last; if (!L0) return viewHome();
+  const st = starsOf(L0.correct, L0.n);
+  const title = L0.kind === 'practice' ? 'אימון ' + CATS[L0.cat].n : L0.kind === 'boss' ? (L0.day === TOTAL ? 'מבחן הגמר' : 'מבחן בוס') : 'משימה ' + L0.day;
+  const msg = st === 3 ? 'ביצוע של אלוף.' : st === 2 ? 'עבודה טובה מאוד.' : st === 1 ? 'התחלה טובה. קרא את ההסברים למטה, שם הלמידה האמיתית.' : 'יום קשה קורה לכולם. ההסברים למטה יעזרו לפעם הבאה.';
+  const stars = [0, 1, 2].map(i => `<span class="${i < st ? 'on' : 'offs'}">${IC.star.replace('<svg', `<svg class="pop" style="animation-delay:${i * .15}s"`)}</span>`).join('');
+  const nb = L0.newB.map(id => { const i = BADGES.findIndex(b => b.id === id); const b = BADGES[i]; return `<div class="card newb">${medal(true, i)}<div><b>תג חדש: ${b.n}</b><div class="muted" style="font-size:.85rem">${b.d}</div></div></div>`; }).join('');
+  const rev = L0.review.length ? `<section><div class="sec-h"><h3>${L0.kind === 'boss' ? 'כל השאלות וההסברים' : 'שאלות לחזור עליהן'}</h3></div><div class="rev">${L0.review.map(x => `<div class="card item"><div class="q"><span class="tag" style="margin-inline-end:6px">${CATS[x.cat].n}</span>${x.ok ? '<b style="color:var(--good)">✓</b>' : '<b style="color:var(--bad)">✗</b>'} ${x.q.replace(/<[^>]+>/g, '')}</div><div class="a">תשובה נכונה: <b>${x.a}</b></div><div class="e">${x.ex}</div></div>`).join('')}</div></section>` : '';
+  return `<div class="stack">${topBar()}<section class="card res-hero"><div class="eyebrow">${title}</div><div class="stars">${stars}</div><div class="score">${L0.correct}/${L0.n}</div><p class="muted" style="margin:4px 0 0">${msg}</p><span class="xp">+${L0.pts} נקודות</span></section>${nb}<button class="btn btn-primary btn-wide" data-go="home">חזרה למסלול</button>${rev}</div>`;
+}
+
+/* ---------- STATS ---------- */
+function viewStats() {
+  const ks = Object.keys(CATS);
+  const bars = ks.map(k => { const s = S.stats[k] || { c: 0, t: 0 }; const p = s.t ? Math.round(s.c / s.t * 100) : 0; const weak = s.t >= 6 && p < 65; return `<div class="bar ${weak ? 'weak' : ''}"><div class="row"><span>${CATS[k].n}${weak ? ' · <b style="color:var(--bad)">לחזק</b>' : ''}</span><span>${s.t ? p + '% · ' + s.c + '/' + s.t : 'עוד לא תורגל'}</span></div><div class="track"><i style="width:${p}%"></i></div></div>`; }).join('');
+  const ds = Object.keys(S.missions).map(Number).sort((a, b) => a - b).slice(-20);
+  let spark = '<p class="muted" style="margin:0">אחרי המשימה הראשונה יופיע כאן גרף.</p>';
+  if (ds.length) {
+    const W = 320, H = 120, bw = W / 20;
+    spark = `<svg viewBox="0 0 ${W} ${H + 16}" class="spark">${[0, 50, 100].map(v => `<line class="gl" x1="0" x2="${W}" y1="${H - v / 100 * H + 2}" y2="${H - v / 100 * H + 2}"/>`).join('')}${ds.map((d, i) => { const m = S.missions[d], p = m.c / m.n, h = Math.max(3, p * H); return `<rect class="b ${isBoss(d) ? 'boss' : ''}" x="${W - (i + 1) * bw + 2}" y="${H - h + 2}" width="${bw - 4}" height="${h}" rx="2"/><text x="${W - (i + .5) * bw}" y="${H + 14}" text-anchor="middle">${d}</text>`; }).join('')}</svg><p class="muted" style="font-size:.78rem;margin:6px 0 0">אחוז הצלחה בכל משימה (סגול = מבחן בוס). הקווים: 0%, 50%, 100%.</p>`;
+  }
+  const tot = ks.reduce((a, k) => a + ((S.stats[k] || {}).t || 0), 0), cor = ks.reduce((a, k) => a + ((S.stats[k] || {}).c || 0), 0);
+  return `<div class="stack">${topBar()}
+  <section class="stats3"><div class="card stat"><div class="big">${tot}</div><div class="lbl">שאלות נפתרו</div></div><div class="card stat"><div class="big">${tot ? Math.round(cor / tot * 100) : 0}%</div><div class="lbl">הצלחה כללית</div></div><div class="card stat"><div class="big">${S.best}</div><div class="lbl">רצף הכי ארוך</div></div></section>
+  <section><div class="sec-h"><h3>לפי תחום</h3></div><div class="card bars">${bars}</div></section>
+  <section><div class="sec-h"><h3>משימות אחרונות</h3></div><div class="card">${spark}</div></section>
+  <section><div class="sec-h"><h3>הגדרות</h3></div><div class="card stack" style="gap:12px"><label class="field" for="exam"><span>תאריך המבחן</span><input type="date" id="exam" value="${S.exam}"></label>
+  <div class="field"><span class="muted" style="font-size:.85rem">המסלול התחיל ב-${S.start.split('-').reverse().join('.')}. משימה חדשה נפתחת כל יום. אם פספסת יום, אפשר להשלים.</span></div>
+  <button class="btn btn-ghost" data-act="reset" style="color:var(--bad)">איפוס כל ההתקדמות</button></div></section></div>`;
+}
+
+/* ---------- TIPS ---------- */
+function viewTips() {
+  return `<div class="stack">${topBar()}
+  <section class="card tip" style="border-color:var(--marker);border-width:2px"><h4>איך המסלול עובד</h4><ul>
+  <li>כל יום נפתחת משימה של 10 שאלות מכל התחומים. כל 7 ימים יש <b>מבחן בוס</b>: 15 שאלות ב-20 דקות, כמו במבחן אמיתי.</li>
+  <li>שבועות 1-2 חימום, 3-5 רמה בינונית-קשה, 6-9 רמה קשה ומהירות.</li>
+  <li>נקודות: 10/15/20 לפי רמת השאלה. 3 נכונות ברצף = בונוס 10. משבוע 3, תשובה נכונה מתחת ל-45 שניות = בונוס 5.</li>
+  <li>אחרי כל תשובה יש הסבר. אל תדלג עליו גם כשצדקת: לפעמים יש דרך מהירה יותר.</li></ul></section>
+  ${Object.keys(CATS).map(k => `<section class="card tip"><h4>${CATS[k].n}</h4><p>${CATS[k].tip}</p></section>`).join('')}
+  <section class="card tip"><h4>אסטרטגיה ליום המבחן</h4><ol>
+  <li>קרא את כל התשובות לפני שאתה בוחר. לפעמים יש "כמעט נכונה" ונכונה.</li>
+  <li>תקוע יותר מדקה וחצי? דלג וחזור בסוף. כל שאלה שווה אותו דבר.</li>
+  <li>לא בטוח? פסול קודם את מה שבטוח לא נכון. מ-4 אפשרויות ל-2 זה פי 2 סיכוי.</li>
+  <li>בבעיות חשבון, הצב את התשובה בחזרה בשאלה ובדוק.</li>
+  <li>שינה טובה בלילה שלפני שווה יותר משעה של תרגול נוסף.</li></ol></section></div>`;
+}
+
+/* ---------- EVENTS ---------- */
+function modal(title, text, okLbl, onOk, okCls = 'btn-primary') {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card" role="dialog" aria-modal="true"><h4>${title}</h4><p>${text}</p><div class="row"><button class="btn btn-ghost" data-m="no">ביטול</button><button class="btn ${okCls}" data-m="ok">${okLbl}</button></div></div>`;
+  app.appendChild(m);
+  m.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (e.target === m || (b && b.dataset.m === 'no')) m.remove(); else if (b) { m.remove(); onOk(); } });
+}
+function bind() {
+  app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  app.querySelectorAll('[data-opt]').forEach(b => b.onclick = () => answer(+b.dataset.opt));
+  app.querySelectorAll('[data-practice]').forEach(b => b.onclick = () => { if (S.cur) return modal('יש משימה פתוחה', 'קודם סיים את המשימה שהתחלת, או צא ממנה כדי להתחיל אימון.', 'להמשיך במשימה', () => go('quiz')); startMission('practice', nextDay() || TOTAL, b.dataset.practice); });
+  app.querySelectorAll('[data-node]').forEach(b => b.onclick = () => {
+    const k = +b.dataset.node, m = S.missions[k];
+    if (m) return modal(`משימה ${k}`, `${m.c} מתוך ${m.n} נכונות · ${m.pts} נקודות · ${m.date.split('-').reverse().join('.')}`, 'סגור', () => { });
+    if (k === nextDay() && k <= unlocked() && !S.cur) return startMission(isBoss(k) ? 'boss' : 'daily', k);
+    if (k > unlocked()) modal('עוד לא', `משימה ${k} תיפתח בעוד ${k - unlocked()} ימים. סבלנות של אלופים!`, 'הבנתי', () => { });
+  });
+  const A = a => app.querySelector(`[data-act="${a}"]`);
+  if (A('start')) A('start').onclick = () => { const k = nextDay(); startMission(isBoss(k) ? 'boss' : 'daily', k); };
+  if (A('resume')) A('resume').onclick = () => { if (S.cur && !S.cur.deadline) S.cur.qStart = Date.now(); go('quiz'); };
+  if (A('next')) A('next').onclick = nextQ;
+  if (A('hint')) A('hint').onclick = () => { S.cur.hint = true; save(); renderQuiz(); };
+  if (A('skip')) A('skip').onclick = () => { const c = S.cur; const nx = c.qs.findIndex((_, k) => k > c.i && !c.res[k]); const any = c.qs.findIndex((_, k) => k !== c.i && !c.res[k]); const to = nx >= 0 ? nx : any; if (to >= 0) { c.i = to; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0); } };
+  if (A('quit')) A('quit').onclick = () => modal('לצאת מהמשימה?', S.cur.kind === 'boss' ? 'ההתקדמות נשמרת, אבל השעון של הבוס ממשיך לרוץ.' : 'ההתקדמות נשמרת ואפשר להמשיך אחר כך מאותה שאלה.', 'יציאה', () => { S.view = 'home'; save(); render(); });
+  if (A('reset')) A('reset').onclick = () => modal('לאפס הכל?', 'כל הנקודות, המשימות והתגים יימחקו. אי אפשר לבטל.', 'כן, לאפס', () => { S = defState(); SEEN = S.seen; save(); render(); }, 'btn-boss');
+  const ex = document.getElementById('exam'); if (ex) ex.onchange = () => { if (ex.value) { S.exam = ex.value; save(); } };
+}
+
+/* ---------- CONFETTI ---------- */
+function burst(n) {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.getElementById('fx'); cv.hidden = false; const dpr = window.devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; const x = cv.getContext('2d'); x.scale(dpr, dpr);
+  const cs = getComputedStyle(document.documentElement); const cols = ['--blue', '--marker', '--good', '--boss', '--bad'].map(v => cs.getPropertyValue(v).trim());
+  const P = Array.from({ length: n }, () => ({ x: innerWidth / 2, y: innerHeight * .35, vx: (R() - .5) * 12, vy: -R() * 11 - 3, r: R() * 6 + 3, c: pick(cols), a: R() * 6, va: (R() - .5) * .3 }));
+  let t = 0; (function f() { x.clearRect(0, 0, innerWidth, innerHeight); P.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .35; p.a += p.va; x.save(); x.translate(p.x, p.y); x.rotate(p.a); x.fillStyle = p.c; x.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); x.restore(); }); if (++t < 90) requestAnimationFrame(f); else { x.clearRect(0, 0, innerWidth, innerHeight); cv.hidden = true; } })();
+}
+
+render();
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body></html>
