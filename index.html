@@ -567,6 +567,20 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
 <script>
+/* ================= V13: KID PROFILES (each kid has separate storage) ================= */
+const PROFILES = {
+  yonatan: { id: 'yonatan', name: 'יונתן', bd: '12-13', g: 'm', key: 'brainlab-yonatan-v1', sbx: 'brainlab-sandbox-v1', cloud: 'bl-cloud' },
+  romi: { id: 'romi', name: 'רומי', bd: '04-03', g: 'f', key: 'brainlab-romi-v1', sbx: 'brainlab-sandbox-romi', cloud: 'bl-cloud-romi' },
+};
+const PROF = (() => {
+  let id = null;
+  try {
+    const m = /[?&]kid=(\w+)/.exec(location.search);
+    if (m && PROFILES[m[1]]) { id = m[1]; localStorage.setItem('bl-profile', id); try { history.replaceState(null, '', location.pathname); } catch (e) { } }
+    else id = localStorage.getItem('bl-profile');
+  } catch (e) { }
+  return PROFILES[id] || PROFILES.yonatan;
+})();
 /* ================= QUESTION ENGINE ================= */
 let SEEN = {};
 const R = Math.random;
@@ -1927,7 +1941,7 @@ async function shareCard(kind) {
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-m="no"]')) { m.remove(); URL.revokeObjectURL(url); } });
 }
 /* ================= V6: DAD'S SANDBOX (separate storage) ================= */
-const MAIN_KEY = 'brainlab-yonatan-v1', SBX_KEY = 'brainlab-sandbox-v1', SBX_FLAG = 'bl-sbx';
+const MAIN_KEY = PROF.key, SBX_KEY = PROF.sbx, SBX_FLAG = 'bl-sbx';
 const isSbx = () => KEY === SBX_KEY;
 function mainPin() { try { return (JSON.parse(localStorage.getItem(MAIN_KEY)) || {}).pin || null; } catch (e) { return null; } }
 function sbxBadge() {
@@ -2009,7 +2023,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '12';
+const APP_VER = '13';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -2074,7 +2088,7 @@ function bindUpdate() {
   const f = document.getElementById('restoref'); if (f) f.onchange = () => { const file = f.files[0]; if (!file) return; const fr = new FileReader(); fr.onload = () => restoreFrom(fr.result); fr.readAsText(file); };
 }
 /* ================= V8: OPTIONAL CLOUD SYNC (Firebase Realtime DB, REST) ================= */
-const CLOUD_KEY = 'bl-cloud';
+const CLOUD_KEY = PROF.cloud;
 const cloudCfg = () => { try { return JSON.parse(localStorage.getItem(CLOUD_KEY)) || {}; } catch (e) { return {}; } };
 const cloudSet = c => { try { localStorage.setItem(CLOUD_KEY, JSON.stringify(c)); } catch (e) { } };
 const cloudOn = () => { const c = cloudCfg(); return !!(c.url && c.code); };
@@ -2153,7 +2167,7 @@ document.documentElement.setAttribute('dir', 'rtl');
 document.documentElement.setAttribute('lang', 'he');
 let KEY = (() => { try { return sessionStorage.getItem(SBX_FLAG) ? SBX_KEY : MAIN_KEY; } catch (e) { return MAIN_KEY; } })();
 const TOTAL = 75;
-const ME = { name: 'יונתן', bd: '12-13' };
+const ME = { name: PROF.name, bd: PROF.bd };
 const EC = { air: '#7FE3D6', water: '#53A8FF', earth: '#A6D45E', fire: '#FF7A3D', master: '#C9A7FF' };
 const WORLDS = [
   { k: 'air', n: 'עולם האוויר', a: 1, b: 15, line: 'קל כמו רוח, חד כמו מחשבה.' },
@@ -3236,7 +3250,7 @@ function viewSongs() {
   if (S.songId) return viewSong(SONGS.find(s => s.id === S.songId));
   const open = songsOpen(); S.songSeen = open;
   const list = SONGS.map((s, i) => i < open
-    ? `<button class="card song" data-song="${s.id}"><span class="sn">${i + 1}</span><div class="grow"><b>${s.n}</b><span>${s.a}</span></div><span class="sc ltr" dir="ltr">${s.sec[0].c.slice(0, 4).join(' ')}</span></button>`
+    ? `<button class="card song" data-song="${s.id}"><span class="sn">${i + 1}</span><div class="grow" data-nog><b>${s.n}</b><span>${s.a}</span></div><span class="sc ltr" dir="ltr">${s.sec[0].c.slice(0, 4).join(' ')}</span></button>`
     : `<div class="card song locked"><span class="sn">${IC.lock}</span><div class="grow"><b>שיר ${i + 1}</b><span>נפתח אחרי משימה ${s.at}</span></div></div>`).join('');
   return `<div class="stack">${hud()}<div class="sec-h"><h3>פינת הפסנתר</h3><button class="chip" data-go="arcade">חזרה</button></div>
   <details class="card howto"><summary><b>איך מנגנים אקורד</b></summary><p>יד ימין: 3 תווים יחד. יד שמאל: תו אחד נמוך, הבס.</p><p><b>מז׳ור</b> (C): מהיסוד סופרים 4 קלידים (כולל שחורים) ואז עוד 3. <b>מינור</b> (Am): 3 ואז 4. זה כל ההבדל בין צליל שמח לצליל עצוב.</p></details>
@@ -3249,12 +3263,12 @@ function viewSong(s) {
   const sel = S.songChord && all.includes(S.songChord) ? S.songChord : all[0];
   const cn = chordNotes(sel), tw = twins(s);
   const secs = s.sec.map((x, si) => `<div class="sec"><div class="sh"><b>${SECN[x.k] || x.k}</b><button class="chip ${cur && cur.si === si ? 'on' : ''}" data-loop="${si}">${cur && cur.si === si ? 'עצור' : 'נגן לולאה'}</button></div><div class="chs" dir="ltr">${x.c.map((c, ci) => `<button class="ch ${c === sel ? 'sel' : ''} ${cur && cur.si === si && cur.ci === ci ? 'beat' : ''}" data-chord="${c}">${c}</button>`).join('')}</div></div>`).join('');
-  return `<div class="stack">${hud()}<div class="sec-h"><h3>${s.n}</h3><button class="chip" data-song="">כל השירים</button></div>
+  return `<div class="stack">${hud()}<div class="sec-h"><h3 data-nog>${s.n}</h3><button class="chip" data-song="">כל השירים</button></div>
   <section class="card stack" style="gap:10px"><div class="muted small">${s.a}${!NOTRANS.has(s.id) ? ` · במקור ב-<span class="ltr" dir="ltr">${s.ok}</span>, כאן בסולם קל יותר לידיים` : ''}</div>
   <div class="kbwrap">${kbSVG(sel)}<div class="kbl"><b class="ltr" dir="ltr">${sel}</b><span>${cn ? `<i class="l"></i>${SOLF12[cn.lh % 12]} · <i class="r"></i>${cn.rh.map(n => SOLF12[n % 12]).join(' ')}` : ''}</span></div></div>
   ${secs}
   <div class="row tempo"><span class="small muted">קצב</span><button class="chip ${S.songFast ? '' : 'on'}" data-tempo="0">איטי</button><button class="chip ${S.songFast ? 'on' : ''}" data-tempo="1">מקורי (${s.bpm})</button></div>
-  <p class="small" style="margin:0">${s.tip}</p>${tw.length ? `<p class="small twin">אותם אקורדים כמו: <b>${tw.join(', ')}</b></p>` : ''}</section></div>`;
+  <p class="small" style="margin:0">${s.tip}</p>${tw.length ? `<p class="small twin">אותם אקורדים כמו: <b data-nog>${tw.join(', ')}</b></p>` : ''}</section></div>`;
 }
 function loopStep() {
   if (!SL) return;
@@ -3294,11 +3308,90 @@ viewResult = function () {
   if (S.pendingSong && S.last) { S.last.newSong = S.pendingSong; delete S.pendingSong; }
   let h = _viewResult12.apply(this, arguments);
   const s = S.last && S.last.newSong && SONGS.find(x => x.id === S.last.newSong);
-  if (s) h = h.replace('<section class="card res-hero"', `<button class="banner songban" data-opensong="${s.id}">${IC.keys}<div class="grow">נפתח שיר חדש בפינת הפסנתר: <b>${s.n}</b></div></button><section class="card res-hero"`);
+  if (s) h = h.replace('<section class="card res-hero"', `<button class="banner songban" data-opensong="${s.id}">${IC.keys}<div class="grow">נפתח שיר חדש בפינת הפסנתר: <b data-nog>${s.n}</b></div></button><section class="card res-hero"`);
   return h;
 };
 const _bindV11 = bindV11;
 bindV11 = function () { _bindV11(); const o = app.querySelector('[data-opensong]'); if (o) o.onclick = () => { S.songId = o.dataset.opensong; S.view = 'songs'; save(); render(); window.scrollTo(0, 0); }; };
+/* ================= V13: ROMI (profile switch, her look, feminine text, acrobatics) ================= */
+const isGirl = () => PROF.g === 'f' && !S.guest;
+
+/* ---------- avatar: blonde, blue eyes, long hair, no glasses ---------- */
+const _avatarSVG13 = avatarSVG;
+avatarSVG = function (o) {
+  let s = _avatarSVG13(o);
+  if (PROF.id !== 'romi' || S.guest) return s;
+  s = s.split('#5B3A22').join('#D9A93E').split('#82593A').join('#F4D88A');
+  s = s.replace(/<path d="M50 20 l2 -9[^>]*>/, '');
+  s = s.replace(/<g fill="rgba\(255,255,255,\.14\)" stroke="#20222B"[\s\S]*?<\/g><path d="M58\.5 58 h3[^>]*>/, '');
+  const eye = (x) => `<circle cx="${x}" cy="58" r="3.6" fill="#3B82E0"/><circle cx="${x}" cy="58" r="1.7" fill="#14213D"/><circle cx="${x + 1.2}" cy="56.8" r="1" fill="#fff"/>`;
+  s = s.replace('<circle cx="51" cy="58" r="3" fill="#1A1B22"/><circle cx="69" cy="58" r="3" fill="#1A1B22"/><circle cx="52.1" cy="56.9" r="1" fill="#fff"/><circle cx="70.1" cy="56.9" r="1" fill="#fff"/>', eye(51) + eye(69) + '<path d="M46 53.5 l-2 -1.6 M74 53.5 l2 -1.6" stroke="#8A6A2A" stroke-width="1.3" stroke-linecap="round"/>');
+  const back = `<path d="M30 58 C25 30 41 14 60 14 C80 14 95 30 90 58 C93 76 93 92 87 100 C83 92 80 86 78 80 L42 80 C40 86 37 92 33 100 C27 92 27 76 30 58Z" fill="#D9A93E"/><path d="M33 70 C31 82 32 92 35 98 M87 70 C89 82 88 92 85 98" stroke="#F4D88A" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/>`;
+  s = s.replace('<path d="M52 74 h16', back + '<path d="M52 74 h16');
+  s = s.replace('</svg>', '<g transform="translate(78 30) rotate(20)"><path d="M0 0 l-7 -5 v10z M0 0 l7 -5 v10z" fill="#FF7AA8"/><circle r="2.4" fill="#E0457F"/></g></svg>');
+  return s;
+};
+
+/* ---------- feminine forms (UI text addressed to the kid; parent area stays as is) ---------- */
+const GPH = [['ברוך הבא', 'ברוכה הבאה'], ['סדר את', 'סדרי את'], ['סדר מהקטן', 'סדרי מהקטן'], ['לך לשתות', 'לכי לשתות'], ['אתה מתאמן', 'את מתאמנת'], ['שאתה מתאמן', 'שאת מתאמנת'], ['שאתה לא מוותר', 'שאת לא מוותרת'], ['אתה לא מוותר', 'את לא מוותרת'], ['אתה יכול', 'את יכולה'], ['המשך לשאלה', 'המשיכי לשאלה'], ['שמע, זכור', 'שמעי, זכרי'], ['פתח מתנה', 'פתחי מתנה'], ['צייר קו', 'ציירי קו'], ['צייר את', 'ציירי את'], ['צייר שתי', 'ציירי שתי'], ['בחר תשובה', 'בחרי תשובה']];
+const GW = { 'אתה': 'את', 'נסה': 'נסי', 'לחץ': 'לחצי', 'זכור': 'זכרי', 'נגן': 'נגני', 'התחל': 'התחילי', 'תזכור': 'תזכרי', 'תראה': 'תראי', 'מוכן': 'מוכנה', 'אלוף': 'אלופה', 'שתף': 'שתפי', 'הצב': 'הציבי', 'דלג': 'דלגי', 'בדוק': 'בדקי', 'עליך': 'עלייך', 'מתאמן': 'מתאמנת', 'מוותר': 'מוותרת', 'בוא': 'בואי', 'צא': 'צאי', 'ספור': 'ספרי', 'חפש': 'חפשי', 'שים': 'שימי', 'תן': 'תני', 'מוכן?': 'מוכנה?' };
+const GRE = new RegExp(`(^|[^א-ת])([ושכ]?)(${Object.keys(GW).map(k => k.replace('?', '\\?')).sort((a, b) => b.length - a.length).join('|')})(?=[^א-ת]|$)`, 'g');
+function femText(t) {
+  if (!/[א-ת]/.test(t)) return t;
+  GPH.forEach(([a, b]) => { if (t.includes(a)) t = t.split(a).join(b); });
+  return t.replace(GRE, (m, pre, px, w) => pre + px + GW[w]);
+}
+function femNode(root) {
+  if (!isGirl() || S.view === 'parent') return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement && n.parentElement.closest('svg,script,style,.kbl,[data-nog]') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+  const ns = []; while (w.nextNode()) ns.push(w.currentNode);
+  ns.forEach(n => { const v = femText(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; });
+  root.querySelectorAll && root.querySelectorAll('[placeholder],[aria-label]').forEach(e => { ['placeholder', 'aria-label'].forEach(a => { const v = e.getAttribute(a); if (v) { const f = femText(v); if (f !== v) e.setAttribute(a, f); } }); });
+}
+try { new MutationObserver(ms => { if (!isGirl()) return; ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) femNode(n); else if (n.nodeType === 3 && n.parentElement) femNode(n.parentElement); })); }).observe(document.body, { childList: true, subtree: true }); } catch (e) { }
+
+/* ---------- acrobatics flavour for Romi ---------- */
+function genAcro(d) {
+  const T = pick(['hand', 'pyr', 'tramp', 'flips']);
+  if (T === 'hand') { const a = ri(3, 8), k = ri(2, 4), n = ri(5, 9); const ans = a + k * (n - 1); return numQ('math', d, `רומי מתאמנת על עמידת ידיים. ביום הראשון החזיקה ${a} שניות, ובכל יום החזיקה ${k} שניות יותר מהיום הקודם. כמה שניות החזיקה ביום ה-${n}?`, '', ans, [a + k * n, k * n, ans - k], `ביום ה-${n} עברו ${n - 1} ימים של שיפור: ${a} + ${k}×${n - 1} = ${ans}. מלכודת: לכפול ב-${n} ולא ב-${n - 1}.`, ' שנ׳'); }
+  if (T === 'pyr') { const b = ri(4, 6), tot = b * (b + 1) / 2 + ri(2, 9); const pyr = b * (b + 1) / 2; return numQ('math', d, `בקבוצת האקרובטיקה ${tot} ילדות. בונות פירמידה: בשורה התחתונה ${b}, ובכל שורה מעליה אחת פחות, עד ילדה אחת למעלה. כמה ילדות לא נכנסו לפירמידה?`, '', tot - pyr, [tot - b * b, tot - pyr - 1, pyr], `בפירמידה: ${Array.from({ length: b }, (_, i) => b - i).join(' + ')} = ${pyr}. נשארו ${tot} − ${pyr} = ${tot - pyr}.`); }
+  if (T === 'tramp') { const h = ri(2, 5) * 10, n = ri(3, 4); const ans = h * Math.pow(2, n - 1); return numQ('math', d, `בכל קפיצה על הטרמפולינה רומי עולה פי 2 מהקפיצה הקודמת. בקפיצה הראשונה עלתה ${h} ס״מ. לאיזה גובה עלתה בקפיצה ה-${n}?`, '', ans, [h * 2 * n, h * Math.pow(2, n), h * n], `${Array.from({ length: n }, (_, i) => h * Math.pow(2, i)).join(' → ')}. בכל צעד כופלים ב-2, וכפל חוזר גדל מהר מאוד.`, ' ס״מ'); }
+  const s = ri(2, 4), m = ri(3, 6); const per = 60 / s; const ans = per * m; return numQ('math', d, `גלגלון לוקח לרומי ${s} שניות. כמה גלגלונים היא יכולה לעשות ב-${m} דקות, בלי הפסקה?`, '', ans, [m * s, per, ans + per], `בדקה יש 60 שניות: 60 ÷ ${s} = ${per} גלגלונים בדקה. ב-${m} דקות: ${per} × ${m} = ${ans}.`);
+}
+if (PROF.id === 'romi') { MT.acro = genAcro; [1, 2, 3, 4].forEach(k => MPOOL[k] && MPOOL[k].push('acro')); }
+
+/* ---------- switching kids (parent area) ---------- */
+function switchProfile(id) {
+  if (!PROFILES[id] || id === PROF.id) return;
+  save();
+  try {
+    const t = PROFILES[id], raw = localStorage.getItem(t.key), o = raw ? JSON.parse(raw) : null, pin = S.pin;
+    if (o && !o.pin && pin) { o.pin = pin; localStorage.setItem(t.key, JSON.stringify(o)); }
+    if (!o && pin) localStorage.setItem('bl-pin-carry', pin);
+    localStorage.setItem('bl-profile', id); sessionStorage.removeItem('bl-sbx');
+  } catch (e) { }
+  location.reload();
+}
+try { const pc = localStorage.getItem('bl-pin-carry'); if (pc && !S.pin) { S.pin = pc; save(); } localStorage.removeItem('bl-pin-carry'); } catch (e) { }
+function profileSection() {
+  const kids = Object.values(PROFILES);
+  const btns = kids.map(k => k.id === PROF.id ? `<button class="btn btn-primary" disabled style="flex:1;min-height:44px">${k.name} (עכשיו)</button>` : `<button class="btn btn-ghost" data-prof="${k.id}" style="flex:1;min-height:44px">עבור ל${k.name}</button>`).join('');
+  const links = kids.map(k => `<div class="row small" style="justify-content:space-between;gap:8px"><span>הטלפון של ${k.name}</span><button class="chip" data-proflink="${k.id}">שלח קישור</button></div>`).join('');
+  return `<section class="card stack" style="gap:10px" data-nog><h4 style="font-size:1.15rem">ילדים</h4><p class="small muted" style="margin:0">לכל ילד התקדמות נפרדת. מעבר בין הילדים לא מוחק כלום.</p><div class="row" style="gap:8px">${btns}</div>
+  <details class="small"><summary class="muted">התקנה בטלפון של כל ילד</summary><p class="muted" style="margin:6px 0">קישור שפותח את האפליקציה ישר בפרופיל של הילד. פותחים אותו פעם אחת בטלפון שלו ומוסיפים למסך הבית.</p>${links}</details></section>`;
+}
+function bindProfiles() {
+  app.querySelectorAll('[data-prof]').forEach(b => b.onclick = () => modal(`לעבור ל${PROFILES[b.dataset.prof].name}?`, 'ההתקדמות של כל ילד נשמרת בנפרד.', 'עבור', () => switchProfile(b.dataset.prof), 'btn-primary'));
+  app.querySelectorAll('[data-proflink]').forEach(b => b.onclick = async () => {
+    const k = PROFILES[b.dataset.proflink], url = APP_URL + '?kid=' + k.id, text = `מעבדת המוח של ${k.name}`;
+    try { if (navigator.share) return await navigator.share({ title: text, url }); } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(url); toast('הקישור הועתק'); } catch (e) { toast(url, 6000); }
+  });
+}
+const _viewParent13 = viewParent;
+viewParent = function () { const h = _viewParent13.apply(this, arguments); return PARENT_OK && !isSbx() ? h.replace('<button class="btn btn-ghost btn-wide" data-act="pout">', profileSection() + '<button class="btn btn-ghost btn-wide" data-act="pout">') : h; };
+const _bindV11_13 = bindV11;
+bindV11 = function () { _bindV11_13(); bindProfiles(); };
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
