@@ -504,6 +504,22 @@ html.sbx .qbar{top:calc(env(safe-area-inset-top,0px) + 28px)}
 canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;height:100%}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.hero h2{font-size:2rem}.hero .who{width:96px;height:96px}.stat .big{font-size:1.7rem}.hud h1{font-size:1.45rem}.pill{padding:5px 8px;font-size:.85rem}.tile{min-height:136px}}
+/* v10 */
+.fb.no{background:rgba(255,200,69,.09);border-color:rgba(255,200,69,.45)}
+.retry{margin-top:12px;background:rgba(255,200,69,.12);border:1px solid rgba(255,200,69,.5);border-radius:16px;padding:12px 14px;font-size:.95rem;line-height:1.55;animation:rin .3s ease}
+@keyframes rin{from{opacity:0;transform:translateY(6px)}}
+.retry b{color:var(--gold)}
+.retry .rh{display:block;margin-top:6px;font-weight:500;color:var(--ink)}
+.opt.gone{opacity:.32;text-decoration:line-through;pointer-events:none}
+.mbox{display:flex;flex-direction:column;gap:6px;align-items:center;margin:4px auto 2px;padding:10px 14px;background:var(--panel);border:1px solid var(--edge);border-radius:16px;width:max-content;max-width:100%}
+.mrow{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.mrow b{min-width:38px;text-align:center;font-size:1.15rem;font-weight:800}
+.mrow i{font-style:normal;color:var(--muted)}
+.mrow .mb{display:inline-grid;place-items:center;width:46px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7B5CFF,#53A8FF);color:#fff;font-weight:800;box-shadow:0 0 14px rgba(123,92,255,.45)}
+.mrow:last-child b{color:var(--gold)}
+.prem{background:var(--panel);border:1px dashed var(--edge2);border-radius:16px;padding:10px 14px}
+.prem p{margin:3px 0;font-weight:600;line-height:1.5}
+.ctx{margin:0 0 8px;color:var(--muted);font-size:.92rem}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -1462,6 +1478,210 @@ const _genVerbal5 = genVerbal5;
 GEN.verbal = d => R() < .15 ? genOrdStory(d) : _genVerbal5(d);
 LESSONS.ostory = ['סידור סיפור', 'מוצאים קודם את הפתיחה ואת הסוף. האמצע מסתדר לבד.'];
 LESSONS.onum = ['סידור מספרים', 'ממירים הכל לאותה צורה, ורק אז משווים.'];
+/* ================= V10: LEARN FROM MISTAKES + NEW FORMATS ================= */
+/* --- lesson key override: new types carry q.lk --- */
+const _lessonFor9 = lessonFor;
+lessonFor = q => q.lk || _lessonFor9(q);
+Object.assign(LESSONS, {
+  magic: ['תיבת קסם', 'מנחשים חוק מהזוג הראשון, ובודקים אותו על כל הזוגות.'],
+  syll: ['מסקנה בטוחה', 'רק מה שחייב להיות נכון. מה שרק "יכול להיות" לא נחשב.'],
+  belief: ['היגיון מול מציאות', 'מניחים שהמשפטים נכונים, גם אם הם מוזרים. בודקים רק את ההיגיון.'],
+  groups: ['חלוקה לקבוצות', 'מתחילים מרמז שקובע מקום, ואז מצמידים את מי שחייב להיות יחד.'],
+  family: ['קרבת משפחה', 'מתקדמים צעד אחד בכל פעם, מהסוף של המשפט להתחלה.'],
+});
+
+/* --- bookkeeping shared by first try and retry --- */
+function rateQ(q, ok, secs, c) {
+  const rr = S.rat[q.cat] ?? baseDiff(c.day || nextDay() || TOTAL);
+  S.rat[q.cat] = Math.max(1, Math.min(4.4, rr + (ok ? (q.d >= Math.round(rr) ? .14 : .06) : -.15)));
+  const t = S.times[q.cat] || (S.times[q.cat] = { s: 0, n: 0 }); t.s += Math.min(secs, 300); t.n++;
+  if (q.d >= 3) { const hk = CHAPKEY[q.cat]; if (hk) { S.hard = S.hard || {}; const h = S.hard[hk] || (S.hard[hk] = { c: 0, t: 0 }); h.t++; if (ok) h.c++; } }
+}
+/* Ladder: wrong → tomorrow an easier twin with the rule → 2 days later the original → out. */
+function noteMist(q, ok, c, first) {
+  const today = todayStr();
+  if (q.rev) {
+    const m = S.mist.find(x => x.id === q.rev); if (!m) return;
+    if (!first) return;
+    if (ok) { if (q.twin) { m.box = 1; m.due = addDays(today, 2); } else { S.mist = S.mist.filter(x => x !== m); S.fixed = (S.fixed || 0) + 1; } }
+    else { m.box = 0; m.due = addDays(today, 1); }
+    return;
+  }
+  if (c.kind === 'sim' || q.champ) return;
+  const id = mistId(q);
+  if (!first) { const m = S.mist.find(x => x.id === id); if (m && ok) { m.box = 1; m.due = addDays(today, 3); } return; }
+  if (ok) return;
+  if (!S.mist.some(x => x.id === id)) { const qq = Object.assign({}, q); delete qq.rev; delete qq.twin; S.mist.push({ id, q: qq, due: addDays(today, 1), box: 0 }); if (S.mist.length > 50) S.mist.shift(); }
+}
+function makeTwin(q) {
+  const key = lessonFor(q), d = Math.max(1, (q.d || 2) - 1), g = GEN[q.cat];
+  if (!g) return null;
+  const snap = JSON.stringify(SEEN);
+  let out = null;
+  for (let k = 0; k < 80 && !out; k++) {
+    let t; try { t = g(LEVEL4.has(q.cat) ? d : Math.min(d, 3)); } catch (e) { continue; }
+    if (!t) continue; t.cat = t.cat || q.cat;
+    if (lessonFor(t) === key && (t.prompt + t.vis + (t.options || t.items || []).join('')) !== (q.prompt + q.vis + (q.options || q.items || []).join(''))) { t.d = d; out = t; }
+  }
+  const back = JSON.parse(snap); Object.keys(SEEN).forEach(k => delete SEEN[k]); Object.assign(SEEN, back);
+  return out;
+}
+function mistQ(m) {
+  if (!m.box) { const t = makeTwin(m.q); if (t) return Object.assign(t, { rev: m.id, twin: true }); }
+  return Object.assign({}, m.q, { rev: m.id });
+}
+function retryBox(q, t) {
+  const rule = (LESSONS[lessonFor(q)] || LESSONS.logic)[1];
+  const what = q.type === 'num' ? ` ${L(esc(t.val))} לא נכון.` : q.type === 'order' ? ' הסדר עוד לא נכון.' : '';
+  return `<div class="retry"><b>כמעט.</b>${what} נסה שוב.${S.cur.mod === 'nohint' ? '' : `<span class="rh">${rule}</span>`}</div>`;
+}
+function mnote(q, r, c) {
+  if (q.champ || c.kind === 'sim') return '';
+  let t = '';
+  if (q.rev) t = r.ok && !r.second ? (q.twin ? 'צעד אחד לפני שהיא יוצאת מהמחברת.' : 'יצאה מהמחברת. שלטת בזה!') : 'נשארת במחברת. תחזור מחר בגרסה קלה, עם הכלל.';
+  else if (r.second) t = 'נכנסה למחברת. תחזור בעוד כמה ימים, לוודא שזה נשאר.';
+  else if (!r.ok) t = 'נכנסה למחברת. תחזור מחר בגרסה קלה יותר, עם הכלל.';
+  return t ? `<p class="mnote">${t}</p>` : '';
+}
+
+/* ================= NEW FORMAT 1: MAGIC BOX (function machine) ================= */
+const MAGIC = {
+  1: [['x + a', (x, a) => x + a, a => `ועוד ${a}`, [3, 9]], ['x × a', (x, a) => x * a, a => `כפול ${a}`, [2, 5]], ['x − a', (x, a) => x - a, a => `פחות ${a}`, [2, 6]]],
+  2: [['ax + b', (x, a, b) => a * x + b, (a, b) => `כפול ${a} ועוד ${b}`, [2, 4]], ['ax − b', (x, a, b) => a * x - b, (a, b) => `כפול ${a} פחות ${b}`, [2, 4]], ['x²', x => x * x, () => 'כפול עצמו']],
+  3: [['x² + a', (x, a) => x * x + a, a => `כפול עצמו ועוד ${a}`, [1, 6]], ['(x + a) × b', (x, a, b) => (x + a) * b, (a, b) => `ועוד ${a}, ואז כפול ${b}`, [1, 4]], ['x(x+1)', x => x * (x + 1), () => 'כפול המספר שאחריו'], ['x² − x', x => x * x - x, () => 'כפול עצמו, פחות עצמו']],
+};
+function genMagic(d) {
+  d = Math.min(d, 3);
+  for (let k = 0; k < 100; k++) {
+    const R0 = pick(MAGIC[d]); const a = R0[3] ? ri(R0[3][0], R0[3][1]) : 0, b = ri(1, 5);
+    const f = x => R0[1](x, a, b);
+    const ins = shuffle([1, 2, 3, 4, 5, 6, 7]).slice(0, 4); const q0 = ins.pop();
+    if (ins.some(x => f(x) < 0) || f(q0) < 0) continue;
+    ins.sort((x, y) => x - y);
+    const outs = ins.map(f);
+    const inverse = d === 3 && R() < .35;
+    let x1 = q0 + (d >= 2 ? ri(3, 6) : 0); if (inverse) x1 = q0 + ri(2, 5);
+    if (ins.includes(x1)) continue;
+    const ans = inverse ? x1 : f(x1);
+    if (ans > 400) continue;
+    const alts = [ans + 1, ans - 1, x1 + (outs[0] - ins[0]), x1 * Math.round(outs[0] / Math.max(1, ins[0])), f(x1 - 1), f(x1 + 1)];
+    const row = (i, o) => `<div class="mrow"><b>${i}</b><i>→</i><span class="mb">?</span><i>→</i><b>${o}</b></div>`;
+    const vis = `<div class="mbox" dir="ltr">${ins.map((x, j) => row(x, outs[j])).join('')}${inverse ? row('?', f(x1)) : row(x1, '?')}</div>`;
+    const rule = R0[2](a, b);
+    const prompt = inverse ? 'כל מספר שנכנס לתיבה יוצא לפי אותו חוק. איזה מספר נכנס, אם יצא ' + L(f(x1)) + '?' : 'כל מספר שנכנס לתיבה יוצא לפי אותו חוק. מה ייצא?';
+    const ex = `החוק: ${rule}. בדיקה: ${ins.map((x, j) => `${x}→${outs[j]}`).map(L).join(', ')}. ${inverse ? `מחפשים מספר שאחרי החוק נותן ${f(x1)}: ${L(`${x1} → ${f(x1)}`)}.` : `ולכן ${L(`${x1} → ${ans}`)}.`} טריק: חוק שמתאים רק לזוג הראשון הוא מלכודת. בודקים את כולם.`;
+    const q = numQ('math', d, prompt, vis, ans, inverse ? [x1 + 1, x1 - 1, f(x1) - (outs[0] - ins[0]), Math.round(f(x1) / 2)] : alts, ex);
+    q.lk = 'magic'; return q;
+  }
+  return genMath5(d);
+}
+MT.magic = genMagic;
+[1, 2, 3, 4].forEach(k => MPOOL[k] && MPOOL[k].push('magic'));
+
+/* ================= NEW FORMAT 2: SYLLOGISMS (premises → sure conclusion) ================= */
+const SING = w => { const s = w.slice(0, -2), f = { 'נ': 'ן', 'מ': 'ם', 'פ': 'ף', 'כ': 'ך', 'צ': 'ץ' }; return s.slice(0, -1) + (f[s.slice(-1)] || s.slice(-1)); };
+const NONW = ['זרגים', 'פלימים', 'טרומים', 'גלונים', 'בורקים', 'שמילים', 'קרפים', 'דולגים', 'מינקים', 'סלפים'];
+const SY = {
+  all: (A, B) => `כל ה${A} הם ${B}.`, some: (A, B) => `חלק מה${A} הם ${B}.`, none: (A, B) => `אין ${A} שהם ${B}.`, someNot: (A, B) => `חלק מה${A} אינם ${B}.`,
+};
+const SYT = [
+  { d: 1, p: (A, B, C) => [SY.all(A, B), SY.all(B, C)], c: (A, B, C) => [SY.all(A, C), SY.all(C, A), SY.none(A, C), SY.all(C, B)], ex: (A, B, C) => `כל ה${A} נמצאים בתוך ה${B}, וכל ה${B} בתוך ה${C}. אז כל ה${A} בתוך ה${C}. ההפך (כל ה${C} הם ${A}) לא בטוח.` },
+  { d: 1, p: (A, B, C) => [SY.all(A, B), SY.none(B, C)], c: (A, B, C) => [SY.none(A, C), SY.some(A, C), SY.all(C, A), SY.all(B, A)], ex: (A, B, C) => `ה${A} כולם בתוך ה${B}, ואף ${SING(B)} אינו ${SING(C)}. אז גם אף ${SING(A)} אינו ${SING(C)}.` },
+  { d: 2, p: (A, B, C) => [SY.some(A, B), SY.all(B, C)], c: (A, B, C) => [SY.some(A, C), SY.all(A, C), SY.none(A, C), SY.all(C, B)], ex: (A, B, C) => `ה${A} שהם ${B} הם גם ${C} (כי כל ה${B} הם ${C}). אז לפחות חלק מה${A} הם ${C}. על כל ה${A} אי אפשר לדעת.` },
+  { d: 2, p: (A, B, C) => [SY.all(A, B), SY.some(C, A)], c: (A, B, C) => [SY.some(C, B), SY.all(C, B), SY.all(B, A), SY.none(C, B)], ex: (A, B, C) => `חלק מה${C} הם ${A}, וכל ${SING(A)} הוא גם ${SING(B)}. אז החלק הזה של ה${C} הוא ${B}.` },
+  { d: 2, p: (A, B, C) => [SY.none(A, B), SY.all(C, B)], c: (A, B, C) => [SY.none(C, A), SY.some(C, A), SY.all(B, C), SY.none(B, C)], ex: (A, B, C) => `כל ה${C} בתוך ה${B}, וה${A} לגמרי מחוץ ל${B}. אז ה${A} וה${C} לא נפגשים בכלל.` },
+  { d: 3, p: (A, B, C) => [SY.all(A, B), SY.some(B, C)], c: (A, B, C) => ['אף אחת מהמסקנות האחרות לא בטוחה', SY.some(A, C), SY.none(A, C), SY.all(C, A)], ex: (A, B, C) => `ה${B} שהם ${C} יכולים להיות בדיוק אלה שאינם ${A}. לכן אי אפשר לדעת בוודאות שום דבר על ${A} ו${C}. זו המלכודת הכי נפוצה.` },
+  { d: 3, p: (A, B, C) => [SY.some(A, B), SY.some(B, C)], c: (A, B, C) => ['אף אחת מהמסקנות האחרות לא בטוחה', SY.some(A, C), SY.all(A, C), SY.none(A, C)], ex: (A, B, C) => `"חלק" ועוד "חלק" לא נותנים כלום. ייתכן שה${B} שהם ${A} שונים לגמרי מה${B} שהם ${C}.` },
+  { d: 3, p: (A, B, C) => [SY.all(A, B), SY.someNot(C, B)], c: (A, B, C) => [SY.someNot(C, A), SY.some(C, A), SY.none(A, C), SY.all(B, A)], ex: (A, B, C) => `כל ${SING(A)} הוא ${SING(B)}. ה${C} שאינם ${B} לא יכולים להיות ${A}. אז חלק מה${C} אינם ${A}.` },
+];
+const BELIEF = [['פילים', 'עכברים', 'גרים בחורים קטנים', 'גרים בחורים קטנים'], ['כלבים', 'ציפורים', 'מטילות ביצים', 'מטילים ביצים'], ['תפוחים', 'ירקות', 'גדלים מתחת לאדמה', 'גדלים מתחת לאדמה'], ['כדורסלנים', 'דגים', 'חיים במים', 'חיים במים'], ['פסנתרים', 'חלילים', 'מנגנים בהם בפה', 'מנגנים בהם בפה']];
+function genSyll(d) {
+  d = Math.min(d, 4);
+  if (d >= 3 && R() < .3) {
+    const [A, B, PB, PA] = pick(BELIEF);
+    const m = mc([`כל ה${A} ${PA}.`, 'אי אפשר להסיק כלום, כי המשפט הראשון לא נכון.', `כל ה${B} הם ${A}.`, `חלק מה${A} לא ${PA}.`]);
+    return { cat: 'logic', d, lk: 'belief', prompt: 'נניח ששני המשפטים נכונים, גם אם הם נשמעים מוזרים. מה נובע מהם בוודאות?', vis: `<div class="prem"><p>כל ה${A} הם ${B}.</p><p>כל ה${B} ${PB}.</p></div>`, options: m.options, answer: m.answer, ex: `בשאלות כאלה בודקים רק את ההיגיון, לא את המציאות. אם כל ה${A} הם ${B}, וכל ה${B} ${PB}, אז כל ה${A} ${PA}.` };
+  }
+  const T = pick(SYT.filter(t => t.d <= d && t.d >= Math.max(1, d - 1)));
+  const [A, B, C] = shuffle(NONW).slice(0, 3);
+  const m = mc(T.c(A, B, C));
+  return { cat: 'logic', d, lk: 'syll', prompt: 'לפי שני המשפטים, איזו מסקנה נכונה בוודאות?', vis: `<div class="prem">${T.p(A, B, C).map(s => `<p>${s}</p>`).join('')}</div>`, options: m.options, answer: m.answer, ex: T.ex(A, B, C) + ' טריק: מציירים עיגולים, ומנסים לבנות ציור שבו המסקנה לא נכונה. אם אפשר, היא לא בטוחה.' };
+}
+
+/* ================= NEW FORMAT 3: GROUPING WITH CONSTRAINTS ================= */
+function genGroups(d) {
+  d = Math.min(d, 3);
+  const M = d <= 1 ? { n: 4, teams: ['הכחולה', 'האדומה'], size: 2, lab: true, ctx: n => `${n} חברים מתחלקים לשתי קבוצות כדורסל של 2: הכחולה והאדומה.` }
+    : d === 2 ? { n: 6, teams: ['הכחולה', 'האדומה'], size: 3, lab: true, ctx: n => `${n} חברים מתחלקים לשתי קבוצות של 3 למשחק כדורסל: הכחולה והאדומה.` }
+      : { n: 6, teams: ['א', 'ב', 'ג'], size: 2, lab: false, ctx: n => `${n} חברים מתחלקים ל-3 זוגות לתרגיל מסירות.` };
+  const T = M.teams.length, unit = M.lab ? 'קבוצה' : 'זוג', same = M.lab ? 'באותה קבוצה' : 'באותו זוג';
+  for (let tries = 0; tries < 60; tries++) {
+    const ppl = shuffle(PEOPLE).slice(0, M.n).map(p => p[0]);
+    const all = []; const rec = (i, arr, cnt) => { if (i === M.n) return all.push(arr.slice()); for (let t = 0; t < T; t++) if (cnt[t] < M.size) { arr[i] = t; cnt[t]++; rec(i + 1, arr, cnt); cnt[t]--; } };
+    rec(0, [], Array(T).fill(0));
+    const sols = M.lab ? all : all.filter(a => { let nx = 0; for (const t of a) { if (t > nx) return false; if (t === nx) nx++; } return true; });
+    const truth = pick(sols);
+    const cons = [];
+    for (let i = 0; i < M.n; i++) for (let j = i + 1; j < M.n; j++) cons.push(truth[i] === truth[j] ? { t: 'with', i, j } : { t: 'apart', i, j });
+    if (M.lab) cons.push(...shuffle(ppl.map((_, i) => ({ t: 'in', i, k: truth[i] }))).slice(0, 1));
+    const sat = (a, c) => c.t === 'with' ? a[c.i] === a[c.j] : c.t === 'apart' ? a[c.i] !== a[c.j] : a[c.i] === c.k;
+    let chosen = [], cur = sols;
+    const maxWith = M.lab ? (d <= 1 ? 2 : 2) : 1; let nw = 0;
+    for (const c of shuffle(cons)) { if (c.t === 'with' && nw >= maxWith) continue; const nx = cur.filter(a => sat(a, c)); if (nx.length < cur.length) { chosen.push(c); cur = nx; if (c.t === 'with') nw++; } if (cur.length === 1) break; }
+    if (cur.length !== 1) continue;
+    for (const c of chosen.slice()) { const rest = chosen.filter(x => x !== c); if (sols.filter(a => rest.every(x => sat(a, x))).length === 1) chosen = rest; }
+    const sol = cur[0];
+    // question
+    const mates = i => ppl.filter((_, j) => j !== i && sol[j] === sol[i]);
+    let prompt, ans, others, x;
+    if (M.size === 2) {
+      const cand = ppl.map((_, i) => i).filter(i => !chosen.some(c => c.t === 'with' && (c.i === i || c.j === i)));
+      if (!cand.length) continue; x = pick(cand); ans = mates(x)[0];
+      others = ppl.filter((p, j) => j !== x && p !== ans);
+      prompt = `עם מי ${ppl[x]} ב${unit}?`;
+    } else {
+      const tt = pick([0, 1]); const mem = ppl.map((_, i) => i).filter(i => sol[i] === tt);
+      const k = pick(mem), [a, b] = mem.filter(i => i !== k);
+      ans = ppl[k]; x = a;
+      others = ppl.filter((_, j) => sol[j] !== sol[k]);
+      prompt = `מי השלישי בקבוצה של ${ppl[a]} ו${ppl[b]}?`;
+    }
+    const opts = [ans, ...shuffle(others).slice(0, 3)];
+    if (opts.length < 3) continue;
+    const ct = c => c.t === 'with' ? `${ppl[c.i]} ו${ppl[c.j]} ${same}.` : c.t === 'apart' ? `${ppl[c.i]} ו${ppl[c.j]} לא ${same}.` : `${ppl[c.i]} בקבוצה ${M.teams[c.k]}.`;
+    const groups = M.teams.map((tn, t) => `${M.lab ? 'הקבוצה ' + tn : 'זוג'}: ${ppl.filter((_, j) => sol[j] === t).join(', ')}`).join(' · ');
+    const m = mc(opts);
+    return { cat: 'logic', d, lk: 'groups', prompt, vis: `<p class="ctx">${M.ctx(M.n)}</p><ul class="clues grp">${shuffle(chosen).map(c => `<li>${ct(c)}</li>`).join('')}</ul>`, options: m.options, answer: m.answer,
+      ex: `${groups}. טריק: מציירים ${M.lab ? 'שתי עמודות' : 'שלושה זוגות ריקים'}, ממקמים קודם את מי שהמקום שלו ידוע, ובכל רמז "לא ${same}" שולחים לצד השני.` };
+  }
+  return genLogic(Math.min(d, 3));
+}
+
+/* ================= NEW FORMAT 4: FAMILY LOGIC ================= */
+const FAM = [
+  ['רותי היא אחותה של אמא של עידו. מה רותי לעידו?', ['דודה', 'סבתא', 'בת דודה', 'אחות'], 'אחות של אמא = דודה.', 1],
+  ['משה הוא האבא של האבא של שירה. מה משה לשירה?', ['סבא', 'דוד', 'אח', 'סבא רבא'], 'אבא של אבא = סבא.', 1],
+  ['נוי היא הבת של אח של יונתן. מה נוי ליונתן?', ['אחיינית', 'בת דודה', 'אחות', 'נכדה'], 'הבת של אח שלי היא האחיינית שלי.', 1],
+  ['גיל הוא הבן של הדוד של מאיה. מה גיל למאיה?', ['בן דוד', 'אח', 'אחיין', 'דוד'], 'הילד של דוד הוא בן דוד.', 1],
+  ['דנה היא הבת היחידה של סבא וסבתא של אורי מצד אמא. מה דנה לאורי?', ['אמא שלו', 'דודה שלו', 'בת דודה שלו', 'אחות שלו'], 'הבת של ההורים של אמא היא אמא, או אחות שלה. היא בת יחידה, אז זו אמא עצמה.', 2],
+  ['לאבא של תמר יש אח אחד, רון. לרון יש בן, טל. מה טל לאבא של תמר?', ['אחיין', 'בן דוד', 'בן', 'נכד'], 'טל הוא הבן של אח שלו, כלומר אחיין. (לתמר הוא בן דוד, אבל השאלה היא על אבא שלה.)', 2],
+  ['איתי הוא נכד של סבתא של רוני, אבל הוא לא אח של רוני. מה איתי לרוני?', ['בן דוד', 'דוד', 'אחיין', 'אבא'], 'נכד של סבתא שלה הוא הילד של אחד מהילדים שלה. אם הוא לא אח של רוני, הוא הילד של דוד או דודה: בן דוד.', 2],
+  ['האמא של האמא של האבא של נועה. מה היא לנועה?', ['סבתא רבא', 'סבתא', 'דודה', 'בת דודה'], 'אמא של אבא = סבתא. אמא של סבתא = סבתא רבא.', 2],
+  ['לשירה יש 2 אחים. לכל אחד מהם יש בדיוק אחות אחת. כמה ילדים במשפחה?', ['3', '4', '5', '6'], 'האחות של כל אחד מהאחים היא שירה עצמה. 2 בנים ושירה = 3.', 2],
+  ['לאבא של מאיה יש 3 אחים, ולכל אחד מהם 2 ילדים. לאמא של מאיה אין אחים ואחיות. כמה בני דודים ובנות דודות יש למאיה?', ['6', '8', '3', '5'], 'רק מצד אבא יש דודים: 3 × 2 = 6.', 2],
+  ['עמית מצביע על תמונה ואומר: "אין לי אחים ואחיות, אבל האבא של האיש בתמונה הוא הבן של אבא שלי." מי האיש בתמונה?', ['הבן של עמית', 'עמית עצמו', 'אבא של עמית', 'האחיין של עמית'], 'הבן של אבא של עמית, כשאין לו אחים, הוא עמית עצמו. אז האבא של האיש בתמונה הוא עמית, והאיש הוא הבן שלו.', 3],
+  ['רון הוא אבא של דן. דן הוא אבא של גיל. מה רון לבת של גיל?', ['סבא רבא', 'סבא', 'דוד', 'סבא רבא רבא'], 'רון → דן → גיל → הבת. שלושה דורות למטה: סבא רבא.', 3],
+  ['אמא של נוי היא אחות של אבא של עומר. מי זאת אמא של אמא של נוי, בשביל עומר?', ['סבתא שלו', 'דודה שלו', 'אין לה קשר אליו', 'סבתא רבא שלו'], 'אמא של נוי ואבא של עומר הם אחים. אז אמא שלה היא גם אמא של אבא של עומר: הסבתא שלו.', 3],
+  ['לסבא וסבתא של ליה יש 3 ילדים. לכל ילד יש 2 ילדים. כמה בני דודים ובנות דודות יש לליה מהצד הזה?', ['4', '6', '5', '3'], 'יש 6 נכדים. מורידים את ליה ואת האח או האחות שלה (גם הם נכדים, אבל לא בני דודים): 6 − 2 = 4.', 3],
+].map(([q, o, ex, d]) => ({ q, o, ex, d }));
+function genFamily(d) {
+  const it = pickBank(FAM, 'fam', Math.min(d, 3)); const m = mc(it.o.map(o => /^\d+$/.test(o) ? L(o) : o));
+  return { cat: 'logic', d, lk: 'family', prompt: it.q, vis: '', options: m.options, answer: m.answer, ex: it.ex + ' טריק: מציירים עץ קטן, דור בכל שורה.' };
+}
+
+/* --- routing: logic chapter gets the new formats --- */
+const _genLogic9 = GEN.logic;
+GEN.logic = d => { const r = R(); return r < .16 ? genSyll(d) : r < .30 ? genGroups(d) : r < .40 ? genFamily(d) : _genLogic9(d); };
 /* ================= V4: JOKES + DAD'S DIAMONDS ================= */
 const JOKES = [
   ['למה ספר המתמטיקה היה עצוב?', 'כי היו לו יותר מדי בעיות.'],
@@ -1745,7 +1965,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '9';
+const APP_VER = '10';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -2034,7 +2254,7 @@ const SFX = {
   ok() { tone(660, 0, .12); tone(990, .08, .2); }, no() { tone(180, 0, .28, 'sawtooth', .07); buzz(60); },
   combo() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .07, .22)); }, coin() { tone(988, 0, .08, 'square', .05); tone(1319, .07, .22, 'square', .05); },
   hit() { tone(140, 0, .16, 'square', .1); tone(90, .05, .2, 'sawtooth', .06); }, win() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, i * .11, .28)); }, tap() { tone(520, 0, .04, 'sine', .05); },
-  beep() { tone(1760, 0, .09, 'square', .05); },
+  beep() { tone(1760, 0, .09, 'square', .05); }, soft() { tone(392, 0, .14, 'sine', .07); tone(330, .1, .2, 'sine', .06); buzz(30); },
 };
 function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { } }
 
@@ -2230,7 +2450,7 @@ function startMission(kind, day, cat, size, path) {
   day = day || nextDay() || TOTAL;
   const base = baseDiff(day), hard = c => Math.max(qDiffFor(c, base), Math.min(3, base));
   let qs, chapters = null, mod = null;
-  if (kind === 'review') { const pool = (dueMist().length ? dueMist() : S.mist).slice(0, 8); qs = pool.map(m => Object.assign({}, m.q, { rev: m.id })); }
+  if (kind === 'review') { const pool = (dueMist().length ? dueMist() : S.mist).slice(0, 8); qs = pool.map(mistQ); }
   else if (kind === 'sim') {
     const per = size === 'full' ? 12 : 6; qs = []; chapters = [];
     CHAPTERS.forEach(ch => { const s = qs.length; for (let j = 0; j < per; j++) { const c = ch.cats[j % ch.cats.length]; qs.push(mkQ(c, hard(c), .35)); } chapters.push({ n: ch.n, s, e: qs.length - 1, mins: per }); });
@@ -2245,7 +2465,7 @@ function startMission(kind, day, cat, size, path) {
     }
     const tp = kind === 'boss' ? .3 : mod === 'typed' ? 1 : .2;
     qs = shuffle(slots).map(c => mkQ(c, kind === 'boss' ? hard(c) : qDiffFor(c, base), tp));
-    if (kind === 'daily') dueMist().slice(0, 2).forEach((m, j) => { qs[qs.length - 1 - j * 3] = Object.assign({}, m.q, { rev: m.id }); });
+    if (kind === 'daily') dueMist().slice(0, 2).forEach((m, j) => { qs[qs.length - 1 - j * 3] = mistQ(m); });
   }
   S.cur = { kind, day, cat: cat || null, qs, i: 0, res: [], pts: 0, combo: 0, hint: false, qStart: Date.now(), deadline: null, hp: 5, mod, size,
     path: !!path, intro: kind === 'daily' || kind === 'sim' || kind === 'boss', chapters, ch: 0, chDeadline: null, chBreak: false, tin: '' };
@@ -2294,7 +2514,7 @@ function renderQuiz() {
       : `<div class="typed"><div class="tin-row"><div class="sprint-in" id="tin">${c.tin || '&nbsp;'}</div>${q.unit ? `<span class="unit">${q.unit}</span>` : ''}</div><div class="keypad" dir="ltr">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => `<button data-tk="${k}">${k}</button>`).join('')}<button data-tk=".">.</button><button data-tk="0">0</button><button data-tk="del" class="k-alt">מחק</button></div><button class="btn btn-primary btn-wide" data-act="tcheck" style="margin-top:10px">בדיקה</button></div>`;
   } else {
     const gridOpts = q.options.some(o => o.includes('<svg') || o.includes('class="sym"'));
-    body = `<div class="opts ${gridOpts ? 'grid' : ''}">${q.options.map((o, i) => { let cls = 'opt'; if (answered) { if (i === q.answer) cls += ' ok'; else if (i === r.sel) cls += ' no'; } return `<button class="${cls}" data-opt="${i}" ${answered ? 'disabled' : ''}><span class="lt">${L8[i]}</span><span class="ob">${o}</span></button>`; }).join('')}</div>`;
+    body = `<div class="opts ${gridOpts ? 'grid' : ''}">${q.options.map((o, i) => { let cls = 'opt'; const tr = c.tried && c.tried.i === c.i; if (answered) { if (i === q.answer) cls += ' ok'; else if (i === r.sel || (r.second && i === r.sel1)) cls += ' no'; } else if (tr && i === c.tried.sel) cls += ' gone'; return `<button class="${cls}" data-opt="${i}" ${answered || cls.includes('gone') ? 'disabled' : ''}><span class="lt">${L8[i]}</span><span class="ob">${o}</span></button>`; }).join('')}</div>`;
   }
   const lvl = [1, 2, 3, 4].map(n => `<i class="${n <= q.d ? 'on' : ''}"></i>`).join('');
   let fb = '';
@@ -2302,9 +2522,10 @@ function renderQuiz() {
     const tchip = `<span class="tchip ${r.secs <= 60 ? 'ok' : ''}">${Math.round(r.secs)} שנ׳</span>`;
     const ansTxt = q.type === 'order' ? 'הסדר הנכון למעלה' : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
     const LS = LESSONS[lessonFor(q)] || LESSONS.logic;
-    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!']) + (r.gain ? ` +${r.gain}` : '') : 'לא הפעם. התשובה: ' + ansTxt} ${tchip}</h4><div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span>${LS[1]}</div>${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${!r.ok && !q.champ ? '<p class="mnote">נשמרה במחברת · חוזרת מחר</p>' : ''}</div>`;
+    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4><div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span>${LS[1]}</div>${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}</div>`;
   }
-  const hint = c.hint && !answered ? `<div class="hintbox"><b>טריק:</b> ${CATS[q.cat].tip}</div>` : '';
+  const tried = !answered && c.tried && c.tried.i === c.i;
+  const hint = tried ? retryBox(q, c.tried) : q.twin && !answered ? `<div class="hintbox"><b>הכלל:</b> ${(LESSONS[lessonFor(q)] || LESSONS.logic)[1]}</div>` : c.hint && !answered ? `<div class="hintbox"><b>טריק:</b> ${CATS[q.cat].tip}</div>` : '';
   const comboTag = c.combo >= 2 && !deferred(c.kind) ? `<span class="combo">${IC.flame}${c.combo}</span>` : '';
   let battle = '';
   if (c.kind === 'boss') {
@@ -2315,11 +2536,11 @@ function renderQuiz() {
   const hintLbl = c.hint ? 'רמז נפתח' : S.hints > 0 ? `רמז (${S.hints} חינם)` : 'רמז (−3 נק׳)';
   const foot = answered ? `<button class="btn btn-primary" data-act="next">${c.i === c.qs.length - 1 ? 'לסיכום' : 'לשאלה הבאה'}</button>`
     : deferred(c.kind) ? `<button class="btn btn-ghost" data-act="skip">דלג וחזור אחר כך</button>`
-      : (c.mod === 'nohint' || q.champ) ? `<button class="btn btn-ghost" disabled>${q.champ ? 'שאלת האלוף: בלי רמזים' : 'היום בלי רמזים'}</button>` : `<button class="btn btn-ghost" data-act="hint" ${c.hint ? 'disabled' : ''}>${hintLbl}</button>`;
+      : (c.mod === 'nohint' || q.champ) ? `<button class="btn btn-ghost" disabled>${q.champ ? 'שאלת האלוף: בלי רמזים' : 'היום בלי רמזים'}</button>` : `<button class="btn btn-ghost" data-act="hint" ${c.hint || tried ? 'disabled' : ''}>${hintLbl}</button>`;
   const el = Math.floor((Date.now() - c.qStart) / 1000);
   const pace = answered ? '' : `<div class="pace ${c.mod === 'blitz' ? 'blitz' : ''}" title="יעד: דקה לשאלה"><i style="animation-delay:-${Math.min(el, 60)}s"></i></div>`;
   app.innerHTML = `<div class="qbar"><button class="icon-btn" data-act="quit" aria-label="יציאה">${IC.x}</button><div class="pdots">${dots}</div><div class="qmeta"><span class="pts">${c.pts} נק׳</span><span class="tm" id="tm"></span></div></div>${chTag}${battle}
-  <div class="card ${q.champ ? 'champq' : ''}"><div class="qtop"><span class="tag ${q.rev ? 'rev' : ''}">${q.champ ? 'שאלת האלוף · ' : q.rev ? 'מהמחברת · ' : ''}${CATS[q.cat].n}</span>${comboTag}<span class="lvl">רמה ${lvl}</span></div>${pace}
+  <div class="card ${q.champ ? 'champq' : ''}"><div class="qtop"><span class="tag ${q.rev ? 'rev' : ''}">${q.champ ? 'שאלת האלוף · ' : q.rev ? (q.twin ? 'מהמחברת · גרסה קלה · ' : 'מהמחברת · ') : ''}${CATS[q.cat].n}</span>${comboTag}<span class="lvl">רמה ${lvl}</span></div>${pace}
   <p class="qprompt">${q.prompt}</p><div class="qvis">${q.vis}</div>${body}${hint}${fb}</div>
   <div class="qfoot"><div class="in">${foot}</div></div>`;
   bind();
@@ -2343,6 +2564,14 @@ function answer(i, val) {
   if (deferred(c.kind)) c.lock = true;
   const typed = q.type === 'num';
   const ok = q.type === 'order' ? JSON.stringify(val) === JSON.stringify(q.correct) : typed ? Math.abs(parseFloat(val) - q.ansv) < .001 : i === q.answer, secs = (Date.now() - c.qStart) / 1000;
+  const first = !(c.tried && c.tried.i === c.i);
+  if (!ok && first && !deferred(c.kind) && !q.champ) {
+    c.tried = { i: c.i, sel: typed || q.type === 'order' ? -1 : i, val: q.type === 'order' ? val : typed ? String(val) : undefined };
+    c.combo = 0; rateQ(q, false, secs, c); noteMist(q, false, c, true);
+    c.tin = ''; c.ord = []; SFX.soft(); save(); renderQuiz();
+    setTimeout(() => { const f = app.querySelector('.retry'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 250);
+    return;
+  }
   let gain = 0;
   if (ok) {
     c.combo++;
@@ -2355,20 +2584,14 @@ function answer(i, val) {
     if (c.hint && !c.freeHint) gain = Math.max(0, gain - 3);
     if (deferred(c.kind)) gain = Math.round(gain * 1.5);
     if (c.kind === 'practice' || c.kind === 'review') gain = Math.round(gain / 2);
+    if (!first) gain = Math.round(gain / 2);
   } else c.combo = 0;
   const prev = c.res[c.i]; if (prev) c.pts -= prev.gain;
-  c.res[c.i] = { sel: typed || q.type === 'order' ? -1 : i, val: q.type === 'order' ? val : typed ? String(val) : undefined, ok, gain, secs };
+  c.res[c.i] = { sel: typed || q.type === 'order' ? -1 : i, val: q.type === 'order' ? val : typed ? String(val) : undefined, ok, gain, secs, second: !first, sel1: first ? null : c.tried.sel };
   c.pts += gain;
   if (!prev) c.res[c.i].newRule = noteLesson(q).first;
-  if (!prev) {
-    const rr = S.rat[q.cat] ?? baseDiff(c.day || nextDay() || TOTAL);
-    S.rat[q.cat] = Math.max(1, Math.min(4.4, rr + (ok ? (q.d >= Math.round(rr) ? .14 : .06) : -.18)));
-    const t = S.times[q.cat] || (S.times[q.cat] = { s: 0, n: 0 }); t.s += Math.min(secs, 300); t.n++;
-    if (q.d >= 3) { const hk = CHAPKEY[q.cat]; if (hk) { S.hard = S.hard || {}; const h = S.hard[hk] || (S.hard[hk] = { c: 0, t: 0 }); h.t++; if (ok) h.c++; } }
-  }
-  const today = todayStr();
-  if (q.rev) { const m = S.mist.find(x => x.id === q.rev); if (m) { if (ok) { m.box++; if (m.box >= 2) { S.mist = S.mist.filter(x => x !== m); S.fixed = (S.fixed || 0) + 1; } else m.due = addDays(today, 3); } else { m.box = 0; m.due = addDays(today, 1); } } }
-  else if (!ok && c.kind !== 'sim' && !q.champ) { const id = mistId(q); if (!S.mist.some(x => x.id === id)) { const qq = Object.assign({}, q); delete qq.rev; S.mist.push({ id, q: qq, due: addDays(today, 1), box: 0 }); if (S.mist.length > 50) S.mist.shift(); } }
+  if (!prev && first) rateQ(q, ok, secs, c);
+  noteMist(q, ok, c, first);
   c.tin = ''; c.ord = [];
   const btn = typed ? document.getElementById('tin') : app.querySelector(`[data-opt="${i}"]`);
   if (deferred(c.kind)) {
@@ -2392,7 +2615,7 @@ function nextQ() {
     if (c.kind === 'daily' && !c.champOffered) { c.champOffered = true; c.champ = 'offer'; save(); renderQuiz(); window.scrollTo(0, 0); return; }
     return finish();
   }
-  c.i++; c.hint = false; c.freeHint = false; c.ord = []; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
+  c.i++; c.hint = false; c.freeHint = false; c.ord = []; c.tried = null; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
 }
 function finish() {
   clearTimers();
@@ -2708,7 +2931,6 @@ function nextStep() {
   if (nd && nd <= unlocked()) return 'mission';
   if (dueMist().length >= 3 && S.reviewDay !== todayStr()) return 'review';
   if (S.bonusDay !== todayStr()) return 'bonus';
-  if ((!S.extLast || dayDiff(S.extLast, todayStr()) >= 7) && S.extSkip !== todayStr() && doneCount(S) >= 3) return 'ext';
   return nd ? 'done' : 'finished';
 }
 function todayChips(step) {
@@ -2773,7 +2995,7 @@ function viewStats() {
   const seg = `<div class="seg">${PT.map(([k, n]) => `<button data-ptab="${k}" class="${t === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   let body;
   if (t === 'me') body = viewMeTab();
-  else if (t === 'data') { const weak = Object.keys(CATS).filter(k => (S.rat[k] ?? 9) < 1.8 && (S.stats[k] || { t: 0 }).t >= 5); body = `${viewDataTab()}${(S.ext || []).length ? `<section><div class="sec-h"><h3>מבחנים במחונן אונליין</h3></div><div class="card small">${S.ext.slice().reverse().map(e => `<div class="row" style="justify-content:space-between;padding:3px 0"><span>${e.d.split('-').reverse().join('.')}</span><b>${e.v}%</b></div>`).join('')}</div></section>` : ''}<section><div class="sec-h"><h3>תרגול לפי נושא</h3><span class="muted small">6 שאלות</span></div><div class="chips">${Object.keys(CATS).map(k => `<button class="chip ${weak.includes(k) ? 'hot' : ''}" data-practice="${k}">${CATS[k].n}</button>`).join('')}</div></section>`; }
+  else if (t === 'data') { const weak = Object.keys(CATS).filter(k => (S.rat[k] ?? 9) < 1.8 && (S.stats[k] || { t: 0 }).t >= 5); body = `${viewDataTab()}<section><div class="sec-h"><h3>תרגול לפי נושא</h3><span class="muted small">6 שאלות</span></div><div class="chips">${Object.keys(CATS).map(k => `<button class="chip ${weak.includes(k) ? 'hot' : ''}" data-practice="${k}">${CATS[k].n}</button>`).join('')}</div></section>`; }
   else if (t === 'rules') body = viewRulesTab();
   else body = `<section class="card stack" style="gap:14px">
     <button class="btn btn-ghost" data-go="parent">אזור הורים</button>
