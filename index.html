@@ -443,6 +443,12 @@ html.sbx #app{padding-top:38px}
 html.sbx .qbar{top:calc(env(safe-area-inset-top,0px) + 28px)}
 .sbx-tools{border-color:rgba(255,200,69,.6);background:repeating-linear-gradient(-45deg,rgba(255,200,69,.06) 0 14px,transparent 14px 28px),var(--panel)}
 
+/* update banner & toast */
+#updbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:45;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;border-radius:99px;background:var(--bg2);border:1px solid var(--acc);box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 18px var(--acc-glow);font-weight:600;font-size:.88rem;white-space:nowrap;direction:rtl}
+#updbar button{background:var(--acc);color:var(--on-acc);border-radius:99px;padding:7px 14px;font-weight:700}
+#toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:60;background:#F3F6FF;color:#0A0F24;font-weight:600;padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
 /* modal */
 .modal{position:fixed;inset:0;z-index:20;background:rgba(5,8,20,.7);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px}
 .modal .card{max-width:360px;width:100%;background:var(--bg2)}
@@ -1390,6 +1396,7 @@ function viewParent() {
     <div class="muted small">רעיונות (לחיצה ממלאת):</div><div class="chips">${REWARD_IDEAS.map(([t, p], i) => `<button class="chip" data-idea="${i}">${t} · ${p}</button>`).join('')}</div></div></div></section>
   <section class="card tip"><h4>איך ${ME.name} מרוויח יהלומים</h4><ul>${DIA_RULES.map(r => `<li>${r}</li>`).join('')}</ul><p class="small muted" style="margin-top:8px">בקצב הצטיינות טוב זה בערך 5-8 יהלומים בשבוע. כדאי לתמחר פרס גדול כך שיידרשו 3-4 שבועות של עבודה רצינית.</p></section>
   <section><div class="sec-h"><h3>היסטוריה</h3></div><div class="card small">${(S.diaLog || []).slice(0, 15).map(l => `<div class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--edge)"><span>${esc(l.why)}</span><span style="color:${l.n > 0 ? 'var(--good)' : 'var(--bad)'}">${l.n === 0 ? '✓' : (l.n > 0 ? '+' : '') + l.n} · ${l.d.slice(5).split('-').reverse().join('.')}</span></div>`).join('') || '<span class="muted">עוד אין.</span>'}</div></section>
+  ${backupSection()}
   ${isSbx() ? '' : `<section class="card stack" style="gap:8px"><h4 style="font-size:1.15rem">מצב בדיקה</h4><p class="small muted" style="margin:0">משחק בעותק נפרד של האפליקציה: כל המשימות פתוחות, ואפשר לקפוץ לכל יום, לתת מטבעות ולבדוק פרסים. הנתונים של ${ME.name} לא משתנים. קיצור נסתר: 5 לחיצות מהירות על "ימים למבחן" במסך הבית.</p><button class="btn btn-gold" data-act="sbxenter">כניסה למצב בדיקה</button></section>`}
   <button class="btn btn-ghost btn-wide" data-act="pout">יציאה מאזור הורים</button></div>`;
 }
@@ -1546,6 +1553,71 @@ function bindSandbox() {
     }
     SFX.tap(); save(); render();
   });
+}
+/* ================= V7: UPDATES + BACKUP ================= */
+const APP_VER = '7';
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
+function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
+async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
+async function doUpdate() {
+  toast('מעדכן...');
+  save();
+  try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); } catch (e) { }
+  try { if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); } } catch (e) { }
+  location.reload();
+}
+function updBanner(v) {
+  if (document.getElementById('updbar')) return;
+  const b = document.createElement('div'); b.id = 'updbar';
+  b.innerHTML = `<span>יש גרסה חדשה (${esc(v)})</span><button type="button">עדכן עכשיו</button>`;
+  document.body.appendChild(b); b.querySelector('button').onclick = doUpdate;
+}
+async function checkUpdate(manual) {
+  const v = await remoteVer();
+  if (v == null) { if (manual) toast('אין חיבור לשרת כרגע. נסה שוב כשיש אינטרנט.'); return; }
+  if (String(v) !== APP_VER) { if (S.cur && !manual) return updBanner(v); manual ? doUpdate() : updBanner(v); }
+  else if (manual) toast(`זו הגרסה הכי חדשה (${APP_VER})`);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkUpdate(false); });
+setTimeout(() => checkUpdate(false), 1500);
+
+/* backup / restore (parent area) */
+const backupName = () => `brainlab-${ME.name === 'יונתן' ? 'yonatan' : 'backup'}-${todayStr()}.json`;
+function backupText() { const o = JSON.parse(JSON.stringify(S)); o.cur = null; o._key = KEY; o._ver = APP_VER; o._at = new Date().toISOString(); return JSON.stringify(o); }
+async function doBackup() {
+  save();
+  const txt = backupText(), file = new File([txt], backupName(), { type: 'application/json' });
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: `גיבוי של מעבדת המוח, ${todayStr().split('-').reverse().join('.')}` }); S.lastBackup = todayStr(); save(); render(); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card" style="max-width:420px"><h4>קוד גיבוי</h4><p>מעתיקים את כל הטקסט ושומרים אותו במקום בטוח, למשל בהודעה לעצמך בוואטסאפ.</p><textarea class="txt" readonly style="width:100%;height:120px;font-size:.7rem;direction:ltr">${esc(txt)}</textarea><div class="rw" style="margin-top:10px"><button class="btn btn-primary" data-m="copy">העתק</button><button class="btn btn-ghost" data-m="no">סגור</button></div></div>`;
+  app.appendChild(m);
+  m.addEventListener('click', async e => { if (e.target === m || e.target.closest('[data-m="no"]')) m.remove(); else if (e.target.closest('[data-m="copy"]')) { try { await navigator.clipboard.writeText(txt); toast('הועתק'); S.lastBackup = todayStr(); save(); } catch (er) { const ta = m.querySelector('textarea'); ta.select(); toast('סמן והעתק ידנית'); } } });
+}
+function restoreFrom(txt) {
+  let o; try { o = JSON.parse(txt); } catch (e) { return toast('הקובץ או הקוד לא תקינים.'); }
+  if (!o || !o.start || !o.missions) return toast('זה לא נראה כמו גיבוי של מעבדת המוח.');
+  const n = Object.keys(o.missions).length;
+  modal('לשחזר מהגיבוי?', `בגיבוי: ${n} משימות, ${o.xp || 0} נקודות, ${o.dia || 0} יהלומים, מתאריך ${String(o._at || '').slice(0, 10).split('-').reverse().join('.')}. ההתקדמות הנוכחית בטלפון הזה תוחלף.`, 'לשחזר', () => {
+    delete o._key; delete o._ver; delete o._at; o.cur = null; o.view = 'home';
+    try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { return toast('השמירה נכשלה.'); }
+    location.reload();
+  }, 'btn-boss');
+}
+function backupSection() {
+  const lb = S.lastBackup ? `גיבוי אחרון: ${S.lastBackup.split('-').reverse().join('.')}` : 'עוד לא נעשה גיבוי';
+  const old = !S.lastBackup || dayDiff(S.lastBackup, todayStr()) >= 7;
+  return `<section class="card stack" style="gap:10px"><h4 style="font-size:1.15rem">גיבוי ושחזור</h4>
+  <p class="small muted" style="margin:0">ההתקדמות נשמרת רק בטלפון הזה, לא בשרת. אם הטלפון יתאפס או שינקו את הנתונים של Chrome, היא תימחק. גיבוי שולח קובץ קטן (למשל אליך בוואטסאפ), ואיתו אפשר לשחזר הכל, גם בטלפון אחר.</p>
+  <div class="small" style="color:${old ? 'var(--gold)' : 'var(--good)'}">${lb}${old ? ' · מומלץ לגבות פעם בשבוע' : ''}</div>
+  <div class="row"><button class="btn btn-gold" data-act="backup" style="flex:1;min-height:46px">גיבוי עכשיו</button><label class="btn btn-ghost" for="restoref" style="flex:1;min-height:46px">שחזור מקובץ</label><input type="file" id="restoref" accept=".json,application/json,text/plain" hidden></div>
+  <details class="small muted"><summary>שחזור מקוד שהועתק</summary><textarea class="txt" id="restoret" style="width:100%;height:80px;margin-top:6px;direction:ltr;font-size:.75rem" placeholder="הדבק כאן את קוד הגיבוי"></textarea><button class="btn btn-ghost" data-act="restoret" style="margin-top:6px;min-height:40px;width:100%">שחזור מהקוד</button></details></section>`;
+}
+function bindUpdate() {
+  const on = (a, fn) => { const e = app.querySelector(`[data-act="${a}"]`); if (e) e.onclick = fn; };
+  on('chkupd', () => checkUpdate(true));
+  on('backup', doBackup);
+  on('restoret', () => { const t = document.getElementById('restoret').value.trim(); if (t) restoreFrom(t); });
+  const f = document.getElementById('restoref'); if (f) f.onchange = () => { const file = f.files[0]; if (!file) return; const fr = new FileReader(); fr.onload = () => restoreFrom(fr.result); fr.readAsText(file); };
 }
 /* ================= APP V3: ELEMENTS ================= */
 document.documentElement.setAttribute('dir', 'rtl');
@@ -2267,6 +2339,7 @@ function viewStats() {
   <section><div class="sec-h"><h3>משימות אחרונות</h3></div><div class="card">${spark}</div></section>
   <section><div class="sec-h"><h3>הגדרות</h3></div><div class="card stack" style="gap:14px">
     <button class="btn btn-ghost" data-go="parent">אזור הורים (פרסים ויהלומים)</button>
+    <div class="field"><span>גרסה ${APP_VER}</span><button class="chip" data-act="chkupd">בדיקת עדכונים</button></div>
     <div class="field"><span>צלילים</span><button class="toggle ${S.sound ? 'on' : ''}" data-act="sound" aria-label="צלילים"></button></div>
     <label class="field" for="exam"><span>תאריך המבחן</span><input type="date" id="exam" value="${S.exam}"></label>
     <p class="muted small" style="margin:0">המסע התחיל ב-${S.start.split('-').reverse().join('.')}. משימה חדשה נפתחת כל יום, ואם פספסת יום אפשר להשלים. רמת הקושי מתאימה את עצמה לכל תחום לפי התשובות.</p>
@@ -2336,7 +2409,7 @@ function bind() {
   on('hints', () => { if (S.coins < 45) return modal('אין מספיק מטבעות', `חסרים ${45 - S.coins} מטבעות.`, 'הבנתי', () => { }, 'btn-primary', true); S.coins -= 45; S.hints += 3; SFX.coin(); save(); render(); });
   on('sound', () => { S.sound = !S.sound; save(); render(); if (S.sound) SFX.ok(); });
   on('spgo', spStart); on('kpgo', kpStart);
-  bindExtra(); bindSandbox();
+  bindExtra(); bindSandbox(); bindUpdate();
   app.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(b.dataset.share));
   const ex = document.getElementById('exam'); if (ex) ex.onchange = () => { if (ex.value) { S.exam = ex.value; save(); } };
 }
