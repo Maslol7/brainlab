@@ -466,6 +466,35 @@ html.sbx .qbar{top:calc(env(safe-area-inset-top,0px) + 28px)}
 .dot-st{width:10px;height:10px;border-radius:50%;flex:none;background:var(--good);box-shadow:0 0 8px var(--good)}
 .dot-st.bad{background:var(--bad);box-shadow:0 0 8px var(--bad)}
 
+/* v9: path, tabs, ordering */
+.today{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:-4px}
+.tchk{font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--panel);border:1px solid var(--edge);color:var(--muted)}
+.tchk.ok{color:var(--good);border-color:rgba(70,224,160,.4)}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mini>div{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:8px 6px;text-align:center}
+.mini b{display:block;font-family:var(--f-display);font-size:1.35rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.mini span{font-size:.7rem;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--panel);border:1px solid var(--edge)}
+.seg button{padding:9px 0;border-radius:10px;font-weight:600;font-size:.88rem;color:var(--muted)}
+.seg button.on{background:var(--acc);color:var(--on-acc)}
+.nav.four .in{grid-template-columns:repeat(4,1fr)}
+.node.simn{border-radius:18px;color:var(--violet);border-color:rgba(169,139,255,.5)}
+.node.simn svg{width:28px;height:28px}
+.node.simn.done{background:linear-gradient(180deg,#D9C9FF,#A98BFF);color:var(--bg0)}
+.tipd{border-bottom:1px solid var(--edge);padding:8px 0}.tipd:last-child{border-bottom:0}
+.tipd summary{cursor:pointer;font-weight:600}.tipd p{margin:6px 0 0}
+.ord-slots{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.ord-slot{display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 10px;border-radius:12px;border:2px dashed var(--edge2);text-align:start;font-size:.95rem}
+.ord-slot b{flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:.78rem;background:var(--panel2);color:var(--acc)}
+.ord-slot.full{border-style:solid;border-color:var(--acc);background:var(--acc-soft)}
+.ord-pool{display:flex;flex-direction:column;gap:6px}
+.ord-item{padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--edge);text-align:start;font-size:.95rem}
+.ord-res{display:flex;flex-direction:column;gap:6px}
+.ord-res .ord-slot{border-style:solid}
+.ord-res .ord-slot.ok{border-color:var(--good);background:rgba(70,224,160,.1)}
+.ord-res .ord-slot.no{border-color:var(--bad);background:rgba(255,92,122,.08)}
+#sbxbar button+button{margin-inline-start:-4px}
+
 /* modal */
 .modal{position:fixed;inset:0;z-index:20;background:rgba(5,8,20,.7);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px}
 .modal .card{max-width:360px;width:100%;background:var(--bg2)}
@@ -1358,6 +1387,7 @@ const LESSONS = {
 };
 function lessonFor(q) {
   const v = q.vis || '', p = q.prompt || '';
+  if (q.type === 'order') return /מהקטן/.test(p) ? 'onum' : 'ostory';
   const has = s => v.includes(s);
   if (has('class="lang"')) return 'lang';
   if (has('class="seats"')) return 'seating';
@@ -1395,6 +1425,43 @@ function lessonsSection() {
   const all = Object.keys(LESSONS).length;
   return `<section><div class="sec-h"><h3>הכללים שלי</h3><span class="muted small">${got.length}/${all}</span></div>${got.length ? `<div class="card rules">${got.map(k => `<div class="rl"><b>${LESSONS[k][0]}</b><span>${LESSONS[k][1]}</span></div>`).join('')}</div>` : '<div class="card muted small">כל סוג שאלה חדש מלמד כלל אחד. הם יופיעו כאן.</div>'}</section>`;
 }
+/* ================= V9: ORDERING QUESTIONS (drag-style format) ================= */
+const OSTORY = [
+  [['יונתן מצא בגינה גור חתולים רטוב ורועד.', 'הוא עטף אותו במגבת והביא אותו הביתה.', 'אחרי כמה ימים הגור כבר רץ בכל הבית.', 'היום הוא החתול הכי מפונק בשכונה.'], 1],
+  [['הקבוצה הפסידה בחצי הראשון 2:0.', 'בהפסקה המאמן שינה את המערך.', 'בחצי השני הם הבקיעו שלושה שערים.', 'בסוף המשחק האוהדים שרו ביציע.'], 1],
+  [['בבוקר השמיים היו בהירים לגמרי.', 'בצהריים התחילו להצטבר עננים כהים.', 'אחר הצהריים ירד מבול.', 'בערב, כשהגשם נפסק, הופיעה קשת בענן.'], 1],
+  [['הקופאי סרק את כל המוצרים.', 'הקופה הראתה שהסכום הוא 47 ₪.', 'הלקוח שילם בשטר של 50 ₪.', 'הקופאי החזיר לו 3 ₪ עודף.'], 1],
+  [['נועה נרשמה לתחרות פסנתר.', 'היא התאמנה כל יום במשך חודש.', 'ביום התחרות הידיים שלה רעדו, אבל היא ניגנה בלי טעויות.', 'השופטים העניקו לה את המקום השני.'], 2],
+  [['המדענית שמה לב שהצמחים בחלון גדלים מהר יותר.', 'היא שיערה שהסיבה היא האור.', 'היא שמה חצי מהצמחים בחושך וחצי באור.', 'אחרי שבועיים ההשערה שלה התאשרה.'], 2],
+  [['הלוחם עלה לזירה והתחמם.', 'בסיבוב הראשון הוא רק בדק את היריב.', 'בסיבוב השני הוא גילה שהיריב מוריד את הידיים כשהוא מתעייף.', 'בסיבוב השלישי הוא ניצל את זה וניצח.'], 2],
+  [['הביטלס התחילו לנגן במועדונים קטנים.', 'השירים שלהם התפרסמו בכל העולם.', 'בהופעות הקהל צרח כל כך חזק שלא שמעו את המוזיקה.', 'הם הפסיקו להופיע והתרכזו בעבודה באולפן.'], 3],
+  [['אורי שם לב שהאופניים שלו חורקים.', 'הוא חיפש בסרטון איך מוצאים את מקור הרעש.', 'הוא גילה שהשרשרת יבשה.', 'אחרי שמשח אותה בשמן, החריקה נעלמה.'], 3],
+].map(([s, d]) => ({ s, d }));
+function genOrdStory(d) {
+  const it = pickBank(OSTORY, 'os', Math.min(d, 3));
+  const perm = shuffle([0, 1, 2, 3]);
+  return { cat: 'verbal', d, type: 'order', prompt: 'סדר את המשפטים כך שייצרו סיפור הגיוני. לחץ עליהם לפי הסדר.', vis: '', items: perm.map(i => it.s[i]), correct: [0, 1, 2, 3].map(i => perm.indexOf(i)),
+    ex: `הסדר: ${it.s.map((x, i) => `${i + 1}. ${x}`).join(' ')} טריק: מחפשים קודם את המשפט שפותח (מציג דמות או מצב), ואחר כך את זה שסוגר. האמצע מסתדר לבד.` };
+}
+const ONUM = {
+  2: [['½', .5], ['¾', .75], ['⅖', .4], ['0.6', .6], ['0.7', .7], ['0.45', .45], ['⅔', 2 / 3], ['⅝', .625], ['0.3', .3], ['¼', .25], ['80%', .8], ['35%', .35], ['0.55', .55], ['⅗', .6 + .001]],
+  3: [['2³', 8], ['3²', 9], ['¾ מ-12', 9.001], ['25% מ-40', 10], ['0.5 × 14', 7.001], ['⅔ מ-15', 10.001], ['2⁴', 16], ['4²', 16.001], ['½ מ-30', 15], ['60 ÷ 4', 15.001], ['1.5 × 8', 12], ['20% מ-55', 11], ['3 × 3.5', 10.5]],
+};
+function genOrdNum(d) {
+  let items;
+  if (d <= 1) { const s = new Set(); items = []; while (items.length < 4) { const a = ri(3, 9), b = ri(3, 9), t = pick(['×', '+', '−']); const v = t === '×' ? a * b : t === '+' ? a * 4 + b : a * 6 - b; const txt = t === '×' ? `${a} × ${b}` : t === '+' ? `${a * 4} + ${b}` : `${a * 6} − ${b}`; if (!s.has(v)) { s.add(v); items.push([txt, v]); } } }
+  else { const pool = ONUM[Math.min(d, 3)]; for (;;) { items = shuffle(pool).slice(0, d >= 3 ? 5 : 4); const vs = items.map(x => Math.round(x[1] * 100)); if (new Set(vs).size === vs.length) break; } }
+  const sorted = items.slice().sort((a, b) => a[1] - b[1]);
+  const disp = items.map(x => L(x[0]));
+  return { cat: 'math', d, type: 'order', prompt: 'סדר מהקטן לגדול. לחץ על המספרים לפי הסדר.', vis: '', items: disp, correct: sorted.map(x => items.indexOf(x)),
+    ex: `הערכים: ${sorted.map(x => `${L(x[0])} = ${L(String(Math.round(x[1] * 100) / 100))}`).join(', ')}. טריק: ${d <= 1 ? 'מחשבים כל תרגיל לפני שמשווים.' : 'ממירים הכל לאותה צורה (עשרוני או אחוזים) ורק אז משווים.'}` };
+}
+MT.ordnum = genOrdNum;
+MPOOL[1].push('ordnum'); MPOOL[2].push('ordnum'); MPOOL[3].push('ordnum'); MPOOL[4].push('ordnum');
+const _genVerbal5 = genVerbal5;
+GEN.verbal = d => R() < .15 ? genOrdStory(d) : _genVerbal5(d);
+LESSONS.ostory = ['סידור סיפור', 'מוצאים קודם את הפתיחה ואת הסוף. האמצע מסתדר לבד.'];
+LESSONS.onum = ['סידור מספרים', 'ממירים הכל לאותה צורה, ורק אז משווים.'];
 /* ================= V4: JOKES + DAD'S DIAMONDS ================= */
 const JOKES = [
   ['למה ספר המתמטיקה היה עצוב?', 'כי היו לו יותר מדי בעיות.'],
@@ -1502,6 +1569,7 @@ function viewParent() {
   ${cloudSection()}
   ${backupSection()}
   ${isSbx() ? '' : `<section class="card stack" style="gap:8px"><h4 style="font-size:1.15rem">מצב בדיקה</h4><p class="small muted" style="margin:0">משחק בעותק נפרד של האפליקציה: כל המשימות פתוחות, ואפשר לקפוץ לכל יום, לתת מטבעות ולבדוק פרסים. הנתונים של ${ME.name} לא משתנים. קיצור נסתר: 5 לחיצות מהירות על "ימים למבחן" במסך הבית.</p><button class="btn btn-gold" data-act="sbxenter">כניסה למצב בדיקה</button></section>`}
+  ${isSbx() ? '' : `<button class="btn btn-ghost btn-wide" data-act="reset" style="color:var(--bad);min-height:44px">איפוס ההתקדמות של ${ME.name}</button>`}
   <button class="btn btn-ghost btn-wide" data-act="pout">יציאה מאזור הורים</button></div>`;
 }
 function bindExtra() {
@@ -1602,13 +1670,15 @@ function sbxBadge() {
   document.documentElement.classList.toggle('sbx', isSbx());
   let el = document.getElementById('sbxbar');
   if (!isSbx()) { if (el) el.remove(); return; }
-  if (!el) { el = document.createElement('div'); el.id = 'sbxbar'; el.innerHTML = '<span>מצב בדיקה של אבא · הנתונים של יונתן לא משתנים</span><button type="button">יציאה</button>'; document.body.appendChild(el); el.querySelector('button').onclick = exitSandbox; }
+  if (!el) { el = document.createElement('div'); el.id = 'sbxbar'; el.innerHTML = '<span>מצב בדיקה · הנתונים של יונתן לא משתנים</span><button type="button" data-b="tools">כלים</button><button type="button" data-b="exit">יציאה</button>'; document.body.appendChild(el); el.querySelector('[data-b="exit"]').onclick = exitSandbox; el.querySelector('[data-b="tools"]').onclick = openSbxTools; }
 }
-function enterSandbox() {
+function sbxFresh() { try { localStorage.removeItem(SBX_KEY); } catch (e) { } S = load(); S.sbxInit = 1; S.start = addDays(todayStr(), -(TOTAL - 1)); S.pin = 'sbx'; S.coins = 300; }
+function sbxCopy() { let o = null; try { o = JSON.parse(localStorage.getItem(MAIN_KEY)); } catch (e) { } if (!o || !o.start) return sbxFresh(); o.cur = null; o.view = 'home'; o.pin = 'sbx'; o.sbxInit = 1; o.copied = todayStr(); try { localStorage.setItem(SBX_KEY, JSON.stringify(o)); } catch (e) { } S = load(); }
+function enterSandbox(mode) {
   save(); clearTimers();
   try { sessionStorage.setItem(SBX_FLAG, '1'); } catch (e) { }
-  KEY = SBX_KEY; S = load();
-  if (!S.sbxInit) { S.sbxInit = 1; S.start = addDays(todayStr(), -(TOTAL - 1)); S.pin = 'sbx'; S.coins = 300; }
+  KEY = SBX_KEY;
+  if (mode === 'copy') sbxCopy(); else if (mode === 'fresh') sbxFresh(); else { S = load(); if (!S.sbxInit) sbxFresh(); }
   SEEN = S.seen; PARENT_OK = false; S.view = 'home'; save(); render(); window.scrollTo(0, 0);
 }
 function exitSandbox() {
@@ -1623,7 +1693,7 @@ function askPinForSandbox() {
   m.innerHTML = `<div class="card" role="dialog" aria-modal="true"><h4>מצב בדיקה</h4><p>הזן קוד הורים.</p><input class="pin" id="sbxpin" type="password" inputmode="numeric" maxlength="4" style="width:100%;margin-bottom:12px"><div class="rw"><button class="btn btn-ghost" data-m="no">ביטול</button><button class="btn btn-primary" data-m="ok">כניסה</button></div></div>`;
   app.appendChild(m);
   const inp = m.querySelector('#sbxpin'); inp.focus();
-  const tryIt = () => { if (inp.value === pin) { m.remove(); enterSandbox(); } else { inp.value = ''; inp.style.borderColor = 'var(--bad)'; buzz(80); } };
+  const tryIt = () => { if (inp.value === pin) { m.remove(); chooseSandbox(); } else { inp.value = ''; inp.style.borderColor = 'var(--bad)'; buzz(80); } };
   inp.onkeydown = e => { if (e.key === 'Enter') tryIt(); };
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-m="no"]')) m.remove(); else if (e.target.closest('[data-m="ok"]')) tryIt(); });
 }
@@ -1632,17 +1702,18 @@ function secretTap() { const now = Date.now(); tapN = now - tapT < 700 ? tapN + 
 function sbxTools() {
   if (!isSbx()) return '';
   return `<section class="card stack sbx-tools" style="gap:10px"><h4 style="font-size:1.2rem">כלי בדיקה</h4><p class="small muted" style="margin:0">הכל כאן קורה בעותק נפרד. הנתונים של יונתן לא נגעו.</p>
-  <div class="chips"><button class="chip" data-sbx="unlock">פתח את כל המשימות</button><button class="chip" data-sbx="coins">+500 מטבעות</button><button class="chip" data-sbx="dia">+20 יהלומים</button><button class="chip" data-sbx="gear">פתח את כל הציוד</button><button class="chip" data-sbx="bday">יום הולדת היום</button><button class="chip" data-sbx="jokes">פתח את כל הבדיחות</button></div>
+  <div class="chips"><button class="chip" data-sbx="copy">עותק טרי של ${ME.name}</button><button class="chip" data-sbx="unlock">פתח את כל המשימות</button><button class="chip" data-sbx="coins">+500 מטבעות</button><button class="chip" data-sbx="dia">+20 יהלומים</button><button class="chip" data-sbx="gear">פתח את כל הציוד</button><button class="chip" data-sbx="bday">יום הולדת היום</button><button class="chip" data-sbx="jokes">פתח את כל הבדיחות</button></div>
   <div class="row"><input class="txt" id="sbxday" type="number" min="1" max="${TOTAL}" placeholder="קפיצה למשימה (1-${TOTAL})" style="flex:1"><button class="btn btn-primary" data-sbx="jump" style="min-height:44px">קפוץ</button></div>
   <div class="row"><button class="btn btn-ghost" data-sbx="reset" style="flex:1;min-height:44px">איפוס הבדיקה</button><button class="btn btn-gold" data-sbx="exit" style="flex:1;min-height:44px">יציאה</button></div></section>`;
 }
 function bindSandbox() {
   app.querySelectorAll('[data-tap5]').forEach(b => b.onclick = secretTap);
-  const sb = app.querySelector('[data-act="sbxenter"]'); if (sb) sb.onclick = enterSandbox;
+  const sb = app.querySelector('[data-act="sbxenter"]'); if (sb) sb.onclick = chooseSandbox;
   app.querySelectorAll('[data-sbx]').forEach(b => b.onclick = () => {
     const a = b.dataset.sbx;
     if (a === 'exit') return exitSandbox();
-    if (a === 'reset') { try { localStorage.removeItem(SBX_KEY); } catch (e) { } S = load(); S.sbxInit = 1; S.start = addDays(todayStr(), -(TOTAL - 1)); S.pin = 'sbx'; S.coins = 300; SEEN = S.seen; }
+    if (a === 'reset') { sbxFresh(); SEEN = S.seen; }
+    if (a === 'copy') { sbxCopy(); SEEN = S.seen; }
     if (a === 'unlock') S.start = addDays(todayStr(), -(TOTAL - 1));
     if (a === 'coins') S.coins += 500;
     if (a === 'dia') giveDia(20, 'בדיקה', []);
@@ -1655,11 +1726,26 @@ function bindSandbox() {
       for (let k = 1; k < N; k++) { const n = isBoss(k) ? 15 : 10, c = Math.max(Math.round(n * .7), n - ri(0, 2)); S.missions[k] = { c, n, pts: c * 15, date: todayStr() }; }
       S.streak = N - 1; S.best = Math.max(S.best, N - 1); S.lastDone = addDays(todayStr(), -1); S.xp = (N - 1) * 140; S.openW = null;
     }
-    SFX.tap(); save(); render();
+    SFX.tap(); save(); document.querySelector('.modal.sbxm')?.remove(); render(); toast('בוצע');
   });
 }
+
+function chooseSandbox() {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card" role="dialog" aria-modal="true"><h4>מצב בדיקה</h4><p>עותק נפרד. מה שתעשה בו לא נוגע בנתונים של ${ME.name}.</p><div class="stack" style="gap:8px"><button class="btn btn-primary" data-m="copy">עותק של ההתקדמות של ${ME.name}</button><button class="btn btn-ghost" data-m="fresh">מאפס, כל המשימות פתוחות</button>${(() => { try { return localStorage.getItem(SBX_KEY) ? '<button class="btn btn-ghost" data-m="cont">להמשיך מהבדיקה הקודמת</button>' : ''; } catch (e) { return ''; } })()}<button class="btn btn-ghost" data-m="no" style="min-height:42px">ביטול</button></div></div>`;
+  app.appendChild(m);
+  m.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (e.target === m || (b && b.dataset.m === 'no')) return m.remove(); if (!b) return; m.remove(); enterSandbox(b.dataset.m === 'cont' ? null : b.dataset.m); });
+}
+function openSbxTools() {
+  if (document.querySelector('.modal.sbxm')) return;
+  const m = document.createElement('div'); m.className = 'modal sbxm';
+  m.innerHTML = `<div class="card" style="max-width:420px;max-height:86vh;overflow:auto">${sbxTools().replace('<section class="card stack sbx-tools"', '<section class="stack sbx-tools"')}<button class="btn btn-ghost btn-wide" data-m="no" style="margin-top:10px;min-height:42px">סגור</button></div>`;
+  app.appendChild(m);
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-m="no"]')) m.remove(); });
+  bindSandbox();
+}
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '8';
+const APP_VER = '9';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -1754,7 +1840,7 @@ function cloudSection() {
   }
   return `<section class="card stack" style="gap:10px"><h4 style="font-size:1.15rem">ענן (לא חובה)</h4>
   <p class="small muted" style="margin:0">גיבוי אוטומטי, ואפשרות לראות את ההתקדמות מהטלפון שלך. בלי ענן הכל ממשיך לעבוד כרגיל.</p>
-  <input class="txt" id="curl" placeholder="כתובת מסד הנתונים (Firebase)" style="direction:ltr">
+  <input class="txt" id="curl" value="brainlab-yonatan" placeholder="מזהה הפרויקט או כתובת מסד הנתונים" style="direction:ltr">
   <input class="txt" id="ccode" placeholder="קוד משפחה (ריק = קוד חדש)" style="direction:ltr">
   <div class="row"><button class="btn btn-primary" data-act="ckid" style="flex:1;min-height:44px;font-size:.92rem">זה הטלפון של ${ME.name}</button><button class="btn btn-ghost" data-act="cdad" style="flex:1;min-height:44px;font-size:.92rem">זה הטלפון של אבא</button></div>
   <p class="small" id="cmsg" style="margin:0;color:var(--bad)"></p>
@@ -1774,8 +1860,9 @@ function bindCloud() {
   const on = (a, fn) => { const e = app.querySelector(`[data-act="${a}"]`); if (e) e.onclick = fn; };
   const msg = t => { const m = document.getElementById('cmsg'); if (m) m.textContent = t; };
   const connect = async role => {
-    const url = (document.getElementById('curl').value || '').trim(), code = (document.getElementById('ccode').value || '').trim() || (role === 'kid' ? newCode() : '');
-    if (!/^https:\/\/[^ ]+\.(firebaseio\.com|firebasedatabase\.app)\/?$/.test(url)) return msg('הכתובת צריכה להיות של Firebase Realtime Database.');
+    let url = (document.getElementById('curl').value || '').trim(); const code = (document.getElementById('ccode').value || '').trim() || (role === 'kid' ? newCode() : '');
+    if (/^[a-z0-9-]+$/.test(url)) { msg('מחפש את מסד הנתונים...'); url = await findDb(url); if (!url) return msg('לא מצאתי Realtime Database בפרויקט הזה. צריך ליצור אותו (שלב 2) ולפרסם את הכללים (שלב 3).'); }
+    if (!/^https:\/\/[^ ]+\.(firebaseio\.com|firebasedatabase\.app)\/?$/.test(url)) return msg('צריך מזהה פרויקט או כתובת של Firebase Realtime Database.');
     if (code.length < 15) return msg(role === 'kid' ? 'קוד קצר מדי.' : 'צריך להזין את קוד המשפחה מהטלפון של ' + ME.name + '.');
     msg(''); const c = { url, code, role };
     if (role === 'kid') { cloudSet(c); const ok = await cloudPut(); if (!ok) { msg('לא הצלחתי לשמור. בדוק את הכתובת ואת הכללים.'); cloudSet({}); return; } }
@@ -1787,6 +1874,15 @@ function bindCloud() {
   on('csync', async () => { toast(await cloudPut() ? 'סונכרן' : 'הסנכרון נכשל'); render(); });
   on('cpull', async () => { const g = await cloudGet(cloudCfg()); if (g.err || !g.data) return toast(g.err || 'אין נתונים בענן'); const d = g.data; d.pin = S.pin; restoreFrom(JSON.stringify(d)); });
   on('cview', async () => { const box = document.getElementById('cviewbox'); box.innerHTML = '<div class="small muted">טוען...</div>'; const g = await cloudGet(cloudCfg()); box.innerHTML = g.err ? `<div class="small" style="color:var(--bad)">${g.err}</div>` : g.data ? viewerHTML(g.data) : '<div class="small muted">אין עדיין נתונים.</div>'; });
+}
+
+async function findDb(id) {
+  const regs = ['', 'europe-west1', 'us-central1', 'asia-southeast1'];
+  for (const r of regs) {
+    const u = r ? `https://${id}-default-rtdb.${r}.firebasedatabase.app` : `https://${id}-default-rtdb.firebaseio.com`;
+    try { const res = await fetch(`${u}/brainlab/probe_000000000000000.json`, { cache: 'no-store' }); if (res.status === 200 || res.status === 401) return u; } catch (e) { }
+  }
+  return null;
 }
 /* ================= APP V3: ELEMENTS ================= */
 document.documentElement.setAttribute('dir', 'rtl');
@@ -2021,7 +2117,7 @@ function elemStrip() {
 
 /* ---------- HOME ---------- */
 const LINES = ['מוכן לשבור שיא היום?', 'כמו באימון כדורסל: קצת כל יום עושה את ההבדל.', 'בריאן מיי בנה גיטרה צעד אחרי צעד. גם אנחנו.', '15 דקות ביום, כמו תרגול פסנתר למוח.', 'לוחם טוב לא ממהר. קורא, חושב, ואז תוקף.', 'כל טעות היום היא נקודה במבחן.', 'האוהדים ביציע מחכים. בוא נעלה למגרש.', 'גם בקופה הראשית, מי שמחשב מהר לא נתקע בתור.'];
-function viewHome() {
+function viewHomeOld() {
   const nd = nextDay(), un = unlocked(), cur = S.cur, W = curWorld();
   const line = (dayDiff(S.start, todayStr()) % 3 === 0) ? W.line : LINES[(dayDiff(S.start, todayStr()) + LINES.length * 9) % LINES.length];
   let hero;
@@ -2072,7 +2168,7 @@ function viewHome() {
 }
 
 /* ---------- PROFILE (read only) ---------- */
-function viewMe() {
+function viewMeTab() {
   const { r, nx, pct } = rankOf(S.xp), g = gearOn();
   const gear = GEAR.map(it => `<div class="card gear ${g[it.id] ? '' : 'off'}"><span class="gi">${avatarSVG({ gear: { [it.id]: 1 } })}</span><div class="grow"><b>${it.n}</b><span>${g[it.id] ? 'נפתח!' : 'איך פותחים: ' + it.d}</span></div>${g[it.id] ? `<span style="color:var(--good)">${IC.star.replace('<svg', '<svg style="width:22px;height:22px"')}</span>` : ''}</div>`).join('');
   const badges = `<div class="badges">${BADGES.map((b, i) => { const on = S.badges.includes(b.id); return `<div class="card badge ${on ? '' : 'off'}">${medal(on, i)}<b>${b.n}</b>${b.d}</div>`; }).join('')}</div>`;
@@ -2083,7 +2179,7 @@ function viewMe() {
   <section><div class="sec-h"><h3>תגים</h3><span class="muted small">${S.badges.length}/${BADGES.length}</span></div>${badges}</section>
   <div class="card row">${IC.cake.replace('<svg', '<svg style="width:40px;height:40px;flex:none"')}<div class="grow">${isBday() ? '<b>היום יום ההולדת!</b>' : `<b>עוד ${daysToBday()} ימים ליום ההולדת</b><div class="muted small">13 בדצמבר. מחכה שם הפתעה.</div>`}</div></div>
   <button class="btn btn-gold btn-wide" data-share="summary">${IC.share} שתף סיכום בקבוצה של המשפחה</button>
-  <button class="btn btn-ghost btn-wide" data-go="home">חזרה למסע</button></div>`;
+  </div>`;
 }
 
 /* ---------- MISSIONS ---------- */
@@ -2129,7 +2225,7 @@ function mkQ(c, d, typedP = 0) {
   if (canType(q) && (R() < typedP || (d >= 4 && R() < .6))) q.type = 'num';
   return q;
 }
-function startMission(kind, day, cat, size) {
+function startMission(kind, day, cat, size, path) {
   ac();
   day = day || nextDay() || TOTAL;
   const base = baseDiff(day), hard = c => Math.max(qDiffFor(c, base), Math.min(3, base));
@@ -2152,7 +2248,7 @@ function startMission(kind, day, cat, size) {
     if (kind === 'daily') dueMist().slice(0, 2).forEach((m, j) => { qs[qs.length - 1 - j * 3] = Object.assign({}, m.q, { rev: m.id }); });
   }
   S.cur = { kind, day, cat: cat || null, qs, i: 0, res: [], pts: 0, combo: 0, hint: false, qStart: Date.now(), deadline: null, hp: 5, mod, size,
-    intro: kind === 'daily' || kind === 'sim' || kind === 'boss', chapters, ch: 0, chDeadline: null, chBreak: false, tin: '' };
+    path: !!path, intro: kind === 'daily' || kind === 'sim' || kind === 'boss', chapters, ch: 0, chDeadline: null, chBreak: false, tin: '' };
   go('quiz');
 }
 const deferred = k => k === 'boss' || k === 'sim';
@@ -2165,12 +2261,13 @@ function renderIntro(c) {
   let title, body, extra, icon;
   if (c.kind === 'daily') { const M = MODS[c.mod] || MODS.classic; title = `משימה ${c.day}: ${M.n}`; body = briefFor(c.day); extra = M.d; icon = elemIcon(W.k); }
   else if (c.kind === 'boss') { const B = BOSSES[c.day]; title = B.n; body = `"${B.line}"`; extra = '15 שאלות, 20 דקות. ניצחון = 70%. אין רמזים, אבל אפשר לדלג ולחזור.'; icon = bossSVG(B); }
-  else { const per = c.chapters[0].mins; title = c.size === 'full' ? 'סימולציה מלאה' : 'חצי סימולציה'; body = `6 פרקים, בדיוק כמו במבחן האמיתי. בכל פרק ${per} שאלות ו-${per} דקות, כלומר דקה לשאלה. כשהזמן של פרק נגמר עוברים לפרק הבא, ואי אפשר לחזור אחורה.`; extra = c.chapters.map((ch, i) => `${i + 1}. ${ch.n}`).join('<br>'); icon = IC.clock; }
+  else { const per = c.chapters[0].mins; title = (c.path ? `משימה ${c.day}: ` : '') + (c.size === 'full' ? 'סימולציה מלאה' : 'חצי סימולציה'); body = `6 פרקים, בדיוק כמו במבחן האמיתי. בכל פרק ${per} שאלות ו-${per} דקות, כלומר דקה לשאלה. כשהזמן של פרק נגמר עוברים לפרק הבא, ואי אפשר לחזור אחורה.`; extra = c.chapters.map((ch, i) => `${i + 1}. ${ch.n}`).join('<br>'); icon = IC.clock; }
   app.innerHTML = `<div class="stack"><div class="card intro-card ${c.kind === 'boss' ? 'boss' : ''}" style="--wc:${EC[W.k]}"><span class="ii">${icon}</span><div class="eyebrow">${c.kind === 'sim' ? 'כמו ביום המבחן' : W.n}</div><h2>${title}</h2><p class="brief">${body}</p><div class="mod">${extra}</div>
   <button class="btn ${c.kind === 'boss' ? 'btn-boss' : 'btn-primary'} btn-wide" data-act="go">${c.kind === 'boss' ? 'לקרב!' : 'יאללה!'}</button><button class="btn btn-ghost btn-wide" data-act="quitintro">לא עכשיו</button></div></div>`;
   bind();
 }
 function renderQuiz() {
+  clearTimers();
   const c = S.cur; c.lock = false;
   if (c.intro) return renderIntro(c);
   if (c.chBreak) {
@@ -2188,7 +2285,11 @@ function renderQuiz() {
   const dots = c.qs.slice(rs, re + 1).map((_, j) => { const i = rs + j, x = c.res[i]; return `<i class="${i === c.i && !x ? 'cur' : x ? (c.kind === 'sim' ? 'ans' : x.ok ? 'ok' : 'no') : ''}"></i>`; }).join('');
   const L8 = ['א', 'ב', 'ג', 'ד', 'ה'];
   let body;
-  if (q.type === 'num') {
+  if (q.type === 'order') {
+    const pk = c.ord || [];
+    body = answered ? `<div class="ord-res">${q.correct.map((ix, j) => `<div class="ord-slot ${r.val && r.val[j] === ix ? 'ok' : 'no'}"><b>${j + 1}</b><span>${q.items[ix]}</span></div>`).join('')}</div>`
+      : `<div class="ord"><div class="ord-slots">${q.items.map((_, j) => `<button class="ord-slot ${pk[j] != null ? 'full' : ''}" data-oslot="${j}"><b>${j + 1}</b><span>${pk[j] != null ? q.items[pk[j]] : ''}</span></button>`).join('')}</div><div class="ord-pool">${q.items.map((it, ix) => pk.includes(ix) ? '' : `<button class="ord-item" data-oitem="${ix}">${it}</button>`).join('')}</div><button class="btn btn-primary btn-wide" data-act="ocheck" ${pk.length === q.items.length ? '' : 'disabled'} style="margin-top:10px">בדיקה</button></div>`;
+  } else if (q.type === 'num') {
     body = answered ? `<div class="typed-res ${r.ok ? 'ok' : 'no'}">התשובה שלך: <b>${L(esc(r.val))}</b>${q.unit || ''}${r.ok ? '' : ` · הנכונה: <b>${L(fmt(q.ansv))}</b>${q.unit || ''}`}</div>`
       : `<div class="typed"><div class="tin-row"><div class="sprint-in" id="tin">${c.tin || '&nbsp;'}</div>${q.unit ? `<span class="unit">${q.unit}</span>` : ''}</div><div class="keypad" dir="ltr">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => `<button data-tk="${k}">${k}</button>`).join('')}<button data-tk=".">.</button><button data-tk="0">0</button><button data-tk="del" class="k-alt">מחק</button></div><button class="btn btn-primary btn-wide" data-act="tcheck" style="margin-top:10px">בדיקה</button></div>`;
   } else {
@@ -2199,7 +2300,7 @@ function renderQuiz() {
   let fb = '';
   if (answered) {
     const tchip = `<span class="tchip ${r.secs <= 60 ? 'ok' : ''}">${Math.round(r.secs)} שנ׳</span>`;
-    const ansTxt = q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
+    const ansTxt = q.type === 'order' ? 'הסדר הנכון למעלה' : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
     const LS = LESSONS[lessonFor(q)] || LESSONS.logic;
     fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!']) + (r.gain ? ` +${r.gain}` : '') : 'לא הפעם. התשובה: ' + ansTxt} ${tchip}</h4><div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span>${LS[1]}</div>${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${!r.ok && !q.champ ? '<p class="mnote">נשמרה במחברת · חוזרת מחר</p>' : ''}</div>`;
   }
@@ -2222,6 +2323,8 @@ function renderQuiz() {
   <p class="qprompt">${q.prompt}</p><div class="qvis">${q.vis}</div>${body}${hint}${fb}</div>
   <div class="qfoot"><div class="in">${foot}</div></div>`;
   bind();
+  app.querySelectorAll('[data-oitem]').forEach(b => b.onclick = () => { c.ord = (c.ord || []).concat(+b.dataset.oitem); SFX.tap(); renderQuiz(); });
+  app.querySelectorAll('[data-oslot]').forEach(b => b.onclick = () => { const j = +b.dataset.oslot; if (c.ord && c.ord[j] != null) { c.ord.splice(j, 1); SFX.tap(); renderQuiz(); } });
   app.querySelectorAll('[data-tk]').forEach(b => b.onclick = () => { const k = b.dataset.tk; if (k === 'del') c.tin = (c.tin || '').slice(0, -1); else if (k === '.') { if (!(c.tin || '').includes('.')) c.tin = (c.tin || '0') + '.'; } else if ((c.tin || '').length < 7) c.tin = (c.tin || '') + k; SFX.tap(); document.getElementById('tin').innerHTML = c.tin || '&nbsp;'; });
   const tm = document.getElementById('tm');
   const tick = () => {
@@ -2232,14 +2335,14 @@ function renderQuiz() {
   };
   tick(); every(tick, 1000);
 }
-function mistId(q) { const s = q.cat + q.prompt + q.vis.length + (q.options ? q.options.join('').length : q.ansv); let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return 'm' + h; }
+function mistId(q) { const s = q.cat + q.prompt + q.vis.length + (q.options ? q.options.join('').length : q.items ? q.items.join('') : q.ansv); let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return 'm' + h; }
 function floatPts(el, txt) { if (!el) return; const r0 = el.getBoundingClientRect(); const f = document.createElement('div'); f.className = 'floater'; f.textContent = txt; f.style.left = (r0.left + r0.width / 2 - 20) + 'px'; f.style.top = r0.top + 'px'; document.body.appendChild(f); setTimeout(() => f.remove(), 1000); }
 function answer(i, val) {
   const c = S.cur, q = c.qs[c.i];
   if ((c.res[c.i] && !deferred(c.kind)) || c.lock) return;
   if (deferred(c.kind)) c.lock = true;
   const typed = q.type === 'num';
-  const ok = typed ? Math.abs(parseFloat(val) - q.ansv) < .001 : i === q.answer, secs = (Date.now() - c.qStart) / 1000;
+  const ok = q.type === 'order' ? JSON.stringify(val) === JSON.stringify(q.correct) : typed ? Math.abs(parseFloat(val) - q.ansv) < .001 : i === q.answer, secs = (Date.now() - c.qStart) / 1000;
   let gain = 0;
   if (ok) {
     c.combo++;
@@ -2254,7 +2357,7 @@ function answer(i, val) {
     if (c.kind === 'practice' || c.kind === 'review') gain = Math.round(gain / 2);
   } else c.combo = 0;
   const prev = c.res[c.i]; if (prev) c.pts -= prev.gain;
-  c.res[c.i] = { sel: typed ? -1 : i, val: typed ? String(val) : undefined, ok, gain, secs };
+  c.res[c.i] = { sel: typed || q.type === 'order' ? -1 : i, val: q.type === 'order' ? val : typed ? String(val) : undefined, ok, gain, secs };
   c.pts += gain;
   if (!prev) c.res[c.i].newRule = noteLesson(q).first;
   if (!prev) {
@@ -2266,7 +2369,7 @@ function answer(i, val) {
   const today = todayStr();
   if (q.rev) { const m = S.mist.find(x => x.id === q.rev); if (m) { if (ok) { m.box++; if (m.box >= 2) { S.mist = S.mist.filter(x => x !== m); S.fixed = (S.fixed || 0) + 1; } else m.due = addDays(today, 3); } else { m.box = 0; m.due = addDays(today, 1); } } }
   else if (!ok && c.kind !== 'sim' && !q.champ) { const id = mistId(q); if (!S.mist.some(x => x.id === id)) { const qq = Object.assign({}, q); delete qq.rev; S.mist.push({ id, q: qq, due: addDays(today, 1), box: 0 }); if (S.mist.length > 50) S.mist.shift(); } }
-  c.tin = '';
+  c.tin = ''; c.ord = [];
   const btn = typed ? document.getElementById('tin') : app.querySelector(`[data-opt="${i}"]`);
   if (deferred(c.kind)) {
     if (c.kind === 'boss') { if (ok) { SFX.hit(); document.getElementById('bossF')?.classList.add('hit'); floatPts(btn, '+' + gain); } else { c.hp = Math.max(0, c.hp - 1); SFX.no(); document.getElementById('meF')?.classList.add('hit'); } }
@@ -2289,7 +2392,7 @@ function nextQ() {
     if (c.kind === 'daily' && !c.champOffered) { c.champOffered = true; c.champ = 'offer'; save(); renderQuiz(); window.scrollTo(0, 0); return; }
     return finish();
   }
-  c.i++; c.hint = false; c.freeHint = false; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
+  c.i++; c.hint = false; c.freeHint = false; c.ord = []; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
 }
 function finish() {
   clearTimers();
@@ -2297,7 +2400,8 @@ function finish() {
   c.qs.forEach((q, i) => { const r = c.res[i]; const s = S.stats[q.cat] || (S.stats[q.cat] = { c: 0, t: 0 }); s.t++; if (r && r.ok) s.c++; if (q.champ) { champOk = !!(r && r.ok); return; } n++; if (r && r.ok) correct++; });
   const chapters = c.chapters ? c.chapters.map(ch => { let k = 0; for (let j = ch.s; j <= ch.e; j++) if (c.res[j] && c.res[j].ok) k++; return { n: ch.n, c: k, t: ch.e - ch.s + 1 }; }) : null;
   const before = S.badges.slice(), rankBefore = rankOf(S.xp).r[1], gearBefore = Object.keys(gearOn()), worldBefore = curWorld().k;
-  if (c.kind === 'daily' || c.kind === 'boss') {
+  if (c.kind === 'review') S.reviewDay = todayStr();
+  if (c.kind === 'daily' || c.kind === 'boss' || (c.kind === 'sim' && c.path)) {
     S.missions[c.day] = { c: correct, n, pts: c.pts, date: todayStr() };
     const t = todayStr();
     if (S.lastDone !== t) { const g = S.lastDone ? dayDiff(S.lastDone, t) : 99; if (g === 1) S.streak++; else if (g > 1 && g < 99 && S.freezes >= g - 1) { S.freezes -= g - 1; S.streak++; } else S.streak = 1; S.lastDone = t; }
@@ -2311,7 +2415,7 @@ function finish() {
   const won = c.kind === 'boss' ? correct / n >= .7 : null;
   const newGear = GEAR.filter(g => gearOn()[g.id] && !gearBefore.includes(g.id)).map(g => g.n);
   S.last = { dia, joke, champOk, chapters, size: c.size, mod: c.mod, kind: c.kind, day: c.day, cat: c.cat, correct, n, pts: c.pts, coins, won, chest: (c.kind === 'daily' || c.kind === 'boss' || c.kind === 'sim') ? 0 : -1, newB: S.badges.filter(b => !before.includes(b)), newGear, newWorld: curWorld().k !== worldBefore ? curWorld().n : null, rankUp: rankOf(S.xp).r[1] !== rankBefore ? rankOf(S.xp).r[1] : null,
-    review: c.qs.map((q, i) => ({ lk: lessonFor(q), q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : q.options[q.answer], ex: q.ex })).filter(x => deferred(c.kind) || !x.ok) };
+    review: c.qs.map((q, i) => ({ lk: lessonFor(q), q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.type === 'order' ? q.correct.map(ix => q.items[ix].replace(/<[^>]+>/g, '')).join(' ← ') : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : q.options[q.answer], ex: q.ex })).filter(x => deferred(c.kind) || !x.ok) };
   S.cur = null; S.openW = null; go('result');
   const st = starsOf(correct, n);
   if (won || st >= 2) { SFX.win(); later(() => burst(st === 3 || won ? 160 : 80), 250); }
@@ -2369,7 +2473,7 @@ function viewArcade() {
     <button class="tile wide" style="--tc:var(--gold)" data-act="review" ${tm ? '' : 'disabled'}><span class="ti">${IC.book}</span><div class="grow"><h4>מחברת הטעויות</h4><p>${tm ? `${tm} שאלות במחברת${dm ? `. <b style="color:var(--gold)">${dm} מחכות לחזרה היום</b>` : ''}` : 'ריקה כרגע. כל טעות נכנסת לכאן וחוזרת עד שתשלוט בה.'}</p></div></button>
     <div class="tile wide" style="--tc:#A98BFF;flex-wrap:wrap"><span class="ti">${IC.clock}</span><div class="grow"><h4>סימולציית מבחן</h4><p>6 פרקים כמו במבחן האמיתי, שעון נפרד לכל פרק, בלי משוב עד הסוף.</p></div><div class="row" style="width:100%;gap:8px"><button class="btn btn-ghost" data-sim="half" style="flex:1;min-height:44px;font-size:.95rem">חצי · 36 דק׳</button><button class="btn btn-boss" data-sim="full" style="flex:1;min-height:44px;font-size:.95rem">מלאה · 72 דק׳</button></div></div>
   </div>
-  <section><div class="sec-h"><h3>אימון לפי נושא</h3><span class="muted small">6 שאלות · חצי נקודות</span></div><div class="chips">${Object.keys(CATS).map(k => `<button class="chip ${weak.includes(k) ? 'hot' : ''}" data-practice="${k}">${CATS[k].n}</button>`).join('')}</div>${weak.length ? '<p class="muted small" style="margin:8px 2px 0">מסומן בזהב: תחומים שכדאי לחזק.</p>' : ''}</section></div>`;
+</div>`;
 }
 /* sprint */
 let SP = null;
@@ -2406,7 +2510,7 @@ function spKey(k) {
   padInput(SP, k, () => { spNew(); const q = document.getElementById('spq'), i = document.getElementById('spin'), s = document.getElementById('spsc'); if (q) q.textContent = SP.q.q; if (i) i.innerHTML = '&nbsp;'; if (s) s.textContent = SP.score; },
     inp => inp !== '' && +inp === SP.q.a ? true : inp.length >= String(SP.q.a).length ? false : null);
 }
-function spOver() { clearTimers(); SP.state = 'over'; S.coins += SP.score * 2; S.xp += SP.score; if (SP.score > S.arcade.sprint) { S.arcade.sprint = SP.score; SFX.win(); burst(80); } checkBadges(); save(); renderSprint(); }
+function spOver() { clearTimers(); SP.state = 'over'; S.bonusDay = todayStr(); S.coins += SP.score * 2; S.xp += SP.score; if (SP.score > S.arcade.sprint) { S.arcade.sprint = SP.score; SFX.win(); burst(80); } checkBadges(); save(); renderSprint(); }
 /* checkout (kupa) */
 let KP = null;
 const KASK = { total: 'כמה צריך לשלם בסך הכל?', change: p => `הלקוח משלם ${p} ₪. כמה עודף?`, disc: p => `יש ${p}% הנחה. מה המחיר אחרי ההנחה?` };
@@ -2439,7 +2543,7 @@ function kpKey(k) {
       return idd.length >= td.length ? false : null;
     });
 }
-function kpOver() { clearTimers(); KP.state = 'over'; S.coins += KP.score * 3; S.xp += KP.score * 2; if (KP.score > S.arcade.kupa) { S.arcade.kupa = KP.score; SFX.win(); burst(80); } checkBadges(); save(); renderKupa(); }
+function kpOver() { clearTimers(); KP.state = 'over'; S.bonusDay = todayStr(); S.coins += KP.score * 3; S.xp += KP.score * 2; if (KP.score > S.arcade.kupa) { S.arcade.kupa = KP.score; SFX.win(); burst(80); } checkBadges(); save(); renderKupa(); }
 /* piano memory */
 let PN = null;
 const SOLF = ['דו', 'רה', 'מי', 'פה', 'סול', 'לה', 'סי', 'דו'];
@@ -2468,7 +2572,7 @@ function pnPlay() {
 function pnKey(i) {
   if (!PN || PN.state !== 'input') return;
   if (i === PN.seq[PN.pos]) { pianoNote(NOTES[i]); lightKey(i); PN.pos++; if (PN.pos === PN.seq.length) { PN.state = 'wait'; later(() => { PN.seq.push(ri(0, 7)); pnPlay(); }, 700); } }
-  else { lightKey(i, 'wrong', 600); SFX.no(); PN.state = 'over'; const sc = PN.seq.length - 1; S.coins += sc * 3; S.xp += sc * 2; if (sc > S.arcade.piano) { S.arcade.piano = sc; later(() => { SFX.win(); burst(80); }, 300); } checkBadges(); save(); later(renderPiano, 650); }
+  else { lightKey(i, 'wrong', 600); SFX.no(); PN.state = 'over'; S.bonusDay = todayStr(); const sc = PN.seq.length - 1; S.coins += sc * 3; S.xp += sc * 2; if (sc > S.arcade.piano) { S.arcade.piano = sc; later(() => { SFX.win(); burst(80); }, 300); } checkBadges(); save(); later(renderPiano, 650); }
 }
 
 /* ---------- SHOP ---------- */
@@ -2492,7 +2596,7 @@ function buySkin(id) {
 }
 
 /* ---------- STATS ---------- */
-function viewStats() {
+function viewDataTab() {
   const ks = Object.keys(CATS);
   const lvlName = r => r < 1.5 ? 'בסיס' : r < 2.2 ? 'בינוני' : r < 2.8 ? 'מתקדם' : 'מומחה';
   const bars = ks.map(k => { const s = S.stats[k] || { c: 0, t: 0 }; const p = s.t ? Math.round(s.c / s.t * 100) : 0; const weak = s.t >= 6 && p < 65; const r = S.rat[k]; const t = S.times[k]; return `<div class="bar ${weak ? 'weak' : ''}"><div class="rw"><span><b>${CATS[k].n}</b>${r ? ` · ${lvlName(r)}` : ''}${weak ? ' · <b style="color:var(--bad)">לחזק</b>' : ''}</span><span>${s.t ? `${p}% · ${s.c}/${s.t}${t && t.n ? ` · ${Math.round(t.s / t.n)} שנ׳` : ''}` : 'עוד לא תורגל'}</span></div><div class="track"><i style="width:${p}%"></i></div></div>`; }).join('');
@@ -2501,26 +2605,19 @@ function viewStats() {
   if (ds.length) { const W = 320, H = 120, bw = W / 20; spark = `<svg viewBox="0 0 ${W} ${H + 16}" class="spark">${[0, 50, 100].map(v => `<line class="gl" x1="0" x2="${W}" y1="${H - v / 100 * H + 2}" y2="${H - v / 100 * H + 2}"/>`).join('')}${ds.map((d, i) => { const m = S.missions[d], h = Math.max(3, m.c / m.n * H); return `<rect class="b ${isBoss(d) ? 'boss' : ''}" x="${W - (i + 1) * bw + 2}" y="${H - h + 2}" width="${bw - 4}" height="${h}" rx="2"/><text x="${W - (i + .5) * bw}" y="${H + 14}" text-anchor="middle">${d}</text>`; }).join('')}</svg><p class="muted small" style="margin:6px 0 0">אחוז הצלחה בכל משימה (סגול = בוס). הקווים: 0%, 50%, 100%.</p>`; }
   const tot = ks.reduce((a, k) => a + ((S.stats[k] || {}).t || 0), 0), cor = ks.reduce((a, k) => a + ((S.stats[k] || {}).c || 0), 0);
   const rated = ks.filter(k => (S.stats[k] || { t: 0 }).t >= 5).sort((a, b) => (S.rat[a] ?? 2) - (S.rat[b] ?? 2));
-  const rec = rated.length >= 2 ? `<div class="card tip"><h4>המלצה לשבוע הזה</h4><p>להתמקד ב<b>${CATS[rated[0]].n}</b> וב<b>${CATS[rated[1]].n}</b>. המשימה היומית כבר מוסיפה שאלה מהתחום החלש, ואפשר להוסיף אימון של 6 שאלות בארקייד.</p></div>` : '';
-  return `<div class="stack">${hud()}
+  const rec = rated.length >= 2 ? `<div class="card tip"><h4>המלצה לשבוע הזה</h4><p>להתמקד ב<b>${CATS[rated[0]].n}</b> וב<b>${CATS[rated[1]].n}</b>. המשימה היומית כבר מוסיפה מהם, ולמטה יש תרגול לפי נושא.</p></div>` : '';
+  return `<div class="stack">
   <section class="stats3"><div class="card stat"><div class="big">${tot}</div><div class="lbl">שאלות נפתרו</div></div><div class="card stat"><div class="big">${tot ? Math.round(cor / tot * 100) : 0}%</div><div class="lbl">הצלחה כללית</div></div><div class="card stat"><div class="big">${S.mist.length}</div><div class="lbl">במחברת הטעויות</div></div></section>
-  ${sbxTools()}
   ${readinessCard()}
   ${rec}
   <section><div class="sec-h"><h3>לפי תחום</h3><span class="muted small">הצלחה · זמן ממוצע</span></div><div class="card bars">${bars}</div></section>
   <section><div class="sec-h"><h3>משימות אחרונות</h3></div><div class="card">${spark}</div></section>
-  <section><div class="sec-h"><h3>הגדרות</h3></div><div class="card stack" style="gap:14px">
-    <button class="btn btn-ghost" data-go="parent">אזור הורים (פרסים ויהלומים)</button>
-    <div class="field"><span>גרסה ${APP_VER}</span><button class="chip" data-act="chkupd">בדיקת עדכונים</button></div>
-    <div class="field"><span>צלילים</span><button class="toggle ${S.sound ? 'on' : ''}" data-act="sound" aria-label="צלילים"></button></div>
-    <label class="field" for="exam"><span>תאריך המבחן</span><input type="date" id="exam" value="${S.exam}"></label>
-    <p class="muted small" style="margin:0">המסע התחיל ב-${S.start.split('-').reverse().join('.')}. משימה חדשה נפתחת כל יום, ואם פספסת יום אפשר להשלים. רמת הקושי מתאימה את עצמה לכל תחום לפי התשובות.</p>
-    <button class="btn btn-ghost" data-act="reset" style="color:var(--bad)">איפוס כל ההתקדמות</button></div></section></div>`;
+</div>`;
 }
 
 /* ---------- TIPS ---------- */
-function viewTips() {
-  return `<div class="stack">${hud()}${lessonsSection()}
+function viewRulesTab() {
+  return `<div class="stack">${lessonsSection()}
   <section class="card tip" style="border-color:var(--acc)"><h4>איך המסע עובד</h4><ul>
   <li><b>5 עולמות:</b> אוויר, מים, אדמה, אש, ובסוף עולם האלוף ברמת מחוננים. 15 משימות בכל עולם, ובכל עולם צבעי האפליקציה משתנים.</li>
   <li><b>משימה יומית:</b> 10 שאלות מכל התחומים. אחת תמיד מהתחום הכי חלש, ועד 2 מהמחברת.</li>
@@ -2528,7 +2625,7 @@ function viewTips() {
   <li><b>רמה שמתאימה את עצמה:</b> מצליח? השאלות בתחום נהיות קשות יותר. מתקשה? קלות יותר.</li>
   <li><b>מחברת הטעויות:</b> כל טעות חוזרת אחרי יום, ואז אחרי 3 ימים. ככה המוח באמת זוכר.</li>
   <li><b>ציוד:</b> סרט, אוזניות, כפפות, מדליה וכתר נפתחים לבד כשמשיגים הישגים.</li></ul></section>
-  ${Object.keys(CATS).map(k => `<section class="card tip"><h4>${CATS[k].n}</h4><p>${CATS[k].tip}</p></section>`).join('')}
+  <section class="card tip"><h4>טריקים לפי פרק</h4>${Object.keys(CATS).map(k => `<details class="tipd"><summary>${CATS[k].n}</summary><p>${CATS[k].tip}</p></details>`).join('')}</section>
   <section class="card tip"><h4>איך נראה המבחן האמיתי</h4><ul><li>מבחן ממוחשב של כ-90 דקות, בינואר.</li><li>6 פרקים: הקשר מילולי, סדרות, אנלוגיות, היגיון, חשבון וצורות. 10-15 שאלות בכל פרק.</li><li>בערך דקה לשאלה. כל שאלה בפרק שווה אותו דבר.</li><li>חלק מהשאלות בלי אפשרויות: מקלידים או גוררים תשובה.</li><li>המבחן יחסי: משווים לשאר התלמידים בשנתון. מחוננים הם האחוזים הבודדים העליונים, מצטיינים הם השכבה שאחריהם.</li></ul></section>
   <section class="card tip"><h4>אסטרטגיה ליום המבחן</h4><ol>
   <li>קרא את כל התשובות לפני שאתה בוחר.</li>
@@ -2554,12 +2651,13 @@ function bind() {
   app.querySelectorAll('[data-node]').forEach(b => b.onclick = () => {
     const k = +b.dataset.node, m = S.missions[k];
     if (m) return modal(BOSSES[k] ? BOSSES[k].n : `משימה ${k}`, `${m.c} מתוך ${m.n} נכונות · ${m.pts} נקודות · ${m.date.split('-').reverse().join('.')}`, 'סגור', () => { }, 'btn-primary', true);
-    if (k === nextDay() && k <= unlocked() && !S.cur) return startMission(isBoss(k) ? 'boss' : 'daily', k);
+    if (k === nextDay() && k <= unlocked() && !S.cur) return startNode(k);
     if (k > unlocked()) modal('עוד לא', `משימה ${k} תיפתח בעוד ${k - unlocked()} ימים.${BOSSES[k] ? ` שם מחכה ${BOSSES[k].n}.` : ''}`, 'הבנתי', () => { }, 'btn-primary', true);
     else if (k > (nextDay() || 99)) modal('קודם המשימות הקודמות', 'המסע הולך לפי הסדר. השלם קודם את המשימה המסומנת.', 'הבנתי', () => { }, 'btn-primary', true);
   });
   const on = (a, fn) => { const e = app.querySelector(`[data-act="${a}"]`); if (e) e.onclick = fn; };
-  on('start', () => { const k = nextDay(); startMission(isBoss(k) ? 'boss' : 'daily', k); });
+  on('start', () => startNode(nextDay()));
+  on('ocheck', () => { const c = S.cur; if ((c.ord || []).length === c.qs[c.i].items.length) answer(-1, c.ord.slice()); });
   on('resume', () => { if (S.cur && !S.cur.deadline) S.cur.qStart = Date.now(); go('quiz'); });
   on('next', nextQ);
   on('hint', () => { if (S.hints > 0) { S.hints--; S.cur.freeHint = true; } S.cur.hint = true; save(); renderQuiz(); });
@@ -2581,7 +2679,7 @@ function bind() {
   on('hints', () => { if (S.coins < 45) return modal('אין מספיק מטבעות', `חסרים ${45 - S.coins} מטבעות.`, 'הבנתי', () => { }, 'btn-primary', true); S.coins -= 45; S.hints += 3; SFX.coin(); save(); render(); });
   on('sound', () => { S.sound = !S.sound; save(); render(); if (S.sound) SFX.ok(); });
   on('spgo', spStart); on('kpgo', kpStart);
-  bindExtra(); bindSandbox(); bindUpdate(); bindCloud();
+  bindExtra(); bindSandbox(); bindUpdate(); bindCloud(); bindNav();
   app.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(b.dataset.share));
   const ex = document.getElementById('exam'); if (ex) ex.onchange = () => { if (ex.value) { S.exam = ex.value; save(); } };
 }
@@ -2596,6 +2694,101 @@ function burst(n) {
   let t = 0; (function f() { x.clearRect(0, 0, innerWidth, innerHeight); Pp.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .35; p.a += p.va; x.save(); x.translate(p.x, p.y); x.rotate(p.a); x.fillStyle = p.c; x.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); x.restore(); }); if (++t < 95) requestAnimationFrame(f); else { x.clearRect(0, 0, innerWidth, innerHeight); cv.hidden = true; } })();
 }
 
+
+/* ================= V9: ONE CLEAR PATH ================= */
+const SIMDAYS = { 24: 'half', 38: 'half', 52: 'half', 64: 'full', 72: 'full' };
+const nodeKind = k => BOSSES[k] ? 'boss' : SIMDAYS[k] ? 'sim' : 'daily';
+function startNode(k) { const t = nodeKind(k); if (t === 'sim') startMission('sim', k, null, SIMDAYS[k], true); else startMission(t, k); }
+const BONUS = [['kupa', 'קופה ראשית', '90 שניות בקופה: סכומים, עודף והנחות.', 'cart', EC.fire], ['sprint', 'ספרינט חשבון', '60 שניות של חשבון בראש.', 'calc', EC.water], ['piano', 'זיכרון פסנתר', 'שמע, זכור ונגן בחזרה.', 'keys', '#A98BFF']];
+const bonusToday = () => BONUS[dayDiff(S.start, todayStr()) % 3 < 0 ? 0 : dayDiff(S.start, todayStr()) % 3];
+const missionToday = () => Object.values(S.missions).some(m => m.date === todayStr());
+function nextStep() {
+  if (S.cur) return 'resume';
+  const nd = nextDay();
+  if (nd && nd <= unlocked()) return 'mission';
+  if (dueMist().length >= 3 && S.reviewDay !== todayStr()) return 'review';
+  if (S.bonusDay !== todayStr()) return 'bonus';
+  if ((!S.extLast || dayDiff(S.extLast, todayStr()) >= 7) && S.extSkip !== todayStr() && doneCount(S) >= 3) return 'ext';
+  return nd ? 'done' : 'finished';
+}
+function todayChips(step) {
+  const t = todayStr(), revNeeded = dueMist().length >= 3 || S.reviewDay === t;
+  const it = [['משימה', missionToday() || (step !== 'mission' && step !== 'resume')], ...(revNeeded ? [['חזרה', S.reviewDay === t]] : []), ['בונוס', S.bonusDay === t]];
+  return `<div class="today"><span class="muted small">היום:</span>${it.map(([n, ok]) => `<span class="tchk ${ok ? 'ok' : ''}">${ok ? '✓' : '○'} ${n}</span>`).join('')}</div>`;
+}
+function heroFor(step) {
+  const nd = nextDay(), W = curWorld(), cur = S.cur;
+  const line = (dayDiff(S.start, todayStr()) % 3 === 0) ? W.line : LINES[(dayDiff(S.start, todayStr()) + LINES.length * 9) % LINES.length];
+  if (step === 'resume') {
+    const lbl = { practice: 'אימון', review: 'חזרה מהמחברת', sim: 'סימולציה', boss: 'קרב בוס', daily: 'משימה' }[cur.kind];
+    return `<section class="card hero ${cur.kind === 'boss' ? 'boss' : ''}"><div class="eyebrow">באמצע ${lbl}</div><h2>ממשיכים</h2><p>שאלה ${cur.i + 1} מתוך ${cur.qs.length}</p><button class="btn btn-primary btn-wide" data-act="resume">להמשיך</button></section>`;
+  }
+  if (step === 'mission') {
+    const kind = nodeKind(nd), B = BOSSES[nd];
+    if (kind === 'boss') return `<section class="card hero boss" style="--bc:${EC[B.el] || '#7B5CFF'}"><div class="eyebrow">${nd === TOTAL ? 'הגמר הגדול' : 'קרב בוס · ' + worldOf(nd).n}</div><div class="stage"><div class="grow"><div class="bubble">"${B.line}"</div></div><div class="who">${bossSVG(B)}</div></div><h2>${B.n}</h2><p>15 שאלות · 20 דקות · ניצחון = 70%</p><button class="btn btn-boss btn-wide" data-act="start">לקרב!</button></section>`;
+    if (kind === 'sim') { const full = SIMDAYS[nd] === 'full'; return `<section class="card hero" style="background:linear-gradient(155deg,rgba(169,139,255,.28),var(--panel) 60%)"><div class="eyebrow">משימה ${nd} · יום מבחן</div><div class="stage"><div class="grow"><div class="bubble">היום מתאמנים בדיוק כמו במבחן האמיתי.</div></div><div class="who" style="display:grid;place-items:center;color:var(--violet)">${IC.clock.replace('<svg', '<svg style="width:70px;height:70px"')}</div></div><h2>${full ? 'סימולציה מלאה' : 'חצי סימולציה'}</h2><p>6 פרקים · ${full ? '72 שאלות · 72 דקות' : '36 שאלות · 36 דקות'} · כדאי לשבת במקום שקט</p><button class="btn btn-boss btn-wide" data-act="start">מתחילים</button></section>`; }
+    return `<section class="card hero"><div class="eyebrow">${W.n} · משימה ${nd}/${TOTAL}</div><div class="stage"><div class="grow"><div class="bubble">${line}</div></div><div class="who">${avatarSVG()}</div></div><p>${(MODS[modFor(nd)] || MODS.classic).n} · 10 שאלות${dueMist().length ? ` · ${Math.min(2, dueMist().length)} מהמחברת` : ''}</p><button class="btn btn-primary btn-wide" data-act="start">יאללה, ${nm()}!</button></section>`;
+  }
+  if (step === 'review') { const n = Math.min(8, dueMist().length); return `<section class="card hero" style="background:linear-gradient(155deg,rgba(255,200,69,.22),var(--panel) 60%)"><div class="eyebrow">הצעד הבא</div><div class="stage"><div class="grow"><div class="bubble">טעויות שחוזרות עליהן לא חוזרות במבחן.</div></div><div class="who" style="display:grid;place-items:center;color:var(--gold)">${IC.book.replace('<svg', '<svg style="width:66px;height:66px"')}</div></div><h2>חזרה מהמחברת</h2><p>${n} שאלות · בערך 5 דקות</p><button class="btn btn-gold btn-wide" data-act="review">לחזרה</button></section>`; }
+  if (step === 'bonus') { const [id, n, d, ic, col] = bonusToday(); return `<section class="card hero" style="background:linear-gradient(155deg,color-mix(in srgb,${col} 28%,transparent),var(--panel) 60%)"><div class="eyebrow">המשימה הושלמה · בונוס</div><div class="stage"><div class="grow"><div class="bubble">הרווחת משחק. ${d}</div></div><div class="who" style="display:grid;place-items:center;color:${col}">${IC[ic].replace('<svg', '<svg style="width:66px;height:66px"')}</div></div><h2>${n}</h2><button class="btn btn-primary btn-wide" data-go="${id}">לשחק</button><button class="btn btn-ghost btn-wide" data-act="skipbonus" style="margin-top:8px;min-height:42px">לא היום</button></section>`; }
+  if (step === 'ext') return `<section class="card hero" style="background:linear-gradient(155deg,rgba(83,168,255,.25),var(--panel) 60%)"><div class="eyebrow">פעם בשבוע</div><h2>מבחן במחונן אונליין</h2><p>מבחן תרגול אחד באתר, ואז רושמים כאן את הציון. ככה רואים התקדמות גם מול שאלות מבחוץ.</p><a class="btn btn-primary btn-wide" href="https://mihonan-online.co.il/" target="_blank" rel="noopener">לאתר</a><div class="row" style="margin-top:10px"><input class="txt" id="extscore" type="number" min="0" max="100" placeholder="ציון באחוזים" style="flex:1"><button class="btn btn-gold" data-act="extsave" style="min-height:46px">שמור</button></div><button class="btn btn-ghost btn-wide" data-act="extskip" style="margin-top:8px;min-height:42px">לא היום</button></section>`;
+  if (step === 'finished') return `<section class="card hero"><div class="stage"><div class="grow"><div class="eyebrow">המסע הושלם</div><h2>אלוף!</h2></div><div class="who">${avatarSVG()}</div></div><p>עד המבחן: סימולציה מלאה פעם בכמה ימים, וחזרה מהמחברת.</p><button class="btn btn-boss btn-wide" data-sim="full">סימולציה מלאה</button></section>`;
+  return `<section class="card hero"><div class="stage"><div class="grow"><div class="eyebrow">סיימת להיום</div><h2 class="glow">כל הכבוד!</h2></div><div class="who">${avatarSVG()}</div></div><p>משימה ${nd} תיפתח מחר.</p></section>${S.jokes ? jokeCard(S.jokes - 1, 'הבדיחה של היום') : ''}`;
+}
+function viewHome() {
+  const step = nextStep(), nd = nextDay(), un = unlocked(), W = curWorld();
+  let bd = '';
+  const dtb = daysToBday();
+  if (isBday()) bd = `<div class="banner">${IC.cake}<div class="grow">יום הולדת שמח, ${nm()}!</div>${S.bdGift[todayStr().slice(0, 4)] ? '' : '<button class="btn btn-gold" data-act="bdgift">פתח מתנה</button>'}</div>`;
+  else if (dtb <= 7) bd = `<div class="banner">${IC.cake}<div class="grow">עוד ${dtb} ימים ליום ההולדת!</div></div>`;
+  const toExam = Math.max(0, dayDiff(todayStr(), S.exam));
+  const mini = `<div class="mini"><div data-tap5><b>${toExam}</b><span>ימים למבחן</span></div><div><b>${curStreak()}</b><span>ימים ברצף</span></div><div><b>${doneCount(S)}/${TOTAL}</b><span>משימות</span></div></div>`;
+  const bdDay = dayDiff(S.start, `${S.start.slice(0, 4)}-${ME.bd}`) + 1;
+  const openW = S.openW || W.k;
+  const map = WORLDS.map(Wd => {
+    const done = worldDone(Wd), open = openW === Wd.k;
+    let path = '';
+    if (open) for (let k = Wd.a; k <= Wd.b; k++) {
+      const m = S.missions[k], kind = nodeKind(k), st = m ? starsOf(m.c, m.n) : 0;
+      const isOpen = k === nd && k <= un && !S.cur;
+      const cls = ['node', kind === 'boss' ? 'boss' : kind === 'sim' ? 'simn' : '', m ? 'done' : isOpen ? 'open' : k > un || k > (nd || 99) ? 'locked' : ''].join(' ');
+      const x = Math.round(Math.sin((k - 1) * .85) * 32);
+      const inner = kind === 'boss' ? bossSVG(BOSSES[k]) : kind === 'sim' ? IC.clock : k;
+      path += `<div class="pn" style="--x:${x}%">${isOpen ? '<span class="go">התחל</span>' : ''}<button class="${cls}" data-node="${k}" aria-label="משימה ${k}">${inner}${m ? `<span class="st">${'★'.repeat(st)}</span>` : ''}${k === bdDay ? giftSVG : ''}</button></div>`;
+    }
+    return `<section class="world ${open ? 'open' : ''}" style="--wc:${EC[Wd.k]}"><button class="wbanner" data-world="${Wd.k}"><span class="wi">${elemIcon(Wd.k)}</span><div><b>${Wd.n}</b><span>${done}/15</span></div><span class="chev">${IC.chev}</span></button><div class="wbar"><i style="width:${done / 15 * 100}%"></i></div>${open ? `<div class="path">${path}</div>` : ''}</section>`;
+  }).join('');
+  return `<div class="stack">${hud()}${bd}${todayChips(step)}${heroFor(step)}${mini}<div class="sec-h"><h3>המסע</h3></div>${map}</div>`;
+}
+function nav(v) {
+  v = { me: 'stats', tips: 'stats', parent: 'stats', result: 'home' }[v] || v;
+  const it = [['home', 'מסע', IC.home, 0], ['arcade', 'משחקים', IC.game, 0], ['stats', 'התקדמות', IC.chart, 0], ['shop', 'חנות', IC.shop, 0]];
+  return `<nav class="nav four"><div class="in">${it.map(([k, n, ic, dot]) => `<button data-go="${k}" class="${v === k ? 'on' : ''}">${ic}${n}${dot ? '<span class="dot"></span>' : ''}</button>`).join('')}</div></nav>`;
+}
+const PT = [['me', 'אני'], ['data', 'נתונים'], ['rules', 'כללים'], ['set', 'הגדרות']];
+function viewMe() { S.ptab = 'me'; return viewStats(); }
+function viewTips() { S.ptab = 'rules'; return viewStats(); }
+function viewStats() {
+  const t = S.ptab || 'me';
+  const seg = `<div class="seg">${PT.map(([k, n]) => `<button data-ptab="${k}" class="${t === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
+  let body;
+  if (t === 'me') body = viewMeTab();
+  else if (t === 'data') { const weak = Object.keys(CATS).filter(k => (S.rat[k] ?? 9) < 1.8 && (S.stats[k] || { t: 0 }).t >= 5); body = `${viewDataTab()}${(S.ext || []).length ? `<section><div class="sec-h"><h3>מבחנים במחונן אונליין</h3></div><div class="card small">${S.ext.slice().reverse().map(e => `<div class="row" style="justify-content:space-between;padding:3px 0"><span>${e.d.split('-').reverse().join('.')}</span><b>${e.v}%</b></div>`).join('')}</div></section>` : ''}<section><div class="sec-h"><h3>תרגול לפי נושא</h3><span class="muted small">6 שאלות</span></div><div class="chips">${Object.keys(CATS).map(k => `<button class="chip ${weak.includes(k) ? 'hot' : ''}" data-practice="${k}">${CATS[k].n}</button>`).join('')}</div></section>`; }
+  else if (t === 'rules') body = viewRulesTab();
+  else body = `<section class="card stack" style="gap:14px">
+    <button class="btn btn-ghost" data-go="parent">אזור הורים</button>
+    <div class="field"><span>גרסה ${APP_VER}</span><button class="chip" data-act="chkupd">בדיקת עדכונים</button></div>
+    <div class="field"><span>צלילים</span><button class="toggle ${S.sound ? 'on' : ''}" data-act="sound" aria-label="צלילים"></button></div>
+    <label class="field" for="exam"><span>תאריך המבחן</span><input type="date" id="exam" value="${S.exam}"></label>
+    <p class="muted small" style="margin:0">המסע התחיל ב-${S.start.split('-').reverse().join('.')}.</p></section>`;
+  return `<div class="stack">${hud()}${seg}${body}</div>`;
+}
+function bindNav() {
+  app.querySelectorAll('[data-ptab]').forEach(b => b.onclick = () => { S.ptab = b.dataset.ptab; SFX.tap(); save(); render(); });
+  const sk = app.querySelector('[data-act="skipbonus"]'); if (sk) sk.onclick = () => { S.bonusDay = todayStr(); save(); render(); };
+  const es = app.querySelector('[data-act="extsave"]'); if (es) es.onclick = () => { const v = parseInt(document.getElementById('extscore').value); if (!(v >= 0 && v <= 100)) return toast('ציון בין 0 ל-100'); S.ext = (S.ext || []).concat({ d: todayStr(), v }); S.extLast = todayStr(); if (v >= 85) giveDia(1, 'מבחן חיצוני 85+', []); SFX.coin(); save(); render(); toast(v >= 85 ? 'נשמר. +1 יהלום!' : 'נשמר'); };
+  const ek = app.querySelector('[data-act="extskip"]'); if (ek) ek.onclick = () => { S.extSkip = todayStr(); save(); render(); };
+}
 render();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
