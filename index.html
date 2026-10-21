@@ -449,6 +449,23 @@ html.sbx .qbar{top:calc(env(safe-area-inset-top,0px) + 28px)}
 #toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:60;background:#F3F6FF;color:#0A0F24;font-weight:600;padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 
+/* v8: rules & cloud */
+.fb .rule,.rev .rule{display:flex;gap:8px;align-items:baseline;margin:8px 0 6px;font-weight:500;line-height:1.5}
+.rt{flex:none;font-size:.68rem;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:99px;background:var(--acc-soft);color:var(--acc)}
+.fb .sol summary{cursor:pointer;font-size:.82rem;color:var(--muted);margin-top:2px}
+.fb .sol p,.fb .solx{margin:6px 0 0;font-size:.92rem;color:#D6DCF5}
+.fb .mnote{margin:8px 0 0;font-size:.75rem;color:var(--muted)}
+.rev details.item summary{cursor:pointer;font-weight:500;font-size:.92rem;line-height:1.5}
+.rev details.item[open] summary{margin-bottom:8px}
+.rev .tag{margin-inline-end:4px}
+.rules{display:flex;flex-direction:column;gap:0;padding:6px 14px}
+.rules .rl{display:flex;flex-direction:column;padding:9px 0;border-bottom:1px solid var(--edge)}
+.rules .rl:last-child{border-bottom:0}
+.rules .rl b{font-size:.8rem;color:var(--acc)}
+.rules .rl span{font-size:.92rem}
+.dot-st{width:10px;height:10px;border-radius:50%;flex:none;background:var(--good);box-shadow:0 0 8px var(--good)}
+.dot-st.bad{background:var(--bad);box-shadow:0 0 8px var(--bad)}
+
 /* modal */
 .modal{position:fixed;inset:0;z-index:20;background:rgba(5,8,20,.7);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px}
 .modal .card{max-width:360px;width:100%;background:var(--bg2)}
@@ -1292,6 +1309,92 @@ function genVerbal5(d) {
 }
 GEN.verbal = genVerbal5; GEN.analog = genAnalog; GEN.series = genSeries5; GEN.matrix = genShapes; GEN.logic = genLogic5; GEN.math = genMath5;
 const LEVEL4 = new Set(['verbal', 'analog', 'series', 'matrix', 'logic']);
+/* ================= V8: ONE RULE PER QUESTION TYPE ================= */
+const LESSONS = {
+  analogy: ['אנלוגיה', 'נסח משפט שמחבר את הזוג הראשון, והצב בו את המילה השלישית.'],
+  figan: ['אנלוגיה של צורות', 'מה השתנה ומה נשאר? מפעילים בדיוק את אותו שינוי.'],
+  odd: ['יוצא דופן', 'מחפשים תכונה שמשותפת לכולם חוץ מאחד.'],
+  sentence: ['השלמת משפט', 'מילת הקישור קובעת: סיבה, תוצאה או ניגוד.'],
+  lang: ['שפה מומצאת', 'מילה שחוזרת בשני משפטים היא המילה המשותפת להם.'],
+  story: ['המשך סיפור', 'המשך נכון לא סותר אף פרט ושומר על סדר הזמנים.'],
+  reading: ['הבנת הנקרא', 'תשובה נכונה נשענת על משהו שכתוב בקטע.'],
+  series: ['סדרות', 'הפרשים קודם. לא קבועים? הפרשי הפרשים, כפל, או שתי סדרות שזורות.'],
+  table: ['טבלת מספרים', 'מוצאים חוק בשורה הראשונה ובודקים אותו על השנייה.'],
+  ring: ['מעגל מספרים', 'בודקים זוגות מנוגדים, ואז שכנים.'],
+  matrix: ['מטריצות', 'תכונה אחת בכל פעם: צורה, כמות, מילוי.'],
+  dial: ['סדרת צורות', 'עוקבים אחרי כל חלק לבד: בכמה הוא זז בכל צעד?'],
+  rotation: ['סיבוב', 'סיבוב לא הופך כמו מראה. עוקבים אחרי חלק בולט אחד.'],
+  net: ['פריסת קובייה', 'פאות נגדיות לעולם לא נוגעות בפריסה.'],
+  cubes: ['ספירת קוביות', 'סופרים עמודות, כולל מה שמוסתר מתחת.'],
+  seating: ['סידור מקומות', 'מתחילים מהרמז החזק ביותר ומציירים כיסאות.'],
+  order: ['סידור לפי גודל', 'מציירים קו ומניחים עליו שם אחרי שם.'],
+  logic: ['היגיון', 'קוראים כל מילה. רוב המלכודות בניסוח.'],
+  ifthen: ['אם... אז', 'בטוח רק דבר אחד: אם התוצאה לא קרתה, גם התנאי לא קרה.'],
+  symbols: ['משוואות סמלים', 'מתחילים מהשורה שיש בה סמל אחד בלבד.'],
+  op: ['פעולה מומצאת', 'מציבים בדיוק לפי ההגדרה. סוגריים קודם.'],
+  calendar: ['ימים בשבוע', 'רק השארית מחלוקה ב-7 משנה.'],
+  clock: ['זווית בשעון', 'גם מחוג השעות זז: חצי מעלה בכל דקה.'],
+  average: ['ממוצע', 'ממוצע × כמות = סכום. עובדים עם סכומים.'],
+  assume: ['"נניח שכולם..."', 'מניחים שכולם מהסוג הפשוט, ומחלקים את העודף.'],
+  percent: ['אחוזים', 'כל אחוז מחושב מהמחיר שלפניו, לא מהמקורי.'],
+  work: ['עבודה משותפת', 'מחברים את מה שכל אחד עושה בשעה אחת.'],
+  ages: ['גילאים', 'בעוד k שנים, כל אחד מתבגר ב-k.'],
+  speed: ['מהירות', 'לקראת: מחברים מהירויות. אחרי: מחסירים.'],
+  ratio: ['יחס', 'יחס = קבוצות שוות. מוצאים כמה קבוצות יש.'],
+  pairs: ['זוגות', 'כל זוג נספר פעם אחת: n × (n−1) ÷ 2.'],
+  backward: ['עבודה מהסוף', 'כשיודעים מה נשאר, עובדים מהסוף להתחלה.'],
+  lcm: ['כפולה משותפת', 'מתחלק בשניהם = מתחלק בכפולה המשותפת הקטנה.'],
+  digits: ['ספירת ספרות', 'סופרים בקבוצות: חד-ספרתיים, דו-ספרתיים, תלת-ספרתיים.'],
+  prob: ['סיכוי', 'סיכוי = אפשרויות טובות ÷ כל האפשרויות.'],
+  geometry: ['היקף ושטח', 'היקף = סכום הצלעות. שטח = אורך × רוחב.'],
+  money: ['עודף ומחיר', 'משלימים לשקל שלם, ואז לעשרות.'],
+  unit: ['מחיר ליחידה', 'מחיר ÷ כמות. הגדול לא תמיד משתלם.'],
+  rate: ['קצב', 'ממירים ליחידה אחת (לשנייה, לשעה) ואז כופלים.'],
+  consec: ['מספרים עוקבים', 'האמצעי של מספרים עוקבים = הממוצע שלהם.'],
+  inverse: ['יחס הפוך', 'יותר עובדים = פחות ימים. המכפלה נשארת קבועה.'],
+  cycle: ['מחזוריות', 'ספרת האחדות של חזקות חוזרת במחזור.'],
+  count: ['ספירה מסודרת', 'עוברים לפי סדר, כדי לא לפספס ולא לספור פעמיים.'],
+  math: ['בעיה מילולית', 'כותבים מה ידוע, נותנים שם לנעלם, ובודקים בסוף.'],
+};
+function lessonFor(q) {
+  const v = q.vis || '', p = q.prompt || '';
+  const has = s => v.includes(s);
+  if (has('class="lang"')) return 'lang';
+  if (has('class="seats"')) return 'seating';
+  if (has('class="story"')) return 'story';
+  if (has('class="passage"')) return 'reading';
+  if (has('class="fan"')) return 'figan';
+  if (has('class="sseries"')) return 'dial';
+  if (has('class="ntab"')) return 'table';
+  if (has('class="ring"')) return 'ring';
+  if (has('class="cubes"')) return 'cubes';
+  if (has('class="net"')) return 'net';
+  if (has('polybig')) return 'rotation';
+  if (has('class="matrix"')) return 'matrix';
+  if (has('class="series"')) return 'series';
+  if (has('class="analogy"')) return 'analogy';
+  if (has('class="sentence"')) return 'sentence';
+  if (has('◆')) return 'op';
+  if (has('class="eqs"')) return 'symbols';
+  if (has('class="clues"')) return 'order';
+  if (/לא שייך/.test(p)) return 'odd';
+  if (/מחוג/.test(p)) return 'clock';
+  if (/איזה יום|באיזה יום/.test(p)) return 'calendar';
+  if (/^אם |אם יורד/.test(p)) return 'ifthen';
+  if (q.cat === 'logic') return 'logic';
+  if (q.cat === 'math' || q.cat === 'code') {
+    const R0 = [[/ממוצע/, 'average'], [/רגליים|שלשות|ראשים/, 'assume'], [/%|הנחה/, 'percent'], [/ברז/, 'work'], [/פועלים/, 'inverse'], [/מבוגר|בן כמה|בת כמה/, 'ages'], [/קמ"ש/, 'speed'], [/על כל/, 'ratio'], [/משחק נגד|כל שחקן/, 'pairs'], [/נשארו/, 'backward'], [/יוצא מהתחנה|מתחלק גם|שקיות/, 'lcm'], [/ספרות בסך הכל|לספר את|למספר את/, 'digits'], [/סיכוי/, 'prob'], [/היקף|שטח/, 'geometry'], [/עודף/, 'change'], [/חבילה של/, 'unit'], [/פעימות|מטרונום/, 'rate'], [/עוקבים/, 'consec'], [/בחזקת/, 'cycle'], [/כמה מספרים|כמה מחלקים/, 'count']];
+    for (const [re, k] of R0) if (re.test(p)) return k === 'change' ? 'money' : k;
+    return 'math';
+  }
+  return q.cat === 'verbal' ? 'odd' : 'logic';
+}
+function noteLesson(q) { const k = lessonFor(q); S.lessons = S.lessons || {}; const first = !S.lessons[k]; S.lessons[k] = (S.lessons[k] || 0) + 1; return { k, first }; }
+function lessonsSection() {
+  const got = Object.keys(S.lessons || {}).filter(k => LESSONS[k]);
+  const all = Object.keys(LESSONS).length;
+  return `<section><div class="sec-h"><h3>הכללים שלי</h3><span class="muted small">${got.length}/${all}</span></div>${got.length ? `<div class="card rules">${got.map(k => `<div class="rl"><b>${LESSONS[k][0]}</b><span>${LESSONS[k][1]}</span></div>`).join('')}</div>` : '<div class="card muted small">כל סוג שאלה חדש מלמד כלל אחד. הם יופיעו כאן.</div>'}</section>`;
+}
 /* ================= V4: JOKES + DAD'S DIAMONDS ================= */
 const JOKES = [
   ['למה ספר המתמטיקה היה עצוב?', 'כי היו לו יותר מדי בעיות.'],
@@ -1396,6 +1499,7 @@ function viewParent() {
     <div class="muted small">רעיונות (לחיצה ממלאת):</div><div class="chips">${REWARD_IDEAS.map(([t, p], i) => `<button class="chip" data-idea="${i}">${t} · ${p}</button>`).join('')}</div></div></div></section>
   <section class="card tip"><h4>איך ${ME.name} מרוויח יהלומים</h4><ul>${DIA_RULES.map(r => `<li>${r}</li>`).join('')}</ul><p class="small muted" style="margin-top:8px">בקצב הצטיינות טוב זה בערך 5-8 יהלומים בשבוע. כדאי לתמחר פרס גדול כך שיידרשו 3-4 שבועות של עבודה רצינית.</p></section>
   <section><div class="sec-h"><h3>היסטוריה</h3></div><div class="card small">${(S.diaLog || []).slice(0, 15).map(l => `<div class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--edge)"><span>${esc(l.why)}</span><span style="color:${l.n > 0 ? 'var(--good)' : 'var(--bad)'}">${l.n === 0 ? '✓' : (l.n > 0 ? '+' : '') + l.n} · ${l.d.slice(5).split('-').reverse().join('.')}</span></div>`).join('') || '<span class="muted">עוד אין.</span>'}</div></section>
+  ${cloudSection()}
   ${backupSection()}
   ${isSbx() ? '' : `<section class="card stack" style="gap:8px"><h4 style="font-size:1.15rem">מצב בדיקה</h4><p class="small muted" style="margin:0">משחק בעותק נפרד של האפליקציה: כל המשימות פתוחות, ואפשר לקפוץ לכל יום, לתת מטבעות ולבדוק פרסים. הנתונים של ${ME.name} לא משתנים. קיצור נסתר: 5 לחיצות מהירות על "ימים למבחן" במסך הבית.</p><button class="btn btn-gold" data-act="sbxenter">כניסה למצב בדיקה</button></section>`}
   <button class="btn btn-ghost btn-wide" data-act="pout">יציאה מאזור הורים</button></div>`;
@@ -1555,7 +1659,7 @@ function bindSandbox() {
   });
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '7';
+const APP_VER = '8';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -1598,7 +1702,7 @@ function restoreFrom(txt) {
   if (!o || !o.start || !o.missions) return toast('זה לא נראה כמו גיבוי של מעבדת המוח.');
   const n = Object.keys(o.missions).length;
   modal('לשחזר מהגיבוי?', `בגיבוי: ${n} משימות, ${o.xp || 0} נקודות, ${o.dia || 0} יהלומים, מתאריך ${String(o._at || '').slice(0, 10).split('-').reverse().join('.')}. ההתקדמות הנוכחית בטלפון הזה תוחלף.`, 'לשחזר', () => {
-    delete o._key; delete o._ver; delete o._at; o.cur = null; o.view = 'home';
+    delete o._key; delete o._ver; delete o._at; o.cur = null; o.view = 'home'; if (!o.pin) o.pin = S.pin;
     try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) { return toast('השמירה נכשלה.'); }
     location.reload();
   }, 'btn-boss');
@@ -1618,6 +1722,71 @@ function bindUpdate() {
   on('backup', doBackup);
   on('restoret', () => { const t = document.getElementById('restoret').value.trim(); if (t) restoreFrom(t); });
   const f = document.getElementById('restoref'); if (f) f.onchange = () => { const file = f.files[0]; if (!file) return; const fr = new FileReader(); fr.onload = () => restoreFrom(fr.result); fr.readAsText(file); };
+}
+/* ================= V8: OPTIONAL CLOUD SYNC (Firebase Realtime DB, REST) ================= */
+const CLOUD_KEY = 'bl-cloud';
+const cloudCfg = () => { try { return JSON.parse(localStorage.getItem(CLOUD_KEY)) || {}; } catch (e) { return {}; } };
+const cloudSet = c => { try { localStorage.setItem(CLOUD_KEY, JSON.stringify(c)); } catch (e) { } };
+const cloudOn = () => { const c = cloudCfg(); return !!(c.url && c.code); };
+const newCode = () => { const a = new Uint8Array(15); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = ri(0, 255)); return Array.from(a, b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join(''); };
+const cloudPath = c => `${c.url.replace(/\/+$/, '')}/brainlab/${c.code}.json`;
+function cloudPayload() { const o = JSON.parse(JSON.stringify(S)); o.cur = null; delete o.pin; o._at = new Date().toISOString(); o._ver = APP_VER; return JSON.stringify(o); }
+let cloudT = null;
+function cloudSoon() { const c = cloudCfg(); if (!c.url || !c.code || c.role !== 'kid' || isSbx()) return; clearTimeout(cloudT); cloudT = setTimeout(cloudPut, 6000); }
+async function cloudPut() {
+  const c = cloudCfg(); if (!c.url || !c.code || c.role !== 'kid' || isSbx()) return false;
+  try { const r = await fetch(cloudPath(c), { method: 'PUT', body: cloudPayload() }); c.err = r.ok ? null : 'שגיאה ' + r.status; if (r.ok) c.last = Date.now(); }
+  catch (e) { c.err = 'אין חיבור'; }
+  cloudSet(c); return !c.err;
+}
+async function cloudGet(c) { try { const r = await fetch(cloudPath(c) + '?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return { err: 'שגיאה ' + r.status }; return { data: await r.json() }; } catch (e) { return { err: 'אין חיבור' }; } }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cloudOn()) cloudPut(); });
+const agoTxt = t => { if (!t) return 'עוד לא'; const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'עכשיו' : m < 60 ? `לפני ${m} דק׳` : m < 1440 ? `לפני ${Math.round(m / 60)} שע׳` : `לפני ${Math.round(m / 1440)} ימים`; };
+const FB_RULES = '{"rules":{"brainlab":{"$code":{".read":"$code.length >= 15",".write":"$code.length >= 15"}}}}';
+function cloudSection() {
+  const c = cloudCfg();
+  if (c.url && c.code) {
+    const kid = c.role === 'kid';
+    return `<section class="card stack" style="gap:10px"><h4 style="font-size:1.15rem">ענן</h4>
+    <div class="row small"><span class="dot-st ${c.err ? 'bad' : 'ok'}"></span><span class="grow">${kid ? `הטלפון של ${ME.name} · שומר לענן` : 'הטלפון של אבא · צפייה בלבד'}${kid ? ` · סונכרן ${agoTxt(c.last)}` : ''}${c.err ? ` · <b style="color:var(--bad)">${c.err}</b>` : ''}</span></div>
+    <div class="small muted">קוד משפחה: <b class="ltr" style="color:var(--ink)">${c.code}</b></div>
+    <div class="row" style="flex-wrap:wrap">${kid ? '<button class="chip" data-act="csync">סנכרן עכשיו</button><button class="chip" data-act="cpull">טען מהענן</button>' : '<button class="btn btn-primary" data-act="cview" style="flex:1;min-height:44px">ההתקדמות של ' + ME.name + '</button>'}<button class="chip" data-act="coff">נתק</button></div><div id="cviewbox"></div></section>`;
+  }
+  return `<section class="card stack" style="gap:10px"><h4 style="font-size:1.15rem">ענן (לא חובה)</h4>
+  <p class="small muted" style="margin:0">גיבוי אוטומטי, ואפשרות לראות את ההתקדמות מהטלפון שלך. בלי ענן הכל ממשיך לעבוד כרגיל.</p>
+  <input class="txt" id="curl" placeholder="כתובת מסד הנתונים (Firebase)" style="direction:ltr">
+  <input class="txt" id="ccode" placeholder="קוד משפחה (ריק = קוד חדש)" style="direction:ltr">
+  <div class="row"><button class="btn btn-primary" data-act="ckid" style="flex:1;min-height:44px;font-size:.92rem">זה הטלפון של ${ME.name}</button><button class="btn btn-ghost" data-act="cdad" style="flex:1;min-height:44px;font-size:.92rem">זה הטלפון של אבא</button></div>
+  <p class="small" id="cmsg" style="margin:0;color:var(--bad)"></p>
+  <details class="small muted"><summary>איך מקבלים כתובת (5 דקות, פעם אחת)</summary><ol style="margin:6px 0 0;padding-inline-start:18px;line-height:1.7"><li>console.firebase.google.com ← Create project (בלי Analytics).</li><li>Build ← Realtime Database ← Create database ← Locked mode.</li><li>בלשונית Rules מדביקים את הכללים שלמטה ← Publish.</li><li>מעתיקים את הכתובת שמופיעה למעלה (מסתיימת ב-firebasedatabase.app).</li></ol><textarea class="txt" readonly style="width:100%;height:56px;margin-top:6px;direction:ltr;font-size:.72rem">${FB_RULES}</textarea></details></section>`;
+}
+function viewerHTML(o) {
+  const done = Object.keys(o.missions || {}).length, st = o.stats || {};
+  const tot = Object.values(st).reduce((a, s) => ({ c: a.c + s.c, t: a.t + s.t }), { c: 0, t: 0 });
+  const last = Object.entries(o.missions || {}).sort((a, b) => b[0] - a[0]).slice(0, 7);
+  const bars = Object.keys(CATS).filter(k => st[k] && st[k].t).map(k => { const p = Math.round(st[k].c / st[k].t * 100); return `<div class="bar ${st[k].t >= 6 && p < 65 ? 'weak' : ''}"><div class="rw"><span>${CATS[k].n}</span><span>${p}%</span></div><div class="track"><i style="width:${p}%"></i></div></div>`; }).join('');
+  return `<div class="stack" style="gap:10px;margin-top:6px"><div class="small muted">עודכן ${agoTxt(Date.parse(o._at))}</div>
+  <div class="stats3"><div class="card stat"><div class="big">${done}</div><div class="lbl">משימות</div></div><div class="card stat"><div class="big">${tot.t ? Math.round(tot.c / tot.t * 100) : 0}%</div><div class="lbl">הצלחה</div></div><div class="card stat"><div class="big">${o.streak || 0}</div><div class="lbl">רצף</div></div></div>
+  ${last.length ? `<div class="card small">${last.map(([k, m]) => `<div class="row" style="justify-content:space-between;padding:3px 0"><span>${isBoss(+k) ? BOSSES[k].n : 'משימה ' + k}</span><span>${m.c}/${m.n} · ${m.date.slice(5).split('-').reverse().join('.')}</span></div>`).join('')}</div>` : ''}
+  ${bars ? `<div class="card bars">${bars}</div>` : ''}<div class="small muted">יהלומים: ${o.dia || 0} · שוברים פתוחים: ${(o.vouchers || []).filter(v => v.state === 'pending').length}</div></div>`;
+}
+function bindCloud() {
+  const on = (a, fn) => { const e = app.querySelector(`[data-act="${a}"]`); if (e) e.onclick = fn; };
+  const msg = t => { const m = document.getElementById('cmsg'); if (m) m.textContent = t; };
+  const connect = async role => {
+    const url = (document.getElementById('curl').value || '').trim(), code = (document.getElementById('ccode').value || '').trim() || (role === 'kid' ? newCode() : '');
+    if (!/^https:\/\/[^ ]+\.(firebaseio\.com|firebasedatabase\.app)\/?$/.test(url)) return msg('הכתובת צריכה להיות של Firebase Realtime Database.');
+    if (code.length < 15) return msg(role === 'kid' ? 'קוד קצר מדי.' : 'צריך להזין את קוד המשפחה מהטלפון של ' + ME.name + '.');
+    msg(''); const c = { url, code, role };
+    if (role === 'kid') { cloudSet(c); const ok = await cloudPut(); if (!ok) { msg('לא הצלחתי לשמור. בדוק את הכתובת ואת הכללים.'); cloudSet({}); return; } }
+    else { const g = await cloudGet(c); if (g.err) return msg('לא הצלחתי לקרוא: ' + g.err); if (!g.data) return msg('אין עדיין נתונים בקוד הזה.'); cloudSet(c); }
+    toast('מחובר לענן'); render();
+  };
+  on('ckid', () => connect('kid')); on('cdad', () => connect('dad'));
+  on('coff', () => modal('לנתק מהענן?', 'הנתונים בטלפון לא נמחקים. מה שבענן נשאר שם.', 'נתק', () => { cloudSet({}); render(); }));
+  on('csync', async () => { toast(await cloudPut() ? 'סונכרן' : 'הסנכרון נכשל'); render(); });
+  on('cpull', async () => { const g = await cloudGet(cloudCfg()); if (g.err || !g.data) return toast(g.err || 'אין נתונים בענן'); const d = g.data; d.pin = S.pin; restoreFrom(JSON.stringify(d)); });
+  on('cview', async () => { const box = document.getElementById('cviewbox'); box.innerHTML = '<div class="small muted">טוען...</div>'; const g = await cloudGet(cloudCfg()); box.innerHTML = g.err ? `<div class="small" style="color:var(--bad)">${g.err}</div>` : g.data ? viewerHTML(g.data) : '<div class="small muted">אין עדיין נתונים.</div>'; });
 }
 /* ================= APP V3: ELEMENTS ================= */
 document.documentElement.setAttribute('dir', 'rtl');
@@ -1671,7 +1840,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 function defState() { return { start: todayStr(), xp: 0, coins: 0, streak: 0, best: 0, lastDone: null, freezes: 0, hints: 0, missions: {}, stats: {}, times: {}, rat: {}, seen: {}, badges: [], exam: '2027-01-15', cur: null, view: 'home', own: { skin: ['auto'] }, skin: 'auto', sound: true, mist: [], arcade: { sprint: 0, piano: 0, kupa: 0 }, bdGift: {}, last: null, openW: null, dia: 0, diaLog: [], rewards: [], vouchers: [], pin: null, jokes: 0, aw: {} }; }
 function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.start) { const d = defState(); const o = Object.assign(d, s); o.own = { skin: ['auto'].concat(((s.own || {}).skin || []).filter(x => SKINS[x] && x !== 'auto')) }; if (!SKINS[o.skin]) o.skin = 'auto'; o.arcade = Object.assign({ sprint: 0, piano: 0, kupa: 0 }, s.arcade || {}); if (['avatar'].includes(o.view)) o.view = 'home'; if (o.exam === '2026-12-21') o.exam = '2027-01-15'; return o; } } catch (e) { } return defState(); }
 let S = load(); SEEN = S.seen;
-function save() { S.seen = SEEN; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+function save() { S.seen = SEEN; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } cloudSoon(); }
 const nm = () => ME.name;
 const unlocked = () => Math.min(TOTAL, dayDiff(S.start, todayStr()) + 1);
 const nextDay = () => { for (let k = 1; k <= TOTAL; k++) if (!S.missions[k]) return k; return null; };
@@ -2031,7 +2200,8 @@ function renderQuiz() {
   if (answered) {
     const tchip = `<span class="tchip ${r.secs <= 60 ? 'ok' : ''}">${Math.round(r.secs)} שנ׳</span>`;
     const ansTxt = q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
-    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!']) + (r.gain ? ` +${r.gain}` : '') : 'לא הפעם. התשובה הנכונה: ' + ansTxt} ${tchip}</h4><span class="why">למה?</span><p>${q.ex}</p>${!r.ok && !q.champ ? '<p class="small muted" style="margin-top:6px">השאלה נכנסה למחברת הטעויות ותחזור בעוד יום.</p>' : ''}</div>`;
+    const LS = LESSONS[lessonFor(q)] || LESSONS.logic;
+    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4>${r.ok ? pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!']) + (r.gain ? ` +${r.gain}` : '') : 'לא הפעם. התשובה: ' + ansTxt} ${tchip}</h4><div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span>${LS[1]}</div>${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${!r.ok && !q.champ ? '<p class="mnote">נשמרה במחברת · חוזרת מחר</p>' : ''}</div>`;
   }
   const hint = c.hint && !answered ? `<div class="hintbox"><b>טריק:</b> ${CATS[q.cat].tip}</div>` : '';
   const comboTag = c.combo >= 2 && !deferred(c.kind) ? `<span class="combo">${IC.flame}${c.combo}</span>` : '';
@@ -2086,6 +2256,7 @@ function answer(i, val) {
   const prev = c.res[c.i]; if (prev) c.pts -= prev.gain;
   c.res[c.i] = { sel: typed ? -1 : i, val: typed ? String(val) : undefined, ok, gain, secs };
   c.pts += gain;
+  if (!prev) c.res[c.i].newRule = noteLesson(q).first;
   if (!prev) {
     const rr = S.rat[q.cat] ?? baseDiff(c.day || nextDay() || TOTAL);
     S.rat[q.cat] = Math.max(1, Math.min(4.4, rr + (ok ? (q.d >= Math.round(rr) ? .14 : .06) : -.18)));
@@ -2107,6 +2278,7 @@ function answer(i, val) {
     return;
   }
   save(); renderQuiz();
+  setTimeout(() => { const f = app.querySelector('.fb'); if (f) f.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
   const nb = typed ? app.querySelector('.typed-res') : app.querySelector(`[data-opt="${i}"]`);
   if (ok) { (c.combo >= 3 && c.combo % 3 === 0 ? SFX.combo : SFX.ok)(); floatPts(nb, '+' + gain); if (c.combo >= 3 && c.combo % 3 === 0) burst(40); }
   else SFX.no();
@@ -2139,7 +2311,7 @@ function finish() {
   const won = c.kind === 'boss' ? correct / n >= .7 : null;
   const newGear = GEAR.filter(g => gearOn()[g.id] && !gearBefore.includes(g.id)).map(g => g.n);
   S.last = { dia, joke, champOk, chapters, size: c.size, mod: c.mod, kind: c.kind, day: c.day, cat: c.cat, correct, n, pts: c.pts, coins, won, chest: (c.kind === 'daily' || c.kind === 'boss' || c.kind === 'sim') ? 0 : -1, newB: S.badges.filter(b => !before.includes(b)), newGear, newWorld: curWorld().k !== worldBefore ? curWorld().n : null, rankUp: rankOf(S.xp).r[1] !== rankBefore ? rankOf(S.xp).r[1] : null,
-    review: c.qs.map((q, i) => ({ q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : q.options[q.answer], ex: q.ex })).filter(x => deferred(c.kind) || !x.ok) };
+    review: c.qs.map((q, i) => ({ lk: lessonFor(q), q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : q.options[q.answer], ex: q.ex })).filter(x => deferred(c.kind) || !x.ok) };
   S.cur = null; S.openW = null; go('result');
   const st = starsOf(correct, n);
   if (won || st >= 2) { SFX.win(); later(() => burst(st === 3 || won ? 160 : 80), 250); }
@@ -2179,7 +2351,7 @@ function viewResult() {
   const nw = L0.newWorld ? `<div class="banner" style="background:linear-gradient(120deg,var(--acc-soft),rgba(169,139,255,.2));border-color:var(--acc)"><span class="wi" style="color:var(--acc);width:44px;height:44px;flex:none">${elemIcon(curWorld().k)}</span><div class="grow">נכנסת ל<b>${L0.newWorld}</b>! צבעי המסע השתנו.</div></div>` : '';
   const ru = L0.rankUp ? `<div class="banner">${IC.star.replace('<svg', '<svg style="width:40px;height:40px;color:var(--gold)"')}<div class="grow">עלית דרגה! עכשיו אתה <b>${L0.rankUp}</b>.</div></div>` : '';
   const chest = L0.chest === 0 ? `<button class="card chest" data-act="chest">${chestSVG(false)}<div><b style="font-family:var(--f-display);font-size:1.2rem">תיבת אוצר!</b><div class="muted small">לחץ כדי לפתוח</div></div></button>` : L0.chest > 0 ? `<div class="card chest open">${chestSVG(true)}<div><b style="font-family:var(--f-display);font-size:1.2rem;color:var(--gold)">+${L0.chest} מטבעות</b><div class="muted small">נכנסו לארנק. בחנות יש ערכות צבע, מגני רצף ורמזים.</div></div></div>` : '';
-  const rev = L0.review.length ? `<section><div class="sec-h"><h3>${deferred(L0.kind) ? 'כל השאלות וההסברים' : 'שאלות לחזור עליהן'}</h3></div><div class="rev">${L0.review.map(x => `<div class="card item"><div class="q"><span class="tag" style="margin-inline-end:6px">${CATS[x.cat].n}</span>${x.ok ? '<b style="color:var(--good)">✓</b>' : '<b style="color:var(--bad)">✗</b>'} ${x.q.replace(/<[^>]+>/g, '')}</div><div class="a">תשובה נכונה: <b>${x.a}</b></div><div class="e">${x.ex}</div></div>`).join('')}</div></section>` : '';
+  const rev = L0.review.length ? `<section><div class="sec-h"><h3>${deferred(L0.kind) ? 'כל השאלות' : 'לחזור עליהן'}</h3></div><div class="rev">${L0.review.map(x => `<details class="card item"><summary><span class="tag">${CATS[x.cat].n}</span> ${x.ok ? '<b style="color:var(--good)">✓</b>' : '<b style="color:var(--bad)">✗</b>'} ${x.q.replace(/<[^>]+>/g, '')}</summary><div class="a">התשובה: <b>${x.a}</b></div>${x.lk && LESSONS[x.lk] ? `<div class="rule small"><span class="rt">הכלל</span>${LESSONS[x.lk][1]}</div>` : ''}<div class="e">${x.ex}</div></details>`).join('')}</div></section>` : '';
   const dv = (L0.dia || []).length ? `<div class="banner" style="background:linear-gradient(120deg,rgba(143,227,255,.22),rgba(169,139,255,.2));border-color:rgba(143,227,255,.5)">${diaS(44)}<div class="grow"><b>+${L0.dia.reduce((a, x) => a + x[0], 0)} יהלומים של אבא!</b><div class="small muted">${L0.dia.map(x => x[1]).join(' · ')}</div></div></div>` : '';
   return `<div class="stack">${hud()}<section class="card res-hero"><div class="eyebrow">${title}</div><div class="who">${who}</div><div class="stars">${stars}</div><div class="score">${L0.correct}/${L0.n}</div><p class="muted" style="margin:4px 0 0">${msg}</p><div class="gains"><span class="gain">+${L0.pts} נק׳</span><span class="gain c">+${L0.coins} מטבעות</span></div></section>${L0.chapters ? `<section class="card"><div class="eyebrow" style="margin-bottom:8px">לפי פרקים</div><div class="bars">${L0.chapters.map(ch => `<div class="bar ${ch.c / ch.t < .6 ? 'weak' : ''}"><div class="rw"><span>${ch.n}</span><span>${ch.c}/${ch.t}</span></div><div class="track"><i style="width:${Math.round(ch.c / ch.t * 100)}%"></i></div></div>`).join('')}</div></section>` : ''}${L0.champOk != null ? `<div class="card row small" style="border-color:rgba(255,200,69,.5)">${IC.star.replace('<svg', '<svg style="width:26px;height:26px;color:var(--gold);flex:none"')}<span>שאלת האלוף: ${L0.champOk ? '<b style="color:var(--good)">נכון! הרווחת יהלום.</b>' : 'הפעם לא. ההסבר נמצא למטה.'}</span></div>` : ''}${dv}${chest}${jokeCard(L0.joke)}${nw}${ng}${ru}${nb}${['daily', 'boss', 'sim'].includes(L0.kind) ? `<button class="btn btn-gold btn-wide" data-share="result">${IC.share} שתף בקבוצה של המשפחה</button>` : ''}<button class="btn btn-primary btn-wide" data-go="home">חזרה למסע</button>${rev}</div>`;
 }
@@ -2348,7 +2520,7 @@ function viewStats() {
 
 /* ---------- TIPS ---------- */
 function viewTips() {
-  return `<div class="stack">${hud()}
+  return `<div class="stack">${hud()}${lessonsSection()}
   <section class="card tip" style="border-color:var(--acc)"><h4>איך המסע עובד</h4><ul>
   <li><b>5 עולמות:</b> אוויר, מים, אדמה, אש, ובסוף עולם האלוף ברמת מחוננים. 15 משימות בכל עולם, ובכל עולם צבעי האפליקציה משתנים.</li>
   <li><b>משימה יומית:</b> 10 שאלות מכל התחומים. אחת תמיד מהתחום הכי חלש, ועד 2 מהמחברת.</li>
@@ -2409,7 +2581,7 @@ function bind() {
   on('hints', () => { if (S.coins < 45) return modal('אין מספיק מטבעות', `חסרים ${45 - S.coins} מטבעות.`, 'הבנתי', () => { }, 'btn-primary', true); S.coins -= 45; S.hints += 3; SFX.coin(); save(); render(); });
   on('sound', () => { S.sound = !S.sound; save(); render(); if (S.sound) SFX.ok(); });
   on('spgo', spStart); on('kpgo', kpStart);
-  bindExtra(); bindSandbox(); bindUpdate();
+  bindExtra(); bindSandbox(); bindUpdate(); bindCloud();
   app.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(b.dataset.share));
   const ex = document.getElementById('exam'); if (ex) ex.onchange = () => { if (ex.value) { S.exam = ex.value; save(); } };
 }
