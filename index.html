@@ -2077,7 +2077,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '17';
+const APP_VER = '18';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -3862,7 +3862,7 @@ if (!S.rhV17) { if ((S.rh || []).length >= 8 && rushRate() > .2) S.rh = Array(8)
 function normCloud(o) {
   if (!o || typeof o !== 'object') return o;
   if (Array.isArray(o.missions)) { const m = {}; o.missions.forEach((v, i) => { if (v) m[i] = v; }); o.missions = m; }
-  ['mist', 'rh', 'moods', 'diaLog', 'vouchers', 'rewards', 'badges', 'mh', 'explainLog', 'duoLog', 'dadMsgs'].forEach(k => { if (o[k] && !Array.isArray(o[k])) o[k] = Object.values(o[k]); if (Array.isArray(o[k])) o[k] = o[k].filter(x => x != null); });
+  ['mist', 'rh', 'moods', 'diaLog', 'vouchers', 'rewards', 'badges', 'mh', 'explainLog', 'duoLog', 'dadMsgs', 'appliedB'].forEach(k => { if (o[k] && !Array.isArray(o[k])) o[k] = Object.values(o[k]); if (Array.isArray(o[k])) o[k] = o[k].filter(x => x != null); });
   ['stats', 'times', 'rat', 'hard', 'aw', 'bdGift', 'seen', 'arcade', 'own', 'lessons', 'pb', 'firstD'].forEach(k => { if (o[k] == null) o[k] = {}; });
   return o;
 }
@@ -3900,6 +3900,92 @@ viewHome = function () {
   if (!isDadPhone() || isSbx()) return h;
   return h.replace('<section class="card hero"', `<button class="banner dadban" data-go="parent"><span style="width:40px;height:40px;flex:none">${IC.chart}</span><div class="grow"><b>זה הטלפון של אבא</b><div class="small muted">לדוח של ${ME.name} מהענן</div></div></button><section class="card hero"`);
 };
+/* ================= V18: DAD MANAGES DIAMONDS FROM HIS PHONE (parent channel in the cloud) ================= */
+/* The kid's phone owns the state and writes it. Dad's phone writes only to a side node (<code>-p):
+   rewards list, bonuses, voucher decisions, dad's notes. The kid's phone reads it and applies it. */
+const pPath = c => `${c.url.replace(/\/+$/, '')}/brainlab/${c.code}-p.json`;
+async function pGet(c) { try { const r = await fetch(pPath(c) + '?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return { err: 'שגיאה ' + r.status }; return { data: (await r.json()) || {} }; } catch (e) { return { err: 'אין חיבור' }; } }
+async function pPut(c, P) { try { const r = await fetch(pPath(c), { method: 'PUT', body: JSON.stringify(P) }); return r.ok; } catch (e) { return false; } }
+const arr = x => Array.isArray(x) ? x.filter(v => v != null) : x && typeof x === 'object' ? Object.values(x) : [];
+
+/* ---------- kid's phone: pull and apply ---------- */
+let P_LAST = 0, P_BUSY = false;
+async function pullParent(force) {
+  const c = cloudCfg(); if (c.role !== 'kid' || !c.url || !c.code || isSbx() || P_BUSY) return;
+  if (!force && Date.now() - P_LAST < 30000) return;
+  P_BUSY = true; P_LAST = Date.now();
+  try {
+    const g = await pGet(c); if (!g.data) return;
+    const P = g.data, msgs = []; let ch = false;
+    S.appliedB = S.appliedB || [];
+    arr(P.bonuses).forEach(b => { if (!b || !b.id || S.appliedB.includes(b.id)) return; S.appliedB.push(b.id); const n = Math.max(-(S.dia || 0), b.n | 0); if (n) { giveDia(n, b.why || (n > 0 ? 'פינוק מאבא' : 'תיקון של אבא'), []); if (n > 0) msgs.push(`אבא שלח לך ${n} ${n === 1 ? 'יהלום' : 'יהלומים'}${b.why ? ': ' + esc(b.why) : '!'}`); } ch = true; });
+    const dec = P.dec || {};
+    (S.vouchers || []).forEach(v => { if (v.state !== 'pending' || !dec[v.id]) return; if (dec[v.id] === 'ok') { v.state = 'done'; v.done = todayStr(); S.diaLog.unshift({ d: todayStr(), n: 0, why: `מומש: ${v.t}` }); msgs.push(`אבא אישר: ${esc(v.t)}`); } else { v.state = 'cancel'; S.dia += v.p; S.diaLog.unshift({ d: todayStr(), n: v.p, why: `בוטל והוחזר: ${v.t}` }); } ch = true; });
+    if (P.rv && P.rv !== S.prv) { S.rewards = arr(P.rewards); S.prv = P.rv; ch = true; }
+    if (P.mv && P.mv !== S.pmv) { S.dadMsgs = arr(P.dadMsgs); S.pmv = P.mv; ch = true; }
+    if (ch) { save(); if (S.view !== 'quiz') render(); }
+    if (msgs.length) toast(msgs.join('<br>'), 5000);
+  } finally { P_BUSY = false; }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullParent(); });
+setTimeout(() => pullParent(true), 1200);
+const _go18 = go;
+go = function (v) { const r = _go18.apply(this, arguments); if (v === 'shop' || v === 'home') pullParent(); return r; };
+
+/* ---------- dad's phone: panel built from the kid's cloud data + the parent node ---------- */
+let PNODE = null;
+function dadPanel(o, P) {
+  o = o || {}; P = P || {};
+  const applied = arr(o.appliedB), waitB = arr(P.bonuses).filter(b => b && !applied.includes(b.id));
+  const waitN = waitB.reduce((a, b) => a + (b.n | 0), 0), dec = P.dec || {};
+  const pend = arr(o.vouchers).filter(v => v.state === 'pending');
+  const rewards = P.rv ? arr(P.rewards) : arr(o.rewards);
+  const msgs = P.mv ? arr(P.dadMsgs) : (arr(o.dadMsgs).length ? arr(o.dadMsgs) : DAD_DEF);
+  const sync = waitB.length || pend.some(v => dec[v.id]) || (P.rv && P.rv !== o.prv) ? `<div class="small" style="color:var(--gold)">יש שינויים שיגיעו לטלפון של ${ME.name} בפעם הבאה שהאפליקציה תיפתח אצלו.</div>` : '';
+  return `<section class="card stack" style="gap:10px" data-nog><div class="dia-head">${diaS(40)}<div class="grow"><div class="eyebrow">יתרה של ${ME.name}</div><div class="dia-n">${(o.dia || 0) + waitN}</div></div></div>${sync}
+    ${!rewards.length ? `<div class="small" style="color:var(--gold)">עוד לא הגדרת פרסים. בלי פרסים, ל${ME.name} אין על מה להשתמש ביהלומים. כדאי להוסיף 3-4 פרסים למטה.</div>` : ''}
+    <div class="eyebrow">פינוק ידני</div><input class="txt" id="dbwhy" maxlength="40" placeholder="סיבה (לא חובה), למשל: עזר בבית"><div class="chips"><button class="chip" data-dbonus="1">+1</button><button class="chip" data-dbonus="3">+3</button><button class="chip" data-dbonus="5">+5</button><button class="chip" data-dbonus="-1">−1</button></div></section>
+  <section data-nog><div class="sec-h"><h3>שוברים לאישור</h3></div>${pend.length ? `<div class="stack" style="gap:8px">${pend.map(v => `<div class="card row"><div class="grow"><b>${esc(v.t)}</b><div class="muted small">${v.p} יהלומים · ${String(v.date || '').split('-').reverse().join('.')}</div></div>${dec[v.id] ? `<span class="small muted">${dec[v.id] === 'ok' ? 'אושר' : 'בוטל'}, ממתין לסנכרון</span>` : `<button class="chip" data-dvok="${v.id}">מימשנו</button><button class="chip" data-dvno="${v.id}">ביטול</button>`}</div>`).join('')}</div>` : '<div class="card small muted">אין שוברים פתוחים.</div>'}</section>
+  <section data-nog><div class="sec-h"><h3>הפרסים</h3><span class="muted small">${ME.name} רואה אותם בחנות</span></div><div class="stack" style="gap:8px">
+    ${rewards.map(r => `<div class="card row"><div class="grow"><b>${esc(r.t)}</b><div class="muted small">${r.p} יהלומים</div></div><button class="chip" data-drdel="${r.id}">מחק</button></div>`).join('')}
+    <div class="card stack" style="gap:8px"><b>פרס חדש</b><input class="txt" id="drname" maxlength="40" placeholder="שם הפרס"><div class="row"><input class="txt" id="drprice" type="number" min="1" max="999" placeholder="מחיר ביהלומים" style="flex:1"><button class="btn btn-primary" data-act="dradd" style="min-height:44px">הוסף</button></div>
+    <div class="muted small">רעיונות (לחיצה ממלאת):</div><div class="chips">${REWARD_IDEAS.map(([t, p], i) => `<button class="chip" data-didea="${i}">${t} · ${p}</button>`).join('')}</div></div></div></section>
+  <section class="card tip" data-nog><h4>איך ${ME.name} מרוויח יהלומים</h4><ul>${DIA_RULES.map(r => `<li>${r}</li>`).join('')}</ul></section>
+  <section data-nog><div class="sec-h"><h3>היסטוריה</h3></div><div class="card small">${arr(o.diaLog).slice(0, 12).map(l => `<div class="row" style="justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--edge)"><span>${esc(l.why)}</span><span>${l.n > 0 ? '+' : ''}${l.n || ''} · ${String(l.d).split('-').reverse().join('.')}</span></div>`).join('') || '<span class="muted">עוד אין.</span>'}</div></section>
+  <section class="card stack" style="gap:8px" data-nog><h4 style="font-size:1.15rem">הודעות מאבא</h4><p class="small muted" style="margin:0">מופיעות מדי פעם בטלפון של ${ME.name}. שורה לכל הודעה.</p><textarea class="txt" id="ddadmsgs" style="width:100%;height:120px;line-height:1.6">${msgs.map(esc).join('\n')}</textarea><button class="btn btn-primary" data-act="ddadsave" style="min-height:44px">שמור</button></section>`;
+}
+async function refreshDadPanel() {
+  const el = document.getElementById('dadpanel'); if (!el) return;
+  const g = await pGet(cloudCfg()); if (g.data) PNODE = g.data;
+  const el2 = document.getElementById('dadpanel'); if (!el2) return;
+  el2.innerHTML = dadPanel(normCloud(ccGet() || {}), PNODE || {}); bindDadPanel();
+}
+async function pEdit(fn, msg) {
+  const c = cloudCfg(), g = await pGet(c); if (g.err) return toast('אין חיבור לענן. נסה שוב.');
+  const P = g.data || {}; fn(P); P.at = new Date().toISOString();
+  if (!(await pPut(c, P))) return toast('השמירה בענן נכשלה.');
+  PNODE = P; if (msg) toast(msg); const el = document.getElementById('dadpanel'); if (el) { el.innerHTML = dadPanel(normCloud(ccGet() || {}), PNODE); bindDadPanel(); }
+}
+function bindDadPanel() {
+  const el = document.getElementById('dadpanel'); if (!el) return;
+  el.querySelectorAll('[data-dbonus]').forEach(b => b.onclick = () => { const n = +b.dataset.dbonus, why = (document.getElementById('dbwhy').value || '').trim(); pEdit(P => { P.bonuses = arr(P.bonuses).concat({ id: 'b' + Date.now(), n, why, d: todayStr() }); }, n > 0 ? `נשלחו ${n} יהלומים` : 'עודכן'); });
+  el.querySelectorAll('[data-dvok]').forEach(b => b.onclick = () => pEdit(P => { P.dec = Object.assign({}, P.dec, { [b.dataset.dvok]: 'ok' }); }, 'אושר'));
+  el.querySelectorAll('[data-dvno]').forEach(b => b.onclick = () => pEdit(P => { P.dec = Object.assign({}, P.dec, { [b.dataset.dvno]: 'no' }); }, 'בוטל, היהלומים יחזרו'));
+  const baseRewards = P => P.rv ? arr(P.rewards) : arr((ccGet() || {}).rewards);
+  el.querySelectorAll('[data-drdel]').forEach(b => b.onclick = () => pEdit(P => { P.rewards = baseRewards(P).filter(r => r.id !== b.dataset.drdel); P.rv = Date.now(); }));
+  el.querySelectorAll('[data-didea]').forEach(b => b.onclick = () => { const [t, p] = REWARD_IDEAS[+b.dataset.didea]; document.getElementById('drname').value = t; document.getElementById('drprice').value = p; });
+  const add = el.querySelector('[data-act="dradd"]'); if (add) add.onclick = () => { const t = document.getElementById('drname').value.trim().replace(/[<>]/g, ''), p = parseInt(document.getElementById('drprice').value); if (!t || !(p > 0)) return toast('צריך שם ומחיר'); pEdit(P => { P.rewards = baseRewards(P).concat({ id: 'r' + Date.now(), t, p }); P.rv = Date.now(); }, 'הפרס נוסף'); };
+  const ms = el.querySelector('[data-act="ddadsave"]'); if (ms) ms.onclick = () => { const v = (document.getElementById('ddadmsgs').value || '').split('\n').map(s => s.trim().replace(/[<>]/g, '')).filter(Boolean).slice(0, 30); pEdit(P => { P.dadMsgs = v; P.mv = Date.now(); }, 'נשמר'); };
+}
+const _viewParent18 = viewParent;
+viewParent = function () {
+  const h = _viewParent18.apply(this, arguments);
+  if (!PARENT_OK || !isDadPhone() || isSbx()) return h;
+  setTimeout(refreshDadPanel, 40);
+  return h.replace(/<section class="card stack" style="gap:10px"><div class="dia-head">[\s\S]*?(?=<section class="card stack" style="gap:10px"><h4 style="font-size:1\.15rem">ענן)/, `<div id="dadpanel">${dadPanel(normCloud(ccGet() || {}), PNODE || {})}</div>`);
+};
+const _refreshDadReport18 = refreshDadReport;
+refreshDadReport = async function () { await _refreshDadReport18.apply(this, arguments); const el = document.getElementById('dadpanel'); if (el) { el.innerHTML = dadPanel(normCloud(ccGet() || {}), PNODE || {}); bindDadPanel(); } };
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
