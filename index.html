@@ -595,6 +595,25 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 @keyframes thinkfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .think{opacity:.45;filter:blur(1.5px);transition:opacity .3s,filter .3s;pointer-events:none}
 .rgrid div.warn{border-color:rgba(255,200,69,.6);background:rgba(255,200,69,.1)}
+/* v16 */
+.checkin{border-color:rgba(169,139,255,.5)}
+.explain{border-color:rgba(70,224,160,.45)}
+.commit{margin-top:8px;display:inline-block;background:rgba(169,139,255,.25);border-color:#A98BFF;font-weight:700}
+.duo{margin:8px 0 0;padding:8px 12px;border-radius:12px;background:rgba(255,122,168,.12);border:1px solid rgba(255,122,168,.4);font-size:.88rem;font-weight:600}
+.duohero{background:linear-gradient(155deg,rgba(255,122,168,.25),var(--panel) 60%)}
+.offer h2{margin:6px 0}
+.bcirc{width:150px;height:150px;margin:18px auto;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(143,227,255,.45),rgba(83,168,255,.12));box-shadow:0 0 40px rgba(143,227,255,.35);transform:scale(.8);transition:transform 4s ease-in-out}
+.bcirc .ii{width:60px;height:60px;color:#8FE3FF}
+.court{position:relative;width:100%;align-self:stretch;box-sizing:border-box;height:170px;margin:12px 0;border-radius:16px;background:linear-gradient(#1B2350,#0E1433);overflow:hidden;border:1px solid var(--edge)}
+.hoop{position:absolute;top:56px;left:50%;width:70px;height:12px;margin-left:-35px;border:4px solid #FF8A3D;border-top:none;border-radius:0 0 30px 30px}
+.hoop:before{content:"";position:absolute;left:50%;top:-40px;width:96px;height:42px;margin-left:-48px;border:3px solid rgba(255,255,255,.6);border-radius:4px;border-bottom:none}
+.ballrow{position:absolute;bottom:18px;left:0;right:0;height:40px;direction:ltr}
+.ball{position:absolute;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFB067,#E06A1B);box-shadow:inset 0 0 0 2px rgba(0,0,0,.25);transition:transform .35s ease-out}
+.ball.in{transform:translateY(-78px) scale(.7)}
+.ball.miss{transform:translateY(-55px) translateX(30px) scale(.8)}
+.hstat{font-weight:700;margin-bottom:6px}
+.banner.calm{border-color:rgba(255,200,69,.45)}
+.rmore{display:flex;flex-direction:column;gap:3px;padding-top:6px;border-top:1px solid var(--edge)}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -2055,7 +2074,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '15';
+const APP_VER = '16';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -3366,7 +3385,7 @@ avatarSVG = function (o) {
 
 /* ---------- feminine forms (UI text addressed to the kid; parent area stays as is) ---------- */
 const GPH = [['ברוך הבא', 'ברוכה הבאה'], ['סדר את', 'סדרי את'], ['סדר מהקטן', 'סדרי מהקטן'], ['לך לשתות', 'לכי לשתות'], ['אתה מתאמן', 'את מתאמנת'], ['שאתה מתאמן', 'שאת מתאמנת'], ['שאתה לא מוותר', 'שאת לא מוותרת'], ['אתה לא מוותר', 'את לא מוותרת'], ['אתה יכול', 'את יכולה'], ['המשך לשאלה', 'המשיכי לשאלה'], ['שמע, זכור', 'שמעי, זכרי'], ['פתח מתנה', 'פתחי מתנה'], ['צייר קו', 'ציירי קו'], ['צייר את', 'ציירי את'], ['צייר שתי', 'ציירי שתי'], ['בחר תשובה', 'בחרי תשובה']];
-const GW = { 'אתה': 'את', 'נסה': 'נסי', 'לחץ': 'לחצי', 'זכור': 'זכרי', 'נגן': 'נגני', 'התחל': 'התחילי', 'תזכור': 'תזכרי', 'תראה': 'תראי', 'מוכן': 'מוכנה', 'אלוף': 'אלופה', 'שתף': 'שתפי', 'הצב': 'הציבי', 'דלג': 'דלגי', 'בדוק': 'בדקי', 'עליך': 'עלייך', 'מתאמן': 'מתאמנת', 'מוותר': 'מוותרת', 'בוא': 'בואי', 'צא': 'צאי', 'ספור': 'ספרי', 'חפש': 'חפשי', 'שים': 'שימי', 'תן': 'תני', 'מוכן?': 'מוכנה?' };
+const GW = { 'אתה': 'את', 'נסה': 'נסי', 'לחץ': 'לחצי', 'זכור': 'זכרי', 'נגן': 'נגני', 'התחל': 'התחילי', 'תזכור': 'תזכרי', 'תראה': 'תראי', 'מוכן': 'מוכנה', 'אלוף': 'אלופה', 'שתף': 'שתפי', 'הצב': 'הציבי', 'דלג': 'דלגי', 'בדוק': 'בדקי', 'עליך': 'עלייך', 'מתאמן': 'מתאמנת', 'מוותר': 'מוותרת', 'בוא': 'בואי', 'צא': 'צאי', 'ספור': 'ספרי', 'חפש': 'חפשי', 'שים': 'שימי', 'תן': 'תני', 'מוכן?': 'מוכנה?', 'תסביר': 'תסבירי', 'זרוק': 'זרקי', 'הסברת': 'הסברת' };
 const GRE = new RegExp(`(^|[^א-ת])([ושכ]?)(${Object.keys(GW).map(k => k.replace('?', '\\?')).sort((a, b) => b.length - a.length).join('|')})(?=[^א-ת]|$)`, 'g');
 function femText(t) {
   if (!/[א-ת]/.test(t)) return t;
@@ -3554,7 +3573,7 @@ function minSecs(q) {
 function logRush(v) { S.rh = (S.rh || []).concat(v ? 1 : 0).slice(-30); }
 const rushRate = (o = S) => { const a = o.rh || []; return a.length >= 8 ? a.reduce((x, y) => x + y, 0) / a.length : 0; };
 (function seedRush() { if (S.rh) return; const t = Object.values(S.times || {}).reduce((a, x) => ({ s: a.s + x.s, n: a.n + x.n }), { s: 0, n: 0 }); if (t.n >= 20 && t.s / t.n < 15) S.rh = Array(10).fill(1); })();
-const thinkOn = c => !deferred(c.kind) && (c.think || rushRate() > .2);
+const thinkOn = c => !deferred(c.kind) && !c.duo && (c.think || rushRate() > .2);
 
 /* ---------- nudge on a too-fast first tap ---------- */
 const NUDGE = ['רגע. ענית תוך {s} שניות. קרא את השאלה עד הסוף, ואז תבחר.', 'עצור רגע. מה בדיוק שואלים? קרא שוב ותענה.', 'לאט. במבחן יש דקה לשאלה. תשתמש בזמן.'];
@@ -3570,7 +3589,7 @@ answer = function (i, val) {
   const c = S.cur; if (!c || c.lock || (c.res[c.i] && !deferred(c.kind))) return _answer15.apply(this, arguments);
   const q = c.qs[c.i], secs = (Date.now() - c.qStart) / 1000, min = minSecs(q), rushed = secs < min;
   const retrying = c.tried && c.tried.i === c.i;
-  if (rushed && !deferred(c.kind) && !q.champ && c.nudged !== c.i && !retrying) { c.nudged = c.i; logRush(1); c.rushLogged = c.i; showNudge(secs); return; }
+  if (rushed && !deferred(c.kind) && !q.champ && !c.duo && c.nudged !== c.i && !retrying) { c.nudged = c.i; logRush(1); c.rushLogged = c.i; showNudge(secs); return; }
   c.noRetry = rushed && !retrying;
   const before = c.res[c.i];
   _answer15.apply(this, arguments);
@@ -3620,6 +3639,205 @@ finish = function () {
   const r = _finish15.apply(this, arguments);
   if (c && !deferred(c.kind) && was && rushRate() <= .2 && (S.rh || []).length >= 8) { toast('יצאת ממצב חשיבה! ענית בקצב של מי שקורא וחושב.', 4000); }
   return r;
+};
+/* ================= V16: GOOD HABITS BY DESIGN + FUN RESETS ================= */
+const weekKey = () => Math.floor(dayDiff(S.start, todayStr()) / 7);
+
+/* ---------- 1. check-in: the kid says how it was, the app adapts ---------- */
+const MOODS = [['easy', 'קל לי מדי'], ['hard', 'קשה לי'], ['rush', 'רציתי לסיים מהר'], ['good', 'היה טוב']];
+const MOOD_REPLY = { easy: 'סבבה. מהמשימה הבאה השאלות יהיו קשות יותר.', hard: 'בסדר גמור. הורדתי קצת את הרמה, וקיבלת 2 רמזים חינם.', rush: 'מבין. אפשר תמיד לעצור באמצע ולהמשיך אחר כך, המשימה נשמרת. בפעם הבאה נעשה את זה בנחת.', good: 'מעולה! ככה ממשיכים.' };
+function wantCheckin(L0) {
+  if (!['daily', 'review', 'boss'].includes(L0.kind) || S.moodDay === todayStr()) return false;
+  const acc = L0.n ? L0.correct / L0.n : 1;
+  return acc < .6 || (L0.rushN || 0) >= 3 || doneCount(S) % 5 === 0;
+}
+function checkinCard(L0) {
+  if (L0.moodDone) return `<section class="card checkin"><b>${MOOD_REPLY[L0.moodDone]}</b></section>`;
+  return `<section class="card checkin"><b>איך היה הפעם?</b><div class="chips" style="margin-top:8px">${MOODS.map(([k, t]) => `<button class="chip" data-mood="${k}">${t}</button>`).join('')}</div></section>`;
+}
+function setMood(k) {
+  const L0 = S.last; if (!L0) return;
+  S.moodDay = todayStr(); L0.moodDone = k;
+  S.moods = (S.moods || []).concat({ d: todayStr(), m: k, acc: L0.n ? Math.round(L0.correct / L0.n * 100) : null }).slice(-20);
+  if (k === 'easy') Object.keys(CATS).forEach(c => S.rat[c] = Math.min(4.4, (S.rat[c] ?? 1) + .35));
+  if (k === 'hard') { Object.keys(CATS).forEach(c => S.rat[c] = Math.max(1, (S.rat[c] ?? 1) - .3)); S.hints = (S.hints || 0) + 2; }
+  if (k === 'rush') S.calmNext = 1;
+  SFX.tap(); save(); render();
+}
+
+/* ---------- 3. "I have it in my head": the wait becomes a choice ---------- */
+const _renderQuiz16 = renderQuiz;
+renderQuiz = function () {
+  const r = _renderQuiz16.apply(this, arguments), c = S.cur;
+  if (!c || S.view !== 'quiz') return r;
+  const bar = app.querySelector('.thinkbar');
+  if (bar && !bar.querySelector('[data-commit]')) {
+    bar.insertAdjacentHTML('beforeend', '<button class="chip commit" data-commit>יש לי תשובה בראש</button>');
+    bar.querySelector('[data-commit]').onclick = () => { c.commit = c.i; clearTimeout(THINK_T); const box = app.querySelector('.opts, .typed, .ord'); if (box) { box.classList.remove('think'); box.querySelectorAll('button').forEach(b => { if (!b.classList.contains('gone')) b.disabled = false; }); } bar.remove(); SFX.tap(); };
+  }
+  if (c.duo) { const card = app.querySelector('.qtop'); if (card && !app.querySelector('.duo')) card.insertAdjacentHTML('afterend', '<div class="duo">אתגר עם אבא: כל אחד אומר בקול מה הוא חושב, ורק אז בוחרים.</div>'); }
+  return r;
+};
+
+/* ---------- flow: detect frustration and boredom, offer a fun reset or a level jump ---------- */
+const _answer16 = answer;
+answer = function (i, val) {
+  const c = S.cur, before = c && c.res[c.i];
+  const secs = c ? (Date.now() - c.qStart) / 1000 : 0;
+  _answer16.apply(this, arguments);
+  if (!c || S.cur !== c) return;
+  const r = c.res[c.i]; if (!r || r === before || deferred(c.kind)) return;
+  const q = c.qs[c.i];
+  if (r.rush) { c.rushN = (c.rushN || 0) + 1; c.rushRun = (c.rushRun || 0) + 1; } else c.rushRun = 0;
+  if (r.ok && !r.second && c.commit === c.i && !r.praise) { r.praise = 'פתרת בראש לפני שהסתכלת, ופגעת.'; c.pts += 3; r.gain += 3; save(); renderQuiz(); }
+  const easy = r.ok && !r.second && !r.rush && secs < minSecs(q) * 3 && q.d <= Math.round(S.rat[q.cat] ?? 1);
+  c.easyRun = easy ? (c.easyRun || 0) + 1 : 0;
+  const left = c.qs.length - 1 - c.i;
+  if (!c.breakOffered && ((c.wrongRun || 0) >= 3 || c.rushRun >= 2) && left >= 1) c.offer = 'break';
+  else if (!c.boostOffered && c.easyRun >= 4 && left >= 3 && !c.duo) c.offer = 'boost';
+};
+const _nextQ16 = nextQ;
+nextQ = function () {
+  const c = S.cur;
+  if (c && c.offer && !deferred(c.kind) && c.i < c.qs.length - 1) { const o = c.offer; c.offer = null; if (o === 'break') c.breakOffered = 1; else c.boostOffered = 1; save(); return renderOffer(o); }
+  return _nextQ16.apply(this, arguments);
+};
+let FUN_T = null, FUN_RAF = null;
+function stopFun() { clearTimeout(FUN_T); cancelAnimationFrame(FUN_RAF); FUN_T = FUN_RAF = null; }
+function renderOffer(o) {
+  stopFun();
+  const body = o === 'break'
+    ? `<div class="eyebrow">הפסקה קטנה</div><h2>זה מתיש עכשיו?</h2><p class="brief">גם אלופים עוצרים לנשום. 20 שניות, וחוזרים חדים יותר.</p><div class="stack" style="gap:8px"><button class="btn btn-primary btn-wide" data-fun="breath">נשימת אוויר (כמו אנג)</button><button class="btn btn-gold btn-wide" data-fun="hoops">זריקות לסל (15 שניות)</button><button class="btn btn-ghost btn-wide" data-fun="go">להמשיך</button></div>`
+    : `<div class="eyebrow">זה קל לך</div><h2>להקפיץ רמה?</h2><p class="brief">4 נכונות ברצף, בלי למהר. רוצה ששאר המשימה תהיה קשה יותר? שאלה קשה שווה יותר נקודות.</p><div class="stack" style="gap:8px"><button class="btn btn-primary btn-wide" data-fun="boost">כן, להקפיץ!</button><button class="btn btn-ghost btn-wide" data-fun="go">ככה טוב לי</button></div>`;
+  app.innerHTML = `<div class="stack"><div class="card intro-card offer">${body}</div></div>`;
+  app.querySelectorAll('[data-fun]').forEach(b => b.onclick = () => {
+    const a = b.dataset.fun; SFX.tap();
+    if (a === 'go') return _nextQ16();
+    if (a === 'boost') { const c = S.cur; for (let k = c.i + 1; k < c.qs.length; k++) { const q = c.qs[k]; if (q.rev) continue; c.qs[k] = mkQ(q.cat, Math.min(4, q.d + 1), .2); } toast('הרמה עלתה. בהצלחה!'); return _nextQ16(); }
+    if (a === 'breath') return renderBreath();
+    if (a === 'hoops') return renderHoops();
+  });
+}
+function renderBreath() {
+  const steps = [['שאיפה', 4], ['להחזיק', 2], ['נשיפה', 4], ['שאיפה', 4], ['להחזיק', 2], ['נשיפה', 4]];
+  app.innerHTML = `<div class="stack"><div class="card intro-card breath"><div class="eyebrow">נשימת אוויר</div><div class="bcirc"><span class="ii">${elemIcon('air')}</span></div><h2 id="bstep">מתכוננים...</h2><button class="btn btn-ghost btn-wide" data-fun="done">חוזרים למשימה</button></div></div>`;
+  const circ = app.querySelector('.bcirc'), lbl = app.querySelector('#bstep');
+  app.querySelector('[data-fun="done"]').onclick = () => { stopFun(); _nextQ16(); };
+  let k = 0;
+  const run = () => { if (k >= steps.length) { lbl.textContent = 'מעולה. ראש נקי.'; circ.style.transform = 'scale(.8)'; return; } const [t, s] = steps[k++]; lbl.textContent = t; circ.style.transitionDuration = s + 's'; circ.style.transform = t === 'שאיפה' ? 'scale(1.25)' : t === 'נשיפה' ? 'scale(.7)' : circ.style.transform; if (t !== 'להחזיק') tone(t === 'שאיפה' ? 392 : 294, 0, s * .9, 'sine', .035); FUN_T = setTimeout(run, s * 1000); };
+  FUN_T = setTimeout(run, 600);
+}
+function renderHoops() {
+  let score = 0, shots = 0, t0 = performance.now(), end = t0 + 15000, lock = false, speed = 1;
+  app.innerHTML = `<div class="stack"><div class="card intro-card hoops"><div class="eyebrow">זריקות לסל</div><div class="court"><div class="hoop"></div><div class="ballrow"><span class="ball" id="ball"></span></div></div><div class="hstat"><b id="hsc">0</b> סלים · <span id="htm">15</span> שנ׳</div><p class="small muted" style="margin:0">לוחצים כשהכדור בדיוק מתחת לסל.</p><button class="btn btn-gold btn-wide" id="throw">זרוק!</button><button class="btn btn-ghost btn-wide" data-fun="done">חוזרים למשימה</button></div></div>`;
+  const ball = app.querySelector('#ball'), sc = app.querySelector('#hsc'), tm = app.querySelector('#htm'), th = app.querySelector('#throw');
+  let x = 50;
+  const loop = now => { if (now > end) return finishH(); x = 50 + 44 * Math.sin((now - t0) / 1000 * 2.1 * speed); ball.style.left = x + '%'; tm.textContent = Math.ceil((end - now) / 1000); FUN_RAF = requestAnimationFrame(loop); };
+  const finishH = () => { stopFun(); S.arcade.hoops = Math.max(S.arcade.hoops || 0, score); save(); th.disabled = true; th.textContent = `${score} סלים${score >= (S.arcade.hoops || 0) && score ? ' · שיא!' : ''}`; };
+  th.onclick = () => { if (lock) return; lock = true; shots++; const hit = Math.abs(x - 50) < 8; ball.classList.add(hit ? 'in' : 'miss'); if (hit) { score++; speed += .12; sc.textContent = score; SFX.ok(); } else tone(200, 0, .1, 'sine', .05); setTimeout(() => { ball.classList.remove('in', 'miss'); lock = false; }, 380); };
+  app.querySelector('[data-fun="done"]').onclick = () => { stopFun(); _nextQ16(); };
+  FUN_RAF = requestAnimationFrame(loop);
+}
+
+/* ---------- 4. explain-to-dad question of the day ---------- */
+function pickExplain(c) {
+  let best = null;
+  c.qs.forEach((q, i) => { const r = c.res[i]; if (r && r.ok && !r.second && !r.rush && !q.champ && (!best || q.d > best.q.d)) best = { q, r }; });
+  if (!best) return null;
+  const q = best.q, a = q.type === 'order' ? q.correct.map(ix => strip(q.items[ix])).join(' ← ') : q.type === 'num' ? fmt(q.ansv) + (q.unit || '') : strip(q.options[q.answer]);
+  return { d: todayStr(), p: q.prompt, v: q.vis || '', a, ex: q.ex, done: 0 };
+}
+function explainCard() {
+  const e = S.explainQ; if (!e || e.d !== todayStr()) return '';
+  return e.done ? `<section class="card explain"><b>הסברת לאבא. כל הכבוד!</b></section>`
+    : `<section class="card explain"><div class="eyebrow">אתגר הערב</div><b>תסביר לאבא איך פתרת את השאלה הזאת:</b><p class="small" style="margin:6px 0 10px">${strip(e.p).slice(0, 140)}</p><button class="btn btn-primary btn-wide" data-act="explained">הסברתי לאבא (+10 מטבעות)</button></section>`;
+}
+function parentExplainCard() {
+  const e = S.explainQ; if (!e || dayDiff(e.d, todayStr()) > 1) return '';
+  return `<section class="card stack" style="gap:8px" data-nog><h4 style="font-size:1.1rem">שאלה ש${ME.name} ${PROF.g === 'f' ? 'פתרה' : 'פתר'} ${e.d === todayStr() ? 'היום' : 'אתמול'}</h4><p class="small muted" style="margin:0">${PROF.g === 'f' ? 'בקש ממנה להסביר לך איך פתרה' : 'בקש ממנו להסביר לך איך פתר'}. כדי שתוכל לעקוב, הנה גם הפתרון.</p><p style="margin:0">${e.p}</p>${e.v ? `<div class="qvis">${e.v}</div>` : ''}<div class="small">התשובה: <b>${e.a}</b></div><details class="small"><summary class="muted">ההסבר</summary><p style="margin:6px 0 0">${e.ex}</p></details>${e.done ? `<div class="small" style="color:var(--good)">${PROF.g === 'f' ? 'היא סימנה שהסבירה לך.' : 'הוא סימן שהסביר לך.'}</div>` : ''}</section>`;
+}
+
+/* ---------- 5. weekly challenge with dad ---------- */
+const _nextStep16 = nextStep;
+nextStep = function () {
+  const s = _nextStep16();
+  if ((s === 'bonus' || s === 'done') && S.duoWeek !== weekKey() && S.duoSkip !== todayStr() && doneCount(S) >= 2 && !S.guest) return 'duo';
+  return s;
+};
+const _heroFor16 = heroFor;
+heroFor = function (step) {
+  if (step !== 'duo') return _heroFor16.apply(this, arguments);
+  return `<section class="card hero duohero"><div class="eyebrow">פעם בשבוע · יהלום</div><div class="stage"><div class="grow"><div class="bubble">3 שאלות קשות, פותרים יחד עם אבא. כל אחד אומר בקול מה הוא חושב.</div></div><div class="who">${avatarSVG()}</div></div><button class="btn btn-primary btn-wide" data-act="duo">אתגר עם אבא</button><button class="btn btn-ghost btn-wide" data-act="duoskip" style="margin-top:8px">לא היום</button></section>`;
+};
+function startDuo() {
+  const order = Object.keys(CHAPNAME), pickCats = shuffle(['analog', 'series', 'logic', 'math', 'matrix', 'verbal']).slice(0, 3);
+  startMission('practice', nextDay() || TOTAL, 'logic');
+  const c = S.cur; c.duo = 1; c.intro = false; c.think = false;
+  c.qs = pickCats.map(k => mkQ(k, Math.min(4, Math.round(S.rat[k] ?? 1) + 1), 0));
+  c.qStart = Date.now(); save(); renderQuiz();
+}
+
+/* ---------- 6. time of day ---------- */
+function morningHint() {
+  const d = new Date(), h = d.getHours(), wd = d.getDay();
+  if (wd > 4 || h < 6 || h > 8 || missionToday()) return '';
+  return `<div class="banner calm"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#FFC845" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5" fill="#FFC845"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><div class="grow">בוקר לפני בית ספר? משימה בראש רגוע יוצאת טובה יותר. אפשר גם אחרי הצהריים.</div></div>`;
+}
+
+/* ---------- hooks ---------- */
+const _startMission16 = startMission;
+startMission = function (kind) {
+  const r = _startMission16.apply(this, arguments);
+  if (S.cur && kind === 'daily' && S.calmNext) { S.cur.think = true; S.calmNext = 0; save(); }
+  return r;
+};
+const _finish16 = finish;
+finish = function () {
+  const c = S.cur;
+  const newDay = c && (c.kind === 'daily' || c.kind === 'boss' || (c.kind === 'sim' && c.path)) && !S.missions[c.day];
+  const ex = c && c.kind === 'daily' && (!S.explainQ || S.explainQ.d !== todayStr()) ? pickExplain(c) : null;
+  const duo = c && c.duo, duoOk = duo ? c.res.filter(r => r && r.ok).length : 0;
+  const rushN = c ? (c.rushN || 0) : 0;
+  const r = _finish16.apply(this, arguments);
+  if (newDay && S.missions[c.day]) S.missions[c.day].h = new Date().getHours();
+  if (S.last) S.last.rushN = rushN;
+  if (ex) S.explainQ = ex;
+  if (duo) { S.duoWeek = weekKey(); S.duoLog = (S.duoLog || []).concat(todayStr()).slice(-12); if (duoOk >= 2 && S.last) giveDia(1, 'אתגר עם אבא', S.last.dia || (S.last.dia = [])); }
+  save(); if (ex || duo) render();
+  return r;
+};
+const _viewResult16 = viewResult;
+viewResult = function () {
+  let h = _viewResult16.apply(this, arguments); const L0 = S.last; if (!L0) return h;
+  const extra = (L0.kind === 'daily' ? explainCard() : '') + (wantCheckin(L0) || L0.moodDone ? checkinCard(L0) : '');
+  if (extra) h = h.replace(/(<\/section>)/, `$1${extra}`);
+  return h;
+};
+const _viewHome16 = viewHome;
+viewHome = function () { const h = _viewHome16.apply(this, arguments); const m = morningHint(); return m ? h.replace('<section class="card hero"', m + '<section class="card hero"') : h; };
+const _viewParent16 = viewParent;
+viewParent = function () { const h = _viewParent16.apply(this, arguments); if (!PARENT_OK) return h; const pe = parentExplainCard(); return pe ? h.replace(/(<section class="card stack report"[\s\S]*?<\/section>)/, `$1${pe}`) : h; };
+const _reportHTML16 = reportHTML;
+reportHTML = function (o, fromCloud) {
+  const h = _reportHTML16.apply(this, arguments), t = todayStr(), M = Object.values(o.missions || {}).filter(Boolean);
+  const lines = [];
+  const md = (o.moods || []).slice(-3); if (md.length) lines.push(`${PROF.g === 'f' ? 'מה היא אמרה' : 'מה הוא אמר'} אחרי משימות: ${md.map(x => `${(MOODS.find(m => m[0] === x.m) || [, x.m])[1]}${x.acc != null ? ` (${x.acc}%)` : ''}`).join(' · ')}`);
+  const exN = o.explainLog ? o.explainLog.filter(d => dayDiff(d, t) < 7).length : 0; if (o.explainLog) lines.push(`${PROF.g === 'f' ? 'הסבירה' : 'הסביר'} לאבא השבוע: ${exN} פעמים`);
+  if (o.duoLog && o.duoLog.length) lines.push(`אתגר עם אבא: ${o.duoLog.length} פעמים (אחרון ${o.duoLog[o.duoLog.length - 1].split('-').reverse().join('.')})`);
+  const mor = M.filter(m => m.h != null && m.h < 9), lat = M.filter(m => m.h != null && m.h >= 12);
+  const ac = a => Math.round(a.reduce((x, m) => x + m.c, 0) / a.reduce((x, m) => x + m.n, 0) * 100);
+  if (mor.length >= 2 && lat.length >= 2) lines.push(`דיוק בבוקר ${ac(mor)}% לעומת אחר הצהריים ${ac(lat)}%`);
+  const hh = PROF.g === 'f' ? h.split('לדבר איתו').join('לדבר איתה').split('לשאול אותו').join('לשאול אותה') : h;
+  return lines.length ? hh.replace(/<\/section>\s*$/, `<div class="small rmore">${lines.map(l => `<div>${l}</div>`).join('')}</div></section>`) : hh;
+};
+const _bindV11_16 = bindV11;
+bindV11 = function () {
+  _bindV11_16();
+  app.querySelectorAll('[data-mood]').forEach(b => b.onclick = () => setMood(b.dataset.mood));
+  const on = (a, fn) => { const e = app.querySelector(`[data-act="${a}"]`); if (e) e.onclick = fn; };
+  on('explained', () => { if (!S.explainQ || S.explainQ.done) return; S.explainQ.done = 1; S.coins += 10; S.explainLog = (S.explainLog || []).concat(todayStr()).slice(-30); SFX.coin(); save(); render(); });
+  on('duo', startDuo);
+  on('duoskip', () => { S.duoSkip = todayStr(); save(); render(); });
 };
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
