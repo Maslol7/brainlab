@@ -614,6 +614,9 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .hstat{font-weight:700;margin-bottom:6px}
 .banner.calm{border-color:rgba(255,200,69,.45)}
 .rmore{display:flex;flex-direction:column;gap:3px;padding-top:6px;border-top:1px solid var(--edge)}
+/* v17 */
+.dadban{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;border-color:rgba(83,168,255,.55)!important}
+.dadban svg{width:36px;height:36px;color:#8CC8FF}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -2074,7 +2077,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '16';
+const APP_VER = '17';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -3570,7 +3573,7 @@ function minSecs(q) {
   return Math.max(3.5, Math.min(15, 2.5 + len / 45));
 }
 /* rush log: last 30 counted answers, 1 = faster than a reasonable reading time */
-function logRush(v) { S.rh = (S.rh || []).concat(v ? 1 : 0).slice(-30); }
+function logRush(v) { if (S.cur && deferred(S.cur.kind)) return; S.rh = (S.rh || []).concat(v ? 1 : 0).slice(-30); }
 const rushRate = (o = S) => { const a = o.rh || []; return a.length >= 8 ? a.reduce((x, y) => x + y, 0) / a.length : 0; };
 (function seedRush() { if (S.rh) return; const t = Object.values(S.times || {}).reduce((a, x) => ({ s: a.s + x.s, n: a.n + x.n }), { s: 0, n: 0 }); if (t.n >= 20 && t.s / t.n < 15) S.rh = Array(10).fill(1); })();
 const thinkOn = c => !deferred(c.kind) && !c.duo && (c.think || rushRate() > .2);
@@ -3587,13 +3590,13 @@ function showNudge(secs) {
 const _answer15 = answer;
 answer = function (i, val) {
   const c = S.cur; if (!c || c.lock || (c.res[c.i] && !deferred(c.kind))) return _answer15.apply(this, arguments);
-  const q = c.qs[c.i], secs = (Date.now() - c.qStart) / 1000, min = minSecs(q), rushed = secs < min;
+  const q = c.qs[c.i], secs = (Date.now() - c.qStart) / 1000, min = deferred(c.kind) ? Math.min(minSecs(q), 3) : minSecs(q), rushed = secs < min;
+  if (deferred(c.kind) && secs < 2 && !q.champ && c.nudged !== c.i) { c.nudged = c.i; showNudge(secs); return; }
   const retrying = c.tried && c.tried.i === c.i;
   if (rushed && !deferred(c.kind) && !q.champ && !c.duo && c.nudged !== c.i && !retrying) { c.nudged = c.i; logRush(1); c.rushLogged = c.i; showNudge(secs); return; }
-  c.noRetry = rushed && !retrying;
+  c.noRetry = rushed && !retrying; c.rushNow = rushed;
   const before = c.res[c.i];
-  _answer15.apply(this, arguments);
-  c.noRetry = false;
+  try { _answer15.apply(this, arguments); } finally { c.noRetry = false; c.rushNow = false; }
   const r = c.res[c.i];
   if (r && r !== before) {
     r.rush = rushed;
@@ -3752,8 +3755,8 @@ function explainCard() {
   return e.done ? `<section class="card explain"><b>הסברת לאבא. כל הכבוד!</b></section>`
     : `<section class="card explain"><div class="eyebrow">אתגר הערב</div><b>תסביר לאבא איך פתרת את השאלה הזאת:</b><p class="small" style="margin:6px 0 10px">${strip(e.p).slice(0, 140)}</p><button class="btn btn-primary btn-wide" data-act="explained">הסברתי לאבא (+10 מטבעות)</button></section>`;
 }
-function parentExplainCard() {
-  const e = S.explainQ; if (!e || dayDiff(e.d, todayStr()) > 1) return '';
+function parentExplainCard(o = S) {
+  const e = o.explainQ; if (!e || dayDiff(e.d, todayStr()) > 1) return '';
   return `<section class="card stack" style="gap:8px" data-nog><h4 style="font-size:1.1rem">שאלה ש${ME.name} ${PROF.g === 'f' ? 'פתרה' : 'פתר'} ${e.d === todayStr() ? 'היום' : 'אתמול'}</h4><p class="small muted" style="margin:0">${PROF.g === 'f' ? 'בקש ממנה להסביר לך איך פתרה' : 'בקש ממנו להסביר לך איך פתר'}. כדי שתוכל לעקוב, הנה גם הפתרון.</p><p style="margin:0">${e.p}</p>${e.v ? `<div class="qvis">${e.v}</div>` : ''}<div class="small">התשובה: <b>${e.a}</b></div><details class="small"><summary class="muted">ההסבר</summary><p style="margin:6px 0 0">${e.ex}</p></details>${e.done ? `<div class="small" style="color:var(--good)">${PROF.g === 'f' ? 'היא סימנה שהסבירה לך.' : 'הוא סימן שהסביר לך.'}</div>` : ''}</section>`;
 }
 
@@ -3838,6 +3841,64 @@ bindV11 = function () {
   on('explained', () => { if (!S.explainQ || S.explainQ.done) return; S.explainQ.done = 1; S.coins += 10; S.explainLog = (S.explainLog || []).concat(todayStr()).slice(-30); SFX.coin(); save(); render(); });
   on('duo', startDuo);
   on('duoskip', () => { S.duoSkip = todayStr(); save(); render(); });
+};
+/* ================= V17: CLEAN DATA FROM RUSHED ANSWERS + DAD'S LIVE REPORT ================= */
+/* rushed answers do not move the level, the readiness estimate or the speed average */
+const _rateQ17 = rateQ;
+rateQ = function (q, ok, secs, c) { if (c && c.rushNow) return; return _rateQ17.apply(this, arguments); };
+const _finish17 = finish;
+finish = function () {
+  const c = S.cur, drop = [];
+  if (c) c.qs.forEach((q, i) => { const r = c.res[i]; if (r && r.rush) drop.push([q.cat, r.ok]); });
+  const out = _finish17.apply(this, arguments);
+  drop.forEach(([cat, ok]) => { const s = S.stats[cat]; if (s) { s.t = Math.max(0, s.t - 1); if (ok) s.c = Math.max(0, s.c - 1); } });
+  if (drop.length) save();
+  return out;
+};
+/* one-time: the old rush log mixed in simulation taps; restart it so calm daily missions can switch think mode off */
+if (!S.rhV17) { if ((S.rh || []).length >= 8 && rushRate() > .2) S.rh = Array(8).fill(1); S.rhV17 = 1; save(); }
+
+/* ---------- cloud: Firebase turns numbered keys into arrays with holes ---------- */
+function normCloud(o) {
+  if (!o || typeof o !== 'object') return o;
+  if (Array.isArray(o.missions)) { const m = {}; o.missions.forEach((v, i) => { if (v) m[i] = v; }); o.missions = m; }
+  ['mist', 'rh', 'moods', 'diaLog', 'vouchers', 'rewards', 'badges', 'mh', 'explainLog', 'duoLog', 'dadMsgs'].forEach(k => { if (o[k] && !Array.isArray(o[k])) o[k] = Object.values(o[k]); if (Array.isArray(o[k])) o[k] = o[k].filter(x => x != null); });
+  ['stats', 'times', 'rat', 'hard', 'aw', 'bdGift', 'seen', 'arcade', 'own', 'lessons', 'pb', 'firstD'].forEach(k => { if (o[k] == null) o[k] = {}; });
+  return o;
+}
+const _cloudGet17 = cloudGet;
+cloudGet = async function (c) { const g = await _cloudGet17(c); if (g && g.data) normCloud(g.data); return g; };
+const CC_KEY = 'bl-cloudcache-' + PROF.id;
+const ccGet = () => { try { return JSON.parse(localStorage.getItem(CC_KEY)); } catch (e) { return null; } };
+let CC_BUSY = false;
+async function refreshDadReport() {
+  if (CC_BUSY) return; CC_BUSY = true;
+  const box = document.getElementById('dadreport');
+  try {
+    const g = await cloudGet(cloudCfg());
+    if (g.data) { try { localStorage.setItem(CC_KEY, JSON.stringify(g.data)); } catch (e) { } }
+    const el = document.getElementById('dadreport'); if (!el) return;
+    el.innerHTML = g.err ? `${ccGet() ? reportHTML(ccGet(), true) : ''}<div class="small" style="color:var(--bad)">לא הצלחתי לעדכן: ${g.err}</div>` : g.data ? reportHTML(g.data, true) + parentExplainCard(g.data) : `<div class="card small muted">עוד אין נתונים בענן. ברגע ש${ME.name} יסיים משימה בטלפון שלו, הם יופיעו כאן.</div>`;
+  } catch (e) { const el = document.getElementById('dadreport'); if (el) el.insertAdjacentHTML('beforeend', `<div class="small" style="color:var(--bad)">שגיאה בהצגת הדוח</div>`); }
+  finally { CC_BUSY = false; }
+}
+const isDadPhone = () => { const c = cloudCfg(); return c.role === 'dad' && c.url && c.code; };
+const _viewParent17 = viewParent;
+viewParent = function () {
+  const h = _viewParent17.apply(this, arguments);
+  if (!PARENT_OK || !isDadPhone() || isSbx()) return h;
+  const cached = ccGet();
+  const block = `<div id="dadreport">${cached ? reportHTML(normCloud(cached), true) + parentExplainCard(cached) : `<div class="card small muted">טוען את ההתקדמות של ${ME.name}...</div>`}</div>`;
+  setTimeout(refreshDadReport, 30);
+  return h.replace(/<section class="card stack report"[\s\S]*?<\/section>/, block);
+};
+viewerHTML = o => reportHTML(normCloud(o), true);
+/* dad's phone: the home screen points to the report instead of an empty game */
+const _viewHome17 = viewHome;
+viewHome = function () {
+  const h = _viewHome17.apply(this, arguments);
+  if (!isDadPhone() || isSbx()) return h;
+  return h.replace('<section class="card hero"', `<button class="banner dadban" data-go="parent"><span style="width:40px;height:40px;flex:none">${IC.chart}</span><div class="grow"><b>זה הטלפון של אבא</b><div class="small muted">לדוח של ${ME.name} מהענן</div></div></button><section class="card hero"`);
 };
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
