@@ -563,6 +563,28 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .newtag{display:inline-block;font-size:.66rem;padding:2px 7px;border-radius:99px;background:#FF7AA8;color:#fff;vertical-align:middle;margin-inline-start:6px}
 .songban{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;border-color:rgba(255,122,168,.55)!important;background:linear-gradient(120deg,rgba(255,122,168,.22),rgba(169,139,255,.18))!important}
 .songban svg{width:36px;height:36px;flex:none;color:#FF9BBE}
+/* v14 */
+.diagoal{display:flex;gap:10px;align-items:center;width:100%;text-align:start;font:inherit;color:var(--ink);cursor:pointer;margin:10px 0;padding:10px 14px;border-radius:14px;background:linear-gradient(120deg,rgba(143,227,255,.16),rgba(169,139,255,.14));border:1px solid rgba(143,227,255,.45);font-weight:600;font-size:.92rem}
+.diagoal svg{width:24px;height:24px;flex:none}
+.diagoal.near{border-color:rgba(255,200,69,.55);background:rgba(255,200,69,.12)}
+.ways{display:flex;flex-direction:column;gap:8px}
+.way{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:12px;background:var(--panel);border:1px solid var(--edge)}
+.way .wd svg{width:20px;height:20px;margin-top:2px}
+.way .grow{display:flex;flex-direction:column;gap:2px}
+.way span{font-size:.86rem;color:var(--muted)}
+.way em{font-style:normal;font-size:.8rem;color:#8FE3FF;font-weight:700}
+.report .verdict{font-weight:800;font-size:1.1rem;padding:8px 12px;border-radius:12px}
+.report .verdict.ok{background:rgba(70,224,160,.14);color:#7CF0BF}
+.report .verdict.mid{background:rgba(255,200,69,.14);color:#FFD66B}
+.report .verdict.bad{background:rgba(255,92,122,.14);color:#FF9AAE}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rgrid div{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.rgrid b{font-size:1.1rem}
+.rgrid span{font-size:.72rem;color:var(--muted);line-height:1.3}
+.days14{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;direction:ltr}
+.days14 i{height:14px;border-radius:4px;background:rgba(255,255,255,.08)}
+.days14 i.on{background:#46E0A0}
+.recs p{margin:4px 0 0;font-size:.9rem;line-height:1.5}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -2023,7 +2045,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '13';
+const APP_VER = '14';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -2386,7 +2408,7 @@ function hud() {
   const { r, pct } = rankOf(S.xp);
   return `<header class="hud"><button class="ava-ring" style="--p:${pct}" data-go="me" aria-label="הפרופיל של ${nm()}"><span class="in">${avatarSVG()}</span></button>
   <div class="grow"><h1>${nm()}</h1><div class="sub">${r[1]} · ${S.xp.toLocaleString('he-IL')} נק׳</div></div>
-  <div class="pills"><span class="pill">${IC.flame}${curStreak()}</span><span class="pill">${IC.coin}${S.coins}</span><button class="pill" data-go="shop" aria-label="יהלומים">${DIA}${S.dia || 0}</button></div></header>`;
+  <div class="pills"><span class="pill">${IC.flame}${curStreak()}</span><span class="pill">${IC.coin}${S.coins}</span><button class="pill" data-act="diasheet" aria-label="יהלומים">${DIA}${S.dia || 0}</button></div></header>`;
 }
 function elemStrip() {
   const cw = curWorld();
@@ -3392,6 +3414,123 @@ const _viewParent13 = viewParent;
 viewParent = function () { const h = _viewParent13.apply(this, arguments); return PARENT_OK && !isSbx() ? h.replace('<button class="btn btn-ghost btn-wide" data-act="pout">', profileSection() + '<button class="btn btn-ghost btn-wide" data-act="pout">') : h; };
 const _bindV11_13 = bindV11;
 bindV11 = function () { _bindV11_13(); bindProfiles(); };
+/* ================= V14: CLEAR DIAMOND GUIDANCE + PARENT REPORT ================= */
+
+/* ---------- diamonds: what they are, how to get the next one ---------- */
+const diaNeed = n => Math.ceil(n * .9);
+function diaGoalLine(c) {
+  if (c.kind === 'daily') { const n = c.qs.length; return `${diaNeed(n)} מתוך ${n} נכונות: יהלום. בלי אף טעות: עוד יהלום.`; }
+  if (c.kind === 'boss') return 'ניצחון (70%): 2 יהלומים. 90% ומעלה: 3 יהלומים.';
+  if (c.kind === 'sim') { const wk = Math.floor(dayDiff(S.start, todayStr()) / 7); return (S.aw || {}).simWeek === wk ? 'כבר קיבלת השבוע יהלומים על סימולציה. עכשיו זה אימון.' : '80% ומעלה: 3 יהלומים, פעם בשבוע.'; }
+  return '';
+}
+function diaWays() {
+  const nd = nextDay(), aw = S.aw || {}, st = curStreak();
+  const nb = Object.keys(BOSSES).map(Number).find(k => k >= (nd || 999) && !S.missions[k]);
+  const W = curWorld(), left = 15 - worldDone(W);
+  const wk = Math.floor(dayDiff(S.start, todayStr()) / 7), simDone = aw.simWeek === wk;
+  return [
+    ['משימה יומית', '9 מתוך 10 נכונות: יהלום. בלי אף טעות: עוד יהלום.', nd ? `הבאה: משימה ${nd}` : ''],
+    ['שאלת האלוף', 'בסוף כל משימה. תשובה נכונה: יהלום.', ''],
+    ['קרב בוס', 'ניצחון: 2 יהלומים. מעל 90%: 3 יהלומים.', nb ? `הבוס הבא: משימה ${nb}` : ''],
+    ['רצף ימים', 'כל 7 ימים ברצף: 2 יהלומים.', st ? `עכשיו ${st} ימים. עוד ${st % 7 === 0 ? 7 : 7 - (st % 7)}.` : 'מתחילים היום.'],
+    ['סיום עולם', 'כל 15 משימות של עולם: 3 יהלומים.', left > 0 ? `ב${W.n} נשארו ${left}` : ''],
+    ['סימולציה מלאה', '80% ומעלה: 3 יהלומים, פעם בשבוע.', simDone ? 'השבוע כבר קיבלת' : 'השבוע עוד פתוח'],
+    ['פינוק מאבא', 'אבא יכול לתת יהלומים גם על דברים אחרים.', ''],
+  ];
+}
+function openDiaSheet() {
+  S.diaHelpSeen = 1; save();
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card diasheet" style="max-width:440px;max-height:88vh;overflow:auto"><div class="dia-head">${diaS(44)}<div class="grow"><div class="eyebrow">היהלומים שלך</div><div class="dia-n">${S.dia || 0}</div></div></div>
+  <p class="small" style="margin:8px 0 10px"><b>יהלומים</b> = פרסים אמיתיים מאבא. <b>מטבעות</b> = דברים בתוך המשחק.</p>
+  <div class="ways">${diaWays().map(([t, d, s]) => `<div class="way"><span class="wd">${DIA}</span><div class="grow"><b>${t}</b><span>${d}</span>${s ? `<em>${s}</em>` : ''}</div></div>`).join('')}</div>
+  <div class="row" style="gap:8px;margin-top:12px"><button class="btn btn-primary" data-m="shop" style="flex:1">לפרסים</button><button class="btn btn-ghost" data-m="no" style="flex:1">סגור</button></div></div>`;
+  app.appendChild(m);
+  m.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (e.target === m || (b && b.dataset.m === 'no')) return m.remove(); if (b && b.dataset.m === 'shop') { m.remove(); go('shop'); } });
+}
+const _renderIntro14 = renderIntro;
+renderIntro = function (c) {
+  const r = _renderIntro14.apply(this, arguments);
+  const g = diaGoalLine(c), card = app.querySelector('.intro-card'), btn = card && card.querySelector('.btn-wide');
+  if (g && btn) btn.insertAdjacentHTML('beforebegin', `<button class="diagoal" data-act="diasheet">${DIA}<span>${g}</span></button>`);
+  const d = app.querySelector('[data-act="diasheet"]'); if (d) d.onclick = openDiaSheet;
+  return r;
+};
+const _viewResult14 = viewResult;
+viewResult = function () {
+  let h = _viewResult14.apply(this, arguments); const L0 = S.last;
+  if (L0 && L0.kind === 'daily' && L0.n && L0.correct === diaNeed(L0.n) - 1) h = h.replace('<section class="card res-hero"', `<button class="diagoal near" data-act="diasheet">${DIA}<span>עוד תשובה נכונה אחת והיה כאן יהלום. מחר זה שלך.</span></button><section class="card res-hero"`);
+  return h;
+};
+const _viewHome14 = viewHome;
+viewHome = function () {
+  let h = _viewHome14.apply(this, arguments);
+  if (!S.diaHelpSeen && doneCount(S) >= 1) h = h.replace('<section class="card hero"', `<button class="diagoal" data-act="diasheet">${DIA}<span>איך מרוויחים יהלומים, ומה מקבלים עליהם? לחץ כאן</span></button><section class="card hero"`);
+  return h;
+};
+
+/* ---------- parent report (works on local state and on cloud data) ---------- */
+function reportHTML(o, fromCloud) {
+  const t = todayStr(), M = o.missions || {}, days = Object.keys(M).map(Number).sort((a, b) => a - b);
+  const done = days.length, since = Math.max(1, dayDiff(o.start, t) + 1), expected = Math.min(TOTAL, since);
+  const behind = expected - done, toExam = o.exam ? dayDiff(t, o.exam) : null;
+  const active = new Set(Object.values(M).map(m => m.date));
+  const dots = Array.from({ length: 14 }, (_, i) => { const d = addDays(t, i - 13); return `<i class="${active.has(d) ? 'on' : ''}" title="${d}"></i>`; }).join('');
+  const act7 = Array.from({ length: 7 }, (_, i) => addDays(t, -i)).filter(d => active.has(d)).length;
+  const gap = o.lastDone ? dayDiff(o.lastDone, t) : null, streak = gap != null && gap <= 1 ? (o.streak || 0) : 0;
+  const acc = arr => { const s = arr.reduce((a, d) => ({ c: a.c + M[d].c, n: a.n + M[d].n }), { c: 0, n: 0 }); return s.n ? s.c / s.n : null; };
+  const last5 = acc(days.slice(-5)), prev5 = acc(days.slice(-10, -5));
+  const st = o.stats || {}, tm = o.times || {}, hd = o.hard || {};
+  const tot = Object.values(st).reduce((a, s) => ({ c: a.c + s.c, t: a.t + s.t }), { c: 0, t: 0 });
+  const tt = Object.values(tm).reduce((a, x) => ({ s: a.s + x.s, n: a.n + x.n }), { s: 0, n: 0 }), spd = tt.n ? Math.round(tt.s / tt.n) : null;
+  const ch = Object.keys(CHAPNAME).map(k => { const cats = Object.keys(CHAPKEY).filter(c => CHAPKEY[c] === k); const s = cats.reduce((a, c) => { const x = st[c]; return x ? { c: a.c + x.c, t: a.t + x.t } : a; }, { c: 0, t: 0 }); const h = hd[k]; return { k, n: CHAPNAME[k], p: s.t ? Math.round(s.c / s.t * 100) : null, t: s.t, hp: h && h.t >= 5 ? Math.round(h.c / h.t * 100) : null }; });
+  const weak = ch.filter(x => x.t >= 8 && x.p != null).sort((a, b) => a.p - b.p)[0];
+  const due = (o.mist || []).filter(m => m.due <= t).length;
+  const pct = v => v == null ? '–' : Math.round(v * 100) + '%';
+  // verdict
+  let verdict, vcls;
+  if (!done) { verdict = 'עוד לא התחיל.'; vcls = 'mid'; }
+  else if (gap != null && gap >= 3) { verdict = `לא התאמן ${gap} ימים.`; vcls = 'bad'; }
+  else if (behind <= 1) { verdict = 'בקצב של המסע.'; vcls = 'ok'; }
+  else { verdict = `מאחור ב-${behind} משימות.`; vcls = behind > 4 ? 'bad' : 'mid'; }
+  // recommendations
+  const rec = [];
+  if (done && act7 < 4) rec.push('להתאמן ביותר ימים. 4-5 ימים בשבוע מספיקים, ושעה קבועה עוזרת.');
+  if (weak && weak.p < 65) rec.push(`לחזק את ${weak.n} (${weak.p}%): התקדמות ← נתונים ← תרגול לפי נושא.`);
+  if (spd && spd > 75) rec.push(`קצב: ${spd} שניות לשאלה, והיעד הוא 60. ספרינט חשבון וסימולציות עוזרים.`);
+  if (due >= 8) rec.push(`${due} שאלות מחכות במחברת הטעויות. כדאי לסגור אותן לפני חומר חדש.`);
+  if (last5 != null && prev5 != null && last5 < prev5 - .1) rec.push('הדיוק ירד לאחרונה. אולי עייפות, או שהרמה עלתה מהר. שווה לשאול אותו.');
+  if (!rec.length && done) rec.push('הכל נראה טוב. להמשיך באותו קצב, ולפרגן על ההתמדה.');
+  const R = (() => { const per = ch.map(x => { const h = hd[x.k]; if (!h || h.t < 5) return null; const cats = Object.keys(CHAPKEY).filter(c => CHAPKEY[c] === x.k); let ts = 0, tn = 0; cats.forEach(c => { const q = tm[c]; if (q) { ts += q.s; tn += q.n; } }); return Math.round(h.c / h.t * Math.min(1, 60 / (tn ? ts / tn : 60)) * 100); }).filter(v => v != null); return per.length >= 3 ? Math.round(per.reduce((a, b) => a + b, 0) / per.length) : null; })();
+  return `<section class="card stack report" style="gap:12px" data-nog>
+  <div class="row" style="justify-content:space-between;align-items:baseline"><h4 style="font-size:1.15rem;margin:0">דוח מצב</h4><span class="small muted">${fromCloud && o._at ? 'מהענן · ' + agoTxt(Date.parse(o._at)) : 'נכון לעכשיו'}</span></div>
+  <div class="verdict ${vcls}">${verdict}</div>
+  <div class="rgrid">
+    <div><b>${done}/${TOTAL}</b><span>משימות (צפוי ${expected})</span></div>
+    <div><b>${act7}/7</b><span>ימי אימון השבוע</span></div>
+    <div><b>${streak}</b><span>רצף נוכחי (שיא ${o.best || 0})</span></div>
+    <div><b>${tot.t ? Math.round(tot.c / tot.t * 100) + '%' : '–'}</b><span>דיוק כללי</span></div>
+    <div><b>${pct(last5)}</b><span>דיוק ב-5 האחרונות${prev5 != null ? ` (לפני: ${pct(prev5)})` : ''}</span></div>
+    <div><b>${spd ? spd + ' שנ׳' : '–'}</b><span>לשאלה (יעד 60)</span></div>
+  </div>
+  <div><div class="small muted" style="margin-bottom:4px">14 הימים האחרונים</div><div class="days14">${dots}</div></div>
+  <div class="bars">${ch.map(x => `<div class="bar ${x.p != null && x.t >= 8 && x.p < 65 ? 'weak' : ''}"><div class="rw"><span>${x.n}</span><span>${x.p == null ? 'אין נתונים' : x.p + '%'}${x.hp != null ? ` · קשות ${x.hp}%` : ''}</span></div><div class="track"><i style="width:${x.p || 0}%"></i></div></div>`).join('')}</div>
+  <div class="small">מוכנות (הערכה, לא ציון רשמי): <b>${R == null ? 'עוד אין מספיק שאלות קשות' : R + (R >= 75 ? ' · אזור מחוננים' : R >= 55 ? ' · אזור מצטיינים' : ' · בדרך')}</b></div>
+  <div class="small">מחברת טעויות: ${(o.mist || []).length} פתוחות${due ? ` (${due} לחזרה היום)` : ''} · ${o.fixed || 0} תוקנו${toExam != null && toExam >= 0 ? ` · ${toExam} ימים למבחן` : ''}</div>
+  ${rec.length ? `<div class="recs"><div class="eyebrow">מה כדאי לעשות</div>${rec.slice(0, 3).map(r => `<p>${r}</p>`).join('')}</div>` : ''}
+  </section>`;
+}
+const _viewParent14 = viewParent;
+viewParent = function () {
+  const h = _viewParent14.apply(this, arguments);
+  if (!PARENT_OK) return h;
+  return h.replace(/(<div class="sec-h"><h3>אזור הורים<\/h3>[\s\S]*?<\/div>)/, `$1${reportHTML(S, false)}`);
+};
+viewerHTML = o => reportHTML(o, true);
+
+const _bindV11_14 = bindV11;
+bindV11 = function () { _bindV11_14(); app.querySelectorAll('[data-act="diasheet"]').forEach(b => b.onclick = openDiaSheet); };
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
