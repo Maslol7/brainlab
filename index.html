@@ -585,6 +585,16 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .days14 i{height:14px;border-radius:4px;background:rgba(255,255,255,.08)}
 .days14 i.on{background:#46E0A0}
 .recs p{margin:4px 0 0;font-size:.9rem;line-height:1.5}
+/* v15 */
+.nudge{display:flex;gap:10px;align-items:center;margin:10px 0 0;padding:10px 14px;border-radius:14px;background:rgba(83,168,255,.14);border:1px solid rgba(83,168,255,.5);font-weight:600;font-size:.95rem;animation:shake .4s ease}
+.nudge b{font-size:1.2rem}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.thinkbar{position:relative;margin:10px 0 0;padding:9px 12px 12px;border-radius:12px;background:rgba(169,139,255,.12);border:1px solid rgba(169,139,255,.4);font-size:.88rem;font-weight:600;overflow:hidden}
+.thinkbar i{position:absolute;inset-inline-start:0;bottom:0;height:3px;width:100%;background:#A98BFF;transform-origin:right;animation:thinkfill linear forwards}
+[dir="ltr"] .thinkbar i{transform-origin:left}
+@keyframes thinkfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.think{opacity:.45;filter:blur(1.5px);transition:opacity .3s,filter .3s;pointer-events:none}
+.rgrid div.warn{border-color:rgba(255,200,69,.6);background:rgba(255,200,69,.1)}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -2045,7 +2055,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '14';
+const APP_VER = '15';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -2645,7 +2655,7 @@ function answer(i, val) {
   const typed = q.type === 'num';
   const ok = q.type === 'order' ? JSON.stringify(val) === JSON.stringify(q.correct) : typed ? Math.abs(parseFloat(val) - q.ansv) < .001 : i === q.answer, secs = (Date.now() - c.qStart) / 1000;
   const first = !(c.tried && c.tried.i === c.i);
-  if (!ok && first && !deferred(c.kind) && !q.champ) {
+  if (!ok && first && !deferred(c.kind) && !q.champ && !c.noRetry) {
     c.tried = { i: c.i, sel: typed || q.type === 'order' ? -1 : i, val: q.type === 'order' ? val : typed ? String(val) : undefined };
     c.combo = 0; rateQ(q, false, secs, c); noteMist(q, false, c, true);
     c.tin = ''; c.ord = []; SFX.soft(); save(); renderQuiz();
@@ -3485,18 +3495,21 @@ function reportHTML(o, fromCloud) {
   const tot = Object.values(st).reduce((a, s) => ({ c: a.c + s.c, t: a.t + s.t }), { c: 0, t: 0 });
   const tt = Object.values(tm).reduce((a, x) => ({ s: a.s + x.s, n: a.n + x.n }), { s: 0, n: 0 }), spd = tt.n ? Math.round(tt.s / tt.n) : null;
   const ch = Object.keys(CHAPNAME).map(k => { const cats = Object.keys(CHAPKEY).filter(c => CHAPKEY[c] === k); const s = cats.reduce((a, c) => { const x = st[c]; return x ? { c: a.c + x.c, t: a.t + x.t } : a; }, { c: 0, t: 0 }); const h = hd[k]; return { k, n: CHAPNAME[k], p: s.t ? Math.round(s.c / s.t * 100) : null, t: s.t, hp: h && h.t >= 5 ? Math.round(h.c / h.t * 100) : null }; });
+  const rr = typeof rushRate === 'function' ? rushRate(o) : 0, rushy = rr > .15 || (spd && spd < 15 && tt.n >= 20);
   const weak = ch.filter(x => x.t >= 8 && x.p != null).sort((a, b) => a.p - b.p)[0];
   const due = (o.mist || []).filter(m => m.due <= t).length;
   const pct = v => v == null ? '–' : Math.round(v * 100) + '%';
   // verdict
   let verdict, vcls;
   if (!done) { verdict = 'עוד לא התחיל.'; vcls = 'mid'; }
+  else if (rushy && (gap == null || gap < 3)) { verdict = behind <= 1 ? 'מתמיד, אבל עונה מהר מדי.' : `מאחור ב-${behind} משימות, ועונה מהר מדי.`; vcls = 'mid'; }
   else if (gap != null && gap >= 3) { verdict = `לא התאמן ${gap} ימים.`; vcls = 'bad'; }
   else if (behind <= 1) { verdict = 'בקצב של המסע.'; vcls = 'ok'; }
   else { verdict = `מאחור ב-${behind} משימות.`; vcls = behind > 4 ? 'bad' : 'mid'; }
   // recommendations
   const rec = [];
-  if (done && act7 < 4) rec.push('להתאמן ביותר ימים. 4-5 ימים בשבוע מספיקים, ושעה קבועה עוזרת.');
+  if (rushy) rec.push(`עונה מהר מדי${rr ? ` (${Math.round(rr * 100)}% מהתשובות לפני שאפשר לקרוא את השאלה)` : ` (${spd} שניות לשאלה)`}. זה ניחוש, לא פתרון. האפליקציה עוברת למצב חשיבה, וכדאי גם לדבר איתו.`);
+  if (done && since >= 7 && act7 < 4) rec.push('להתאמן ביותר ימים. 4-5 ימים בשבוע מספיקים, ושעה קבועה עוזרת.');
   if (weak && weak.p < 65) rec.push(`לחזק את ${weak.n} (${weak.p}%): התקדמות ← נתונים ← תרגול לפי נושא.`);
   if (spd && spd > 75) rec.push(`קצב: ${spd} שניות לשאלה, והיעד הוא 60. ספרינט חשבון וסימולציות עוזרים.`);
   if (due >= 8) rec.push(`${due} שאלות מחכות במחברת הטעויות. כדאי לסגור אותן לפני חומר חדש.`);
@@ -3512,7 +3525,7 @@ function reportHTML(o, fromCloud) {
     <div><b>${streak}</b><span>רצף נוכחי (שיא ${o.best || 0})</span></div>
     <div><b>${tot.t ? Math.round(tot.c / tot.t * 100) + '%' : '–'}</b><span>דיוק כללי</span></div>
     <div><b>${pct(last5)}</b><span>דיוק ב-5 האחרונות${prev5 != null ? ` (לפני: ${pct(prev5)})` : ''}</span></div>
-    <div><b>${spd ? spd + ' שנ׳' : '–'}</b><span>לשאלה (יעד 60)</span></div>
+    <div class="${rushy ? 'warn' : ''}"><b>${spd ? spd + ' שנ׳' : '–'}</b><span>לשאלה${rr ? ` · חפוזות ${Math.round(rr * 100)}%` : ''}</span></div>
   </div>
   <div><div class="small muted" style="margin-bottom:4px">14 הימים האחרונים</div><div class="days14">${dots}</div></div>
   <div class="bars">${ch.map(x => `<div class="bar ${x.p != null && x.t >= 8 && x.p < 65 ? 'weak' : ''}"><div class="rw"><span>${x.n}</span><span>${x.p == null ? 'אין נתונים' : x.p + '%'}${x.hp != null ? ` · קשות ${x.hp}%` : ''}</span></div><div class="track"><i style="width:${x.p || 0}%"></i></div></div>`).join('')}</div>
@@ -3531,6 +3544,83 @@ viewerHTML = o => reportHTML(o, true);
 
 const _bindV11_14 = bindV11;
 bindV11 = function () { _bindV11_14(); app.querySelectorAll('[data-act="diasheet"]').forEach(b => b.onclick = openDiaSheet); };
+/* ================= V15: STOP AND THINK (anti-guessing) ================= */
+const strip = s => String(s || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+function minSecs(q) {
+  const len = strip(q.prompt).length + strip(q.vis).length + (q.options ? q.options.map(strip).join('').length * .5 : 0) + (q.items ? q.items.map(strip).join('').length : 0);
+  return Math.max(3.5, Math.min(15, 2.5 + len / 45));
+}
+/* rush log: last 30 counted answers, 1 = faster than a reasonable reading time */
+function logRush(v) { S.rh = (S.rh || []).concat(v ? 1 : 0).slice(-30); }
+const rushRate = (o = S) => { const a = o.rh || []; return a.length >= 8 ? a.reduce((x, y) => x + y, 0) / a.length : 0; };
+(function seedRush() { if (S.rh) return; const t = Object.values(S.times || {}).reduce((a, x) => ({ s: a.s + x.s, n: a.n + x.n }), { s: 0, n: 0 }); if (t.n >= 20 && t.s / t.n < 15) S.rh = Array(10).fill(1); })();
+const thinkOn = c => !deferred(c.kind) && (c.think || rushRate() > .2);
+
+/* ---------- nudge on a too-fast first tap ---------- */
+const NUDGE = ['רגע. ענית תוך {s} שניות. קרא את השאלה עד הסוף, ואז תבחר.', 'עצור רגע. מה בדיוק שואלים? קרא שוב ותענה.', 'לאט. במבחן יש דקה לשאלה. תשתמש בזמן.'];
+function showNudge(secs) {
+  const c = S.cur; c.nudges = (c.nudges || 0) + 1; if (c.nudges >= 2) c.think = true;
+  document.querySelector('.nudge')?.remove();
+  const box = app.querySelector('.opts, .typed, .ord'); if (!box) return;
+  box.insertAdjacentHTML('beforebegin', `<div class="nudge"><svg viewBox="0 0 24 24" width="22" height="22" fill="#8CC8FF"><rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/></svg><span>${pick(NUDGE).replace('{s} שניות', Math.round(secs) <= 1 ? 'שנייה' : Math.round(secs) + ' שניות')}</span></div>`);
+  SFX.soft(); app.querySelector('.qprompt')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+const _answer15 = answer;
+answer = function (i, val) {
+  const c = S.cur; if (!c || c.lock || (c.res[c.i] && !deferred(c.kind))) return _answer15.apply(this, arguments);
+  const q = c.qs[c.i], secs = (Date.now() - c.qStart) / 1000, min = minSecs(q), rushed = secs < min;
+  const retrying = c.tried && c.tried.i === c.i;
+  if (rushed && !deferred(c.kind) && !q.champ && c.nudged !== c.i && !retrying) { c.nudged = c.i; logRush(1); c.rushLogged = c.i; showNudge(secs); return; }
+  c.noRetry = rushed && !retrying;
+  const before = c.res[c.i];
+  _answer15.apply(this, arguments);
+  c.noRetry = false;
+  const r = c.res[c.i];
+  if (r && r !== before) {
+    r.rush = rushed;
+    if (c.rushLogged !== c.i) { logRush(rushed); c.rushLogged = c.i; }
+    if (rushed) c.combo = 0;
+    if (!deferred(c.kind) && r.ok && !r.praise && c.nudged === c.i && !rushed) { r.praise = 'עצרת, קראת, וזה עבד. ככה פותרים.'; save(); renderQuiz(); }
+  } else if (!r && retrying === false && c.tried && c.tried.i === c.i && c.rushLogged !== c.i) { logRush(rushed); c.rushLogged = c.i; }
+};
+/* rushed misses do not flood the notebook; notebook keeps at most 12 */
+const MIST_MAX = 12;
+function trimMist() {
+  if (!S.mist || S.mist.length <= MIST_MAX) return;
+  const keep = S.mist.filter(m => m.box >= 1).slice(-MIST_MAX);
+  const rest = S.mist.filter(m => !(m.box >= 1)).slice(-(MIST_MAX - keep.length));
+  const set = new Set([...keep, ...rest]); S.mist = S.mist.filter(m => set.has(m));
+}
+const _noteMist15 = noteMist;
+noteMist = function (q, ok, c, first) {
+  if (c.noRetry && !ok && !q.rev) return;
+  _noteMist15.apply(this, arguments); trimMist();
+};
+trimMist();
+
+/* ---------- think mode: options open after a short reading time ---------- */
+let THINK_T = null;
+const _renderQuiz15 = renderQuiz;
+renderQuiz = function () {
+  const r = _renderQuiz15.apply(this, arguments);
+  clearTimeout(THINK_T);
+  const c = S.cur; if (!c || c.intro || c.chBreak || c.champ === 'offer' || S.view !== 'quiz') return r;
+  const q = c.qs[c.i]; if (!q || (c.res[c.i] && !deferred(c.kind)) || (c.tried && c.tried.i === c.i) || !thinkOn(c)) return r;
+  const delay = Math.min(8, Math.round(minSecs(q) * .7)), left = delay - (Date.now() - c.qStart) / 1000;
+  if (left <= .3) return r;
+  const box = app.querySelector('.opts, .typed, .ord'); if (!box) return r;
+  box.classList.add('think'); box.querySelectorAll('button').forEach(b => b.disabled = true);
+  box.insertAdjacentHTML('beforebegin', `<div class="thinkbar"><i style="animation-duration:${left}s"></i><span>מצב חשיבה: קרא, ונסה לפתור בראש. התשובות נפתחות עוד רגע.</span></div>`);
+  THINK_T = setTimeout(() => { if (S.cur !== c) return; box.classList.remove('think'); box.querySelectorAll('button').forEach(b => { if (!b.classList.contains('gone')) b.disabled = false; }); app.querySelector('.thinkbar')?.remove(); }, left * 1000);
+  return r;
+};
+const _finish15 = finish;
+finish = function () {
+  const c = S.cur, was = rushRate() > .2;
+  const r = _finish15.apply(this, arguments);
+  if (c && !deferred(c.kind) && was && rushRate() <= .2 && (S.rh || []).length >= 8) { toast('יצאת ממצב חשיבה! ענית בקצב של מי שקורא וחושב.', 4000); }
+  return r;
+};
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
