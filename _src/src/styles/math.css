@@ -1,0 +1,45 @@
+/* ---- math explanations: method line, bar model, tables, number lines, timelines ---- */
+.mhow{display:block;font-weight:600;color:var(--ink);margin-bottom:2px}
+.mtip{display:block;margin-top:4px;font-size:.84rem;color:var(--muted)}
+.mcap{display:block;margin-top:3px;font-size:.78rem;color:var(--muted)}
+/* bar model: equal unit boxes, so strips are in proportion */
+.mbar{display:block;margin:8px 0 6px}
+.mbr{display:flex;align-items:center;gap:8px;margin:3px 0}
+.mbl{flex:none;width:50px;font-size:.78rem;color:var(--muted)}
+.mbc{display:flex;gap:2px;min-width:0}
+.mbc i{flex:none;width:26px;height:24px;display:inline-grid;place-items:center;font-style:normal;font-size:.72rem;font-weight:700;border-radius:5px;background:var(--acc-soft);border:1px solid color-mix(in srgb,var(--acc) 60%,transparent);color:var(--ink);font-variant-numeric:tabular-nums;overflow:hidden}
+.mbc i.g{background:rgba(255,200,69,.2);border-color:var(--gold);color:var(--gold)}
+.mbc i.m{background:rgba(255,255,255,.05);border-color:var(--edge2);color:var(--muted)}
+.mbc i.k{background:color-mix(in srgb,var(--violet) 25%,transparent);border-color:var(--violet)}
+.mbar.full .mbc{flex:1}
+.mbar.full .mbc i{flex:1 1 0;width:auto;min-width:0}
+.mleg{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:4px;font-size:.78rem;color:var(--muted)}
+.mleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:4px;vertical-align:-1px;background:var(--acc-soft);border:1px solid var(--acc)}
+.mleg i.g{background:var(--gold);border-color:var(--gold)}
+.mleg i.m{background:rgba(255,255,255,.08);border-color:var(--edge2)}
+.mleg i.k,.mleg i.v{background:var(--violet);border-color:var(--violet)}
+.mleg i.a{background:var(--acc);border-color:var(--acc)}
+/* small table */
+.mtab{display:grid;grid-template-columns:repeat(var(--n),auto);width:max-content;max-width:100%;margin:8px 0 6px;border:1px solid var(--edge);border-radius:10px;overflow:hidden;font-variant-numeric:tabular-nums;font-size:.9rem}
+.mtab>span{padding:3px 10px;text-align:center;border-top:1px solid var(--edge)}
+.mtab>.th{border-top:0;font-size:.76rem;color:var(--muted);background:rgba(255,255,255,.05)}
+.mtab>.hi{color:var(--gold);font-weight:700;background:rgba(255,200,69,.1)}
+/* number lines, timelines, shapes */
+.msvg{direction:ltr;display:block;width:100%;max-width:300px;height:auto;margin:6px auto 2px;overflow:visible;font-variant-numeric:tabular-nums}
+.msvg text{fill:currentColor}
+.msvg .ln{stroke:currentColor;stroke-opacity:.45;fill:none}
+.msvg .la{stroke:var(--acc);fill:none;stroke-width:1.6}
+.msvg .lv{stroke:var(--violet);fill:none;stroke-width:1.6}
+.msvg .lg{stroke:var(--gold);stroke-width:1.5}
+.msvg .dash{stroke-dasharray:4 3}
+.msvg .w3{stroke-width:3.5}
+.msvg circle.a,.msvg text.a{fill:var(--acc)}
+.msvg circle.v,.msvg text.v{fill:var(--violet)}
+.msvg circle.g,.msvg text.g{fill:var(--gold)}
+.msvg text.g{font-weight:700}
+.msvg text.mu{fill:var(--muted)}
+.mdots{display:block;margin:6px 0 2px;max-width:100%}
+.mdots .rd{fill:var(--bad)}.mdots .bl{fill:var(--water)}.mdots .gr{fill:var(--good)}
+/* a number and its unit ("4 שעות", "48 ₪") are separate items in the option's flex box; keep a space between them */
+.opt .ob{column-gap:.3em}
+.mnw{display:inline-block;white-space:nowrap;unicode-bidi:isolate}

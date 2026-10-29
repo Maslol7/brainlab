@@ -1,0 +1,36 @@
+/* shapes: matrices, dial series, figural analogies (visual solutions) */
+.sseries .fbox{flex:0 1 47px;width:auto;height:auto;aspect-ratio:1;min-width:0}
+.sseries .fbox .mcell{width:88%}
+.sseries .ar{flex:none}
+.solx .shm,.sol .shm{display:block;margin-bottom:6px}
+.shv{display:block;text-align:center;margin:8px 0 6px}
+.shl{display:flex;align-items:flex-start;gap:8px;margin:5px 0;line-height:1.45}
+.shl>span{flex:1;min-width:0}
+.shi{flex:none;width:20px;height:20px;margin-top:2px;color:var(--gold);vertical-align:middle;overflow:visible}
+.shx{display:inline-block;height:auto;overflow:visible}
+.shgrid{width:150px}
+.shstrip{width:100%;max-width:330px}
+.shx .pp{fill:var(--paper)}
+.shx .pp.pa{fill:#FFF1C2}
+.shx .hlr{fill:none;stroke:var(--gold);stroke-width:3.5}
+.shx .shc{color:#22253A}
+.shx .mk{fill:none;stroke:#D9480F;stroke-width:3.4;stroke-linecap:round}
+.shx .mkh{fill:#D9480F}
+.shx .gh{fill:none;stroke:#D9480F;stroke-width:2.6;stroke-dasharray:4 3.5;opacity:.8}
+.shx .sar{stroke:var(--muted);stroke-width:2.4}
+.shx .sarh{fill:var(--muted)}
+.shx .slb{fill:var(--gold);font-weight:700;font-family:var(--f-body)}
+.shx .sla{fill:none;stroke:var(--gold);stroke-width:2.4;stroke-linecap:round}
+.shx .slah,.shx .sld{fill:var(--gold)}
+/* figural analogy: two rows, change written between the boxes */
+.shv.fx{display:flex;flex-direction:column;align-items:center;gap:8px}
+.fxr{display:flex;align-items:center;gap:6px}
+.fxb{flex:none;width:48px;height:48px;border-radius:10px;background:var(--paper);display:grid;place-items:center}
+.fxb .mcell{width:42px;color:#22253A}
+.fxb.hl{background:#FFF1C2;box-shadow:0 0 0 3px var(--gold)}
+.fxc{display:flex;flex-direction:column;align-items:center;min-width:96px;gap:1px;font-size:.8rem;color:var(--gold);line-height:1.2}
+.fxl{display:flex;align-items:center;gap:3px;white-space:nowrap}
+.fxl i{font-style:normal;color:var(--muted)}
+.fxl .shi{width:17px;height:17px;margin:0}
+.fxt{font-size:.72rem;color:var(--muted)}
+.fxa{color:var(--muted);font-size:1rem;line-height:1}

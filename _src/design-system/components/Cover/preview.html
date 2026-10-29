@@ -1,0 +1,32 @@
+<!-- @dsCard height=288 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Rubik:wght@400&display=swap">
+<style>
+html,body{margin:0;background:var(--bg0)}
+.cv{position:relative;width:960px;height:288px;overflow:hidden;background:var(--bg0)}
+.cv svg{position:absolute;inset:0}
+.air{fill:var(--air)}.water{fill:var(--water)}.earth{fill:var(--earth)}.fire{fill:var(--fire)}.gold{fill:var(--gold)}.star{fill:var(--ink)}
+.cvname{position:absolute;left:40px;bottom:36px;width:440px;direction:rtl;text-align:right}
+.cvname h1{margin:0;font-family:var(--font-display);font-weight:700;font-size:72px;line-height:.95;color:var(--ink)}
+.cvname p{margin:12px 0 0;font-family:var(--font-body);font-size:14px;color:var(--muted)}
+</style>
+<div class="cv">
+<svg viewBox="0 0 960 288" width="960" height="288" aria-hidden="true">
+<!--
+blocks: air 224x80, water 256x80, earth 176x64, fire 208x64 (pills, rx = half the short side, radius-pill); gold disc r44
+arrangement: a staggered zigzag of pills from x=496 to the right edge, fire bleeding off it, like the node path of the journey map
+pattern: discs (friendly, rounded Fredoka face, radius-pill everywhere): 14 small ink discs as the night-sky stars the app is set in
+steps: gaps of gap-stack (16px) between pill rows, star discs 2-4px, radii = radius-pill
+-->
+<rect class="air" x="512" y="24" width="224" height="80" rx="40"/>
+<rect class="water" x="640" y="120" width="256" height="80" rx="40"/>
+<rect class="earth" x="496" y="216" width="176" height="64" rx="32"/>
+<rect class="fire" x="768" y="216" width="208" height="64" rx="32"/>
+<circle class="gold" cx="840" cy="64" r="44"/>
+<g class="star">
+<circle cx="760" cy="18" r="3"/><circle cx="920" cy="140" r="2"/><circle cx="560" cy="150" r="3"/><circle cx="604" cy="186" r="2"/><circle cx="910" cy="30" r="2"/>
+<circle cx="700" cy="216" r="2"/><circle cx="742" cy="110" r="2"/><circle cx="500" cy="120" r="4"/><circle cx="940" cy="196" r="3"/><circle cx="890" cy="112" r="2"/>
+<circle cx="610" cy="112" r="2"/><circle cx="530" cy="190" r="2"/><circle cx="612" cy="212" r="3"/><circle cx="950" cy="80" r="2"/>
+</g>
+</svg>
+<div class="cvname"><h1>מעבדת המוח</h1><p>אימון יומי למבחן המחוננים, בחמישה עולמות.</p></div>
+</div>

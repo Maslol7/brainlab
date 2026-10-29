@@ -1,0 +1,31 @@
+/* logic explanations: order ladder, seat row, Euler circles, team boxes (all inside <p class="solx">, so spans only) */
+.lg-cap{display:block;text-align:center;font-size:.78rem;color:var(--muted);margin:2px 0 6px}
+/* order: a ladder from most to least */
+.lg-lad{display:flex;flex-direction:column;align-items:center;gap:5px;margin:8px auto 8px;padding:2px 0;background:linear-gradient(var(--edge2),var(--edge2)) center/2px 100% no-repeat}
+.lg-end{font-size:.76rem;color:var(--muted);background:var(--bg1);padding:0 8px;border-radius:99px}
+.lg-rung{display:flex;align-items:center;gap:8px;min-width:150px;padding:4px 10px;border-radius:10px;background:var(--bg2);border:1px solid var(--edge2);font-weight:600}
+.lg-rung i,.lg-seat i{font-style:normal;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.lg-rung.on,.lg-seat.on{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+/* seating: seat 1 is the first span, so it sits on the right in RTL */
+.lg-seats{display:flex;justify-content:center;gap:5px;margin:10px 0 0}
+.lg-seat{flex:1 1 0;max-width:64px;min-width:0;display:flex;flex-direction:column;align-items:center;padding:4px 2px 6px;border-radius:12px 12px 6px 6px;background:var(--bg2);border:1px solid var(--edge2);font-size:.86rem;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+/* syllogisms: Euler circles */
+.lg-eus{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:8px 0 2px}
+.lg-eu{display:inline-flex;flex-direction:column;align-items:center;max-width:100%}
+.lg-eu .lg-cap{margin:0;max-width:170px}
+.lg-svg{display:block;max-width:100%;height:auto;overflow:visible}
+.lg-svg circle{stroke-width:2}
+.lg-svg circle.lg-a{fill:var(--acc);fill-opacity:.16;stroke:var(--acc)}
+.lg-svg circle.lg-b{fill:var(--gold);fill-opacity:.12;stroke:var(--gold)}
+.lg-svg circle.lg-c{fill:var(--violet,#A98BFF);fill-opacity:.12;stroke:var(--violet,#A98BFF)}
+.lg-svg circle.lg-dot{fill:var(--ink);stroke:var(--bg0);stroke-width:1.5}
+.lg-svg text{font-size:12px;font-weight:700;stroke:var(--bg0);stroke-width:3px;paint-order:stroke;stroke-linejoin:round}
+.lg-svg text.lg-a{fill:var(--acc)}.lg-svg text.lg-b{fill:var(--gold)}.lg-svg text.lg-c{fill:var(--violet,#A98BFF)}
+.calc i{font-style:normal;font-size:.8rem;color:var(--muted)}
+/* groups: one box per team */
+.lg-teams{display:flex;justify-content:center;gap:6px;margin:10px 0 8px}
+.lg-team{flex:1 1 0;max-width:150px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px 8px;border-radius:12px;background:var(--bg2);border:1px solid var(--edge2)}
+.lg-team>b{font-size:.76rem;color:var(--muted);font-weight:600}
+.lg-mem{display:block;width:100%;text-align:center;padding:2px 4px;border-radius:8px;background:var(--panel2);font-weight:600;font-size:.9rem}
+.lg-mem.me{box-shadow:0 0 0 1px var(--acc);color:var(--acc)}
+.lg-mem.on{box-shadow:0 0 0 1px var(--gold);color:var(--gold)}

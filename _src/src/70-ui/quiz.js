@@ -52,7 +52,7 @@ function renderQuiz() {
     const tchip = `<span class="tchip ${r.secs <= 60 ? 'ok' : ''}">${Math.round(r.secs)} שנ׳</span>`;
     const ansTxt = q.type === 'order' ? 'הסדר הנכון למעלה' : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
     const LS = LESSONS[lessonFor(q)] || LESSONS.logic;
-    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4><span class="fbi">${r.ok ? '✓' : IC.book}</span>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4>${r.praise ? `<div class="praise">${IC.bolt}<span>${r.praise}</span></div>` : ''}<div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span>${LS[1]}</div>${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}${dadHTML(r.love)}${bugBtn('data-qbug="cur"', mistId(q))}</div>`;
+    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4><span class="fbi">${r.ok ? '✓' : IC.book}</span>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4>${r.praise ? `<div class="praise">${IC.bolt}<span>${r.praise}</span></div>` : ''}${r.newRule || strip(q.ex).length < 160 ? `<div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span><span>${LS[1]}</span></div>` : ''}${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}${dadHTML(r.love)}${bugBtn('data-qbug="cur"', mistId(q))}</div>`;
   }
   const tried = !answered && c.tried && c.tried.i === c.i;
   const hint = tried ? retryBox(q, c.tried) : q.twin && !answered ? `<div class="hintbox"><b>הכלל:</b> ${(LESSONS[lessonFor(q)] || LESSONS.logic)[1]}</div>` : c.hint && !answered ? `<div class="hintbox"><span class="hi">${IC.bulb}</span><div><b>רמז</b><p>${hintText(q, 1)}</p></div></div>` : '';
@@ -76,7 +76,7 @@ function renderQuiz() {
   const duo = c.duo ? '<div class="duo">אתגר עם אבא: כל אחד אומר בקול מה הוא חושב, ורק אז בוחרים.</div>' : '';
   app.innerHTML = `<div class="qbar"><button class="icon-btn" data-act="quit" aria-label="יציאה">${IC.x}</button><div class="pdots">${dots}</div><div class="qmeta"><span class="pts">${c.pts} נק׳</span><span class="tm" id="tm"></span></div></div>${chTag}${battle}
   <div class="card ${q.champ ? 'champq' : ''}"><div class="qtop"><span class="tag ${q.rev ? 'rev' : ''}">${q.champ ? 'שאלת האלוף · ' : q.rev ? (q.twin ? 'מהמחברת · גרסה קלה · ' : 'מהמחברת · ') : ''}${CATS[q.cat].n}</span>${comboTag}<span class="lvl">רמה ${lvl}</span>${gchip}</div>${duo}${pace}
-  ${gfirst}<p class="qprompt">${q.prompt}</p><div class="qvis">${q.vis}</div>${body}${hint}${fb}</div>
+  ${gfirst}<p class="qprompt">${q.prompt}</p><div class="qvis">${answered && q.evidence && q.vis.includes(q.evidence) ? q.vis.replace(q.evidence, `<mark class="ev">${q.evidence}</mark>`) : q.vis}</div>${body}${hint}${fb}</div>
   <div class="qfoot"><div class="in">${foot}</div></div>`;
   bind();
   app.querySelectorAll('[data-oitem]').forEach(b => b.onclick = () => { c.ord = (c.ord || []).concat(+b.dataset.oitem); SFX.tap(); renderQuiz(); });

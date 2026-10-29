@@ -14,7 +14,7 @@ const order = JSON.parse(rd('src/order.json'));
 const js = order.map(m => `/* ---- ${m} ---- */\n` + rd('src/' + m)).join('\n').replace(/__VER__/g, V) + '\nrender(); guestOnboard();\n';
 // syntax check before writing anything
 new Function(js);
-const head = rd('src/static/head.html') + '<style>\n' + rd('src/styles/app.css') + '</style>\n' + rd('src/static/body.html');
+const head = rd('src/static/head.html') + '<style>\n' + ['app.css', ...fs.readdirSync(ROOT + 'src/styles').filter(f => f.endsWith('.css') && f !== 'app.css').sort()].map(f => rd('src/styles/' + f)).join('\n') + '</style>\n' + rd('src/static/body.html');
 fs.rmSync(ROOT + DIST, { recursive: true, force: true }); fs.mkdirSync(ROOT + DIST + '/pwa', { recursive: true });
 fs.writeFileSync(ROOT + DIST + '/index.html', head + '<script>\n' + js + '</script>\n');
 const sw = "if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));\n";
@@ -26,7 +26,7 @@ console.log(`built v${V}: ${js.split('\n').length} lines of JS, ${order.length} 
 if (release) {
   const zip = `/mnt/user-data/outputs/brainlab-pwa-v${V}.zip`;
   /* the source travels with the site in _src/ (GitHub Pages does not publish folders that start with _) */
-  execSync(`rm -rf ${ROOT}dist/pwa/_src && mkdir -p ${ROOT}dist/pwa/_src && cd ${ROOT} && cp -r src tools tests README.md package.json version.json dist/pwa/_src/ && rm -rf dist/pwa/_src/tools/inventory.json`);
+  execSync(`rm -rf ${ROOT}dist/pwa/_src && mkdir -p ${ROOT}dist/pwa/_src && cd ${ROOT} && cp -r src tools tests design-system README.md package.json version.json dist/pwa/_src/ && rm -rf dist/pwa/_src/tools/inventory.json`);
   execSync(`cd ${ROOT}dist/pwa && rm -f ${zip} && zip -qr ${zip} .`);
   console.log('zip', zip);
 }

@@ -729,3 +729,5 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .bugwhy{display:flex;flex-wrap:wrap;gap:8px}
 .bugwhy .chip.on{background:var(--acc);color:var(--bg0);border-color:var(--acc)}
 .bugitem summary{cursor:pointer;line-height:1.5}
+/* reading: the sentence that proves the answer, marked after answering */
+mark.ev{background:rgba(255,200,69,.45);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 2px rgba(255,200,69,.45)}

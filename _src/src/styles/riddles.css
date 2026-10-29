@@ -1,0 +1,81 @@
+/* logic riddles and family questions: pictures inside the solution (src/10-content/logic-banks.js) */
+.rd-m{display:block;margin:2px 0 6px;padding-inline-start:9px;border-inline-start:3px solid var(--acc);color:var(--ink);font-weight:600;line-height:1.5}
+.rd-fig{display:block;margin:8px 0;text-align:center;line-height:1.3}
+.rd-svg{max-width:100%;height:auto;overflow:visible;vertical-align:top}
+.rd-svg text{fill:var(--ink);font-size:12px;font-family:var(--f-body)}
+.rd-svg text.mu{fill:var(--muted)}
+.rd-svg text.gd{fill:var(--gold);font-weight:700}
+.rd-svg text.acc{fill:var(--acc);font-weight:700}
+.rd-svg text.bad{fill:var(--bad);font-weight:700}
+.rd-svg text.big{font-size:17px;font-weight:700}
+.rd-svg .ln{fill:none;stroke:var(--muted);stroke-width:1.5}
+.rd-svg .ln.acc{stroke:var(--acc);fill:rgba(127,227,214,.08)}
+.rd-svg .ln.bad{stroke:var(--bad);fill:rgba(255,92,122,.08)}
+.rd-svg .blue{fill:rgba(83,168,255,.35);stroke:var(--water);stroke-width:1.5}
+.rd-svg .gdot{fill:var(--gold)}
+.rd-svg .pdot{fill:var(--muted);opacity:.7}
+.rd-svg .past{fill:var(--bg1);stroke:var(--muted);stroke-width:1.5}
+.rd-svg .next{fill:var(--good)}
+.rd-svg .arr{stroke:var(--acc);stroke-width:2}
+.rd-svg .br{fill:none;stroke:var(--muted);stroke-width:1.2}
+.rd-svg .rope{stroke:var(--earth);stroke-width:5;stroke-linecap:round}
+.rd-svg .cut{stroke:var(--bad);stroke-width:2.5}
+.rd-svg .post{fill:var(--gold)}
+.rd-svg .pond{fill:rgba(83,168,255,.18);stroke:var(--water);stroke-width:1.2}
+.rd-svg .pond.k{stroke:var(--gold);stroke-width:2}
+.rd-svg .lily{fill:var(--good);opacity:.75}
+/* family tree */
+.rd-svg .nd rect{fill:var(--bg2);stroke:var(--edge2);stroke-width:1.2}
+.rd-svg .nd.me rect{stroke:var(--acc);stroke-width:2}
+.rd-svg .nd.me text{fill:var(--acc);font-weight:700}
+.rd-svg .nd.tg rect{stroke:var(--gold);stroke-width:2;fill:#3a3420}
+.rd-svg .nd.tg text{fill:var(--gold);font-weight:700}
+.rd-svg .nd.dim text{fill:var(--muted)}
+.rd-svg .el{fill:none;stroke:var(--dim);stroke-width:1.5}
+.rd-svg .eh{fill:none;stroke:var(--acc);stroke-width:2.2}
+/* tables (truth tables, the fruit grid, if... then) */
+.rd-tab{display:inline-grid;gap:3px;font-size:.8rem;text-align:center;vertical-align:top}
+.rd-tab>span{padding:4px 7px;border-radius:6px;background:var(--panel);white-space:nowrap}
+.rd-tab>span.h{background:none;color:var(--muted);font-weight:600;white-space:normal}
+.rd-tab>span.y{color:var(--good);font-weight:600}
+.rd-tab>span.n{color:var(--bad);font-weight:600}
+.rd-tab>span.k{background:rgba(255,200,69,.16);box-shadow:inset 0 0 0 1.5px var(--gold)}
+/* socks */
+.rd-socks{display:flex;justify-content:center;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.rd-sg{display:inline-flex;flex-direction:column;align-items:center;gap:3px}
+.rd-sg>span:first-child{display:inline-flex;gap:2px}
+.rd-lab{font-size:.72rem;color:var(--muted)}
+.rd-sock path{stroke-width:1.2;stroke-linejoin:round}
+.rd-sock.b path{fill:#2a3157;stroke:#A3AED6}
+.rd-sock.w path{fill:#F3F6FF;stroke:#F3F6FF}
+.rd-sock.q path{fill:none;stroke:var(--gold);stroke-dasharray:2 2}
+/* bat and ball bars */
+.rd-bars{display:inline-grid;grid-template-columns:auto auto;gap:5px 8px;align-items:center;font-size:.82rem}
+.rd-bars>span:nth-child(even){display:flex;gap:2px}
+.rd-seg{display:inline-block;height:24px;line-height:24px;border-radius:6px;text-align:center;font-weight:700}
+.rd-seg.x{width:42px;background:rgba(255,200,69,.2);box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--gold)}
+.rd-seg.c{width:150px;background:rgba(127,227,214,.14);box-shadow:inset 0 0 0 1.5px var(--acc)}
+/* houses in a row (drawn left to right, like the street) */
+.rd-houses{display:flex;direction:ltr;justify-content:center;align-items:flex-end;gap:4px}
+.rd-house{position:relative;width:46px;height:42px;padding-top:16px;box-sizing:border-box;clip-path:polygon(50% 0,100% 34%,100% 100%,0 100%,0 34%);color:#0A0F24;font-size:.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rd-house i{font-style:normal;font-size:.62rem;opacity:.7;line-height:1}
+.rd-end{font-size:.72rem;color:var(--muted);padding:0 2px 12px}
+/* three labelled boxes */
+.rd-boxes{display:flex;justify-content:center;gap:8px}
+.rd-box{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:74px;padding:5px 6px;border-radius:8px;box-shadow:inset 0 0 0 1.5px var(--edge2);font-size:.8rem}
+.rd-box i{font-style:normal;font-size:.66rem;color:var(--muted)}
+.rd-box s{color:var(--bad);text-decoration-thickness:2px}
+.rd-box b{color:var(--gold)}
+/* weighing */
+.rd-weigh{display:inline-grid;grid-template-columns:repeat(6,auto);gap:5px;align-items:center;font-size:.75rem;color:var(--muted)}
+.rd-grp{display:inline-flex;gap:3px;justify-content:center;padding:4px 6px;border-radius:12px;box-shadow:inset 0 0 0 1.2px var(--edge2)}
+.rd-grp.out{box-shadow:inset 0 0 0 1.2px var(--dim);opacity:.75}
+.rd-ball{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--muted)}
+.rd-ball.k{background:var(--gold)}
+/* dates in a row */
+.rd-strip{display:flex;justify-content:center;gap:3px}
+.rd-cell{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:56px;padding:4px 2px;border-radius:7px;background:var(--panel);font-size:.78rem}
+.rd-cell i{font-style:normal;font-size:.62rem;color:var(--muted);white-space:nowrap}
+.rd-cell b{font-size:.74rem}
+.rd-cell.k{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.rd-cell.k b{color:var(--gold)}

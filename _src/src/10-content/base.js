@@ -10,7 +10,8 @@ function numCands(ans, cands, n = 4) {
 const UNIT1 = { ' שעות': ' שעה', ' ימים': ' יום', ' דקות': ' דקה', ' שניות': ' שנייה', ' פעימות': ' פעימה', ' שנ׳': ' שנ׳' };
 const unitFor = (v, unit) => v === 1 && UNIT1[unit] ? UNIT1[unit] : unit;
 const numQ = (cat, d, prompt, vis, ans, cands, ex, unit = '') => {
-  const m = mc(numCands(ans, cands).map(v => L(fmt(v)) + unitFor(v, unit)));
+  /* a unit that sticks to the number (°, %) goes inside the LTR span, or it shows on the wrong side */
+  const m = mc(numCands(ans, cands).map(v => { const u = unitFor(v, unit); return /^\s*[°%]/.test(u) ? L(fmt(v) + u.trim()) : L(fmt(v)) + u; }));
   return { cat, d, prompt, vis, options: m.options, answer: m.answer, ex, ansv: ans, unit };
 };
 function pickBank(bank, key, d) {
