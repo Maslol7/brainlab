@@ -751,6 +751,15 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .bugitem summary{cursor:pointer;line-height:1.5}
 /* reading: the sentence that proves the answer, marked after answering */
 mark.ev{background:rgba(255,200,69,.45);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 2px rgba(255,200,69,.45)}
+/* teaching what was not taught well enough */
+.learnnote{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;padding:10px 12px;border-radius:12px;background:rgba(169,139,255,.14);border:1px solid rgba(169,139,255,.45);font-size:.9rem;line-height:1.5}
+.learnnote svg{width:20px;height:20px;flex:none;color:var(--violet);margin-top:2px}
+.learncard{border-color:rgba(169,139,255,.55);background:linear-gradient(155deg,rgba(169,139,255,.24),var(--panel) 65%)}
+.learncard h3{font-size:1.5rem;margin:4px 0 6px}
+.learncard p{margin:0 0 12px;color:var(--ink)}
+.fb.demo{background:rgba(83,168,255,.1);border-color:rgba(83,168,255,.45)}
+.fb.demo .fbi{background:var(--water);color:var(--bg0)}
+.banner.learnok{background:linear-gradient(120deg,rgba(70,224,160,.2),rgba(255,200,69,.14));border-color:rgba(70,224,160,.5)}
 
 /* ---------- code (צפנים) solutions: rule, steps, symbols, ◆, week strip, clock ---------- */
 .cx-rule{display:block;margin:2px 0 8px;padding:7px 10px;border-radius:10px;background:var(--acc-soft);border-inline-start:3px solid var(--acc);color:var(--ink);line-height:1.45}
@@ -3620,6 +3629,77 @@ Object.assign(GSTEPS, {
   ],
 });
 
+/* ---- 20-learn/mastery.js ---- */
+/* ---------- teaching what we did not teach well enough ----------
+   A wrong answer given too fast (a guess) or after a long time stuck is a sign that this KIND of question
+   was not taught well enough. We keep the last results per question type (lesson key):
+     o = right on the first try, x = wrong, g = guessed (too fast and wrong), s = stuck (over 2 minutes and wrong).
+   Two g/s in the last five, or one success or less in four tries, puts the type on the "to learn" list.
+   The lesson: why we stop (not his fault), the rule, a worked example or the step-by-step guide,
+   then three questions where the help fades: hint shown, hint free, no hint. Two of three right = learned. */
+const STUCK_SECS = 120;
+const lkName = key => (LESSONS[key] || [key])[0];
+function lkStat(key) { const M = S.lk || (S.lk = {}); return M[key] || (M[key] = { r: '', cat: null, learned: null }); }
+function lkNeeds(st) { const w = st.r.slice(-5); return (w.match(/[gs]/g) || []).length >= 2 || (w.length >= 4 && (w.match(/o/g) || []).length <= 1); }
+function noteStruggle(q, r, secs, rushed, c) {
+  if (deferred(c.kind) || q.champ || q.demo || c.kind === 'lesson' || S.guest) return null;
+  const key = lessonFor(q), st = lkStat(key);
+  st.cat = q.cat;
+  st.r = (st.r + (r.ok && !r.second ? 'o' : rushed ? 'g' : secs > STUCK_SECS ? 's' : 'x')).slice(-8);
+  const Q = S.learnQ || (S.learnQ = []);
+  if (r.ok && !r.second) return null;
+  if (!lkNeeds(st) || Q.some(x => x.key === key)) return null;
+  Q.push({ key, at: todayStr(), why: st.r.slice(-5) }); if (Q.length > 4) Q.shift();
+  return key;
+}
+const dueLearn = () => (S.learnQ || []).filter(x => x.at <= todayStr());
+function learnNote(key) {
+  return `<div class="learnnote">${IC.book}<span>זה סימן שעוד לא לימדנו אותך <b>${lkName(key)}</b> מספיק טוב. בסוף המשימה מחכה לך שיעור קצר על זה.</span></div>`;
+}
+function learnCard(where) {
+  const L0 = dueLearn()[0]; if (!L0) return '';
+  const g = L0.why || '', guess = (g.match(/g/g) || []).length, stuck = (g.match(/s/g) || []).length;
+  const why = guess >= stuck ? 'היו כמה תשובות מהירות מדי, כמו ניחוש' : 'היו שאלות שנתקעת בהן הרבה זמן';
+  return `<section class="card learncard"><div class="eyebrow">שיעור קצר · 3 דקות</div><h3>${lkName(L0.key)}</h3><p class="small">${why}. זה לא בגללך: זה סימן שעוד לא לימדנו אותך את הדרך. בוא נלמד אותה, ואז 3 שאלות לתרגול.</p><button class="btn btn-primary btn-wide" data-learn="${L0.key}">ללמוד עכשיו</button>${where === 'home' ? '<button class="btn btn-ghost btn-wide" data-act="learnlater" style="margin-top:8px;min-height:42px">מחר</button>' : ''}</section>`;
+}
+/* a fresh question of this type: the type's own category generator until the lesson key matches */
+function genByKey(key, d) {
+  const cat = lkStat(key).cat || 'logic', g = GEN[cat]; if (!g) return null;
+  const snap = JSON.stringify(SEEN); let out = null;
+  for (let k = 0; k < 150 && !out; k++) { let t; try { t = g(LEVEL4.has(cat) ? d : Math.min(d, 3)); } catch (e) { continue; } if (t && lessonFor(t) === key) out = t; }
+  const back = JSON.parse(snap); Object.keys(SEEN).forEach(k => delete SEEN[k]); Object.assign(SEEN, back);
+  if (out) { out.cat = out.cat || cat; out.lk = out.lk || key; }
+  return out;
+}
+function startLesson(key) {
+  if (S.cur) return modal('יש משימה פתוחה', 'קודם סיים את המשימה שהתחלת, או צא ממנה.', 'להמשיך במשימה', () => go('quiz'));
+  ac();
+  const cat = lkStat(key).cat, d = Math.max(1, Math.round(S.rat[cat] ?? 2)), guide = !!GSTEPS[key];
+  const qs = [], add = (dd, extra) => { const q = genByKey(key, dd); if (q) { Object.assign(q, extra, { d: dd }); qs.push(q); } };
+  if (!guide) add(Math.max(1, d - 1), { demo: 1 });
+  add(Math.max(1, d - 1), { scaffold: 1 }); add(d, { freehint: 1 }); add(d, {});
+  if (qs.filter(q => !q.demo).length < 2) { S.learnQ = (S.learnQ || []).filter(x => x.key !== key); save(); return toast('לא מצאתי שאלות לשיעור הזה'); }
+  const res = [];
+  if (qs[0].demo) res[0] = { sel: qs[0].type === 'num' || qs[0].type === 'order' ? -1 : qs[0].answer, val: qs[0].type === 'order' ? qs[0].correct : qs[0].type === 'num' ? String(qs[0].ansv) : undefined, ok: true, gain: 0, secs: 0, demo: 1 };
+  S.cur = { kind: 'lesson', lkey: key, guide, day: nextDay() || TOTAL, cat, qs, i: 0, res, pts: 0, combo: 0, hint: false, qStart: Date.now(), deadline: null, hp: 5, mod: null, size: null, path: false, intro: true, chapters: null, ch: 0, chDeadline: null, chBreak: false, tin: '' };
+  go('quiz');
+}
+/* called by finish() for a lesson */
+function lessonDone(c) {
+  const real = c.qs.map((q, i) => [q, c.res[i]]).filter(([q]) => !q.demo), ok = real.filter(([, r]) => r && r.ok && !r.second).length, pass = ok >= Math.min(2, real.length);
+  const st = lkStat(c.lkey);
+  if (pass) { st.learned = todayStr(); st.r = ''; S.learnQ = (S.learnQ || []).filter(x => x.key !== c.lkey); S.coins += 20; }
+  else (S.learnQ || []).forEach(x => { if (x.key === c.lkey) x.at = addDays(todayStr(), 1); });
+  return { key: c.lkey, pass, ok, n: real.length };
+}
+/* parent report: what is still to learn, what was learned in a lesson */
+function masteryLine(o) {
+  const M = o.lk || {}, todo = (Array.isArray(o.learnQ) ? o.learnQ : Object.values(o.learnQ || {})).map(x => lkName(x.key));
+  const done = Object.keys(M).filter(k => M[k] && M[k].learned).map(lkName);
+  if (!todo.length && !done.length) return '';
+  return `<div class="small">${todo.length ? `סוגי שאלות שעוד לא לימדנו אותו מספיק טוב: <b>${todo.join(', ')}</b>` : ''}${todo.length && done.length ? ' · ' : ''}${done.length ? `למד בשיעור: ${done.join(', ')}` : ''}</div>`;
+}
+
 /* ---- 20-learn/road.js ---- */
 /* readiness estimate (not an official measure) */
 function readiness() {
@@ -4124,7 +4204,7 @@ function answer(i, val) {
     if (!deferred(c.kind) && c.combo && c.combo % 3 === 0) gain += 10;
     if (c.hint && !c.freeHint) gain = Math.max(0, gain - 3);
     if (deferred(c.kind)) gain = Math.round(gain * 1.5);
-    if (c.kind === 'practice' || c.kind === 'review') gain = Math.round(gain / 2);
+    if (c.kind === 'practice' || c.kind === 'review' || c.kind === 'lesson') gain = Math.round(gain / 2);
     if (!first) gain = Math.round(gain / 2);
   }
   const prev = c.res[c.i]; if (prev) c.pts -= prev.gain;
@@ -4133,6 +4213,7 @@ function answer(i, val) {
   if (!prev && first) { const r0 = S.rat[q.cat]; if (!rushed) rateQ(q, ok, secs, c); r.praise = praiseFor(q, ok, secs, c, r0); }
   if (!prev) r.love = loveOnStreak(c, ok, first);
   noteMist(q, ok, c, first, noRetry);
+  if (!deferred(c.kind)) { const lq = noteStruggle(q, r, secs, rushed, c); if (lq) r.learnQ = lq; }
   logOnce();
   if (!deferred(c.kind)) {
     if (r.ok && !r.praise && c.nudged === c.i && !rushed) r.praise = 'עצרת, קראת, וזה עבד. ככה פותרים.';
@@ -4172,7 +4253,7 @@ function nextQ() {
     if (c.kind === 'daily' && !c.champOffered) { c.champOffered = true; c.champ = 'offer'; save(); renderQuiz(); window.scrollTo(0, 0); return; }
     return finish();
   }
-  c.i++; c.hint = false; c.freeHint = false; c.ord = []; c.tried = null; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
+  c.i++; c.hint = !!c.qs[c.i].scaffold; c.freeHint = !!(c.qs[c.i].scaffold || c.qs[c.i].freehint); c.ord = []; c.tried = null; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
 }
 /* End of a mission: record it, give points, diamonds and unlocks, then show the result screen once. */
 function finish() {
@@ -4185,6 +4266,7 @@ function finish() {
   const extraDay = ['sim', 'practice', 'review'].includes(c.kind) && !c.path && c.res.filter(Boolean).length >= 6;
   let n = 0, correct = 0, champOk = null;
   c.qs.forEach((q, i) => {
+    if (q.demo) return;
     const r = c.res[i], good = !!(r && r.ok && !r.second);
     if (!(r && r.rush)) { const s = S.stats[q.cat] || (S.stats[q.cat] = { c: 0, t: 0 }); s.t++; if (good) s.c++; }
     if (q.champ) { champOk = good; return; }
@@ -4193,6 +4275,7 @@ function finish() {
   const chapters = c.chapters ? c.chapters.map(ch => { let k = 0; for (let j = ch.s; j <= ch.e; j++) if (c.res[j] && c.res[j].ok) k++; return { n: ch.n, c: k, t: ch.e - ch.s + 1 }; }) : null;
   const before = S.badges.slice(), rankBefore = rankOf(S.xp).r[1], gearBefore = Object.keys(gearOn()), worldBefore = curWorld().k;
   if (c.kind === 'review') S.reviewDay = t;
+  const lesson = c.kind === 'lesson' ? lessonDone(c) : null;
   if (counts) { S.missions[c.day] = { c: correct, n, pts: c.pts, date: t }; if (newDay) S.missions[c.day].h = new Date().getHours(); }
   if (counts || extraDay) bumpStreak(t);
   const coins = Math.round(c.pts / 4);
@@ -4204,6 +4287,7 @@ function finish() {
   const newGear = GEAR.filter(g => gearOn()[g.id] && !gearBefore.includes(g.id)).map(g => g.n);
   const L0 = S.last = { dia, joke, champOk, chapters, size: c.size, mod: c.mod, kind: c.kind, day: c.day, cat: c.cat, correct, n, pts: c.pts, coins, won, chest: counts || c.kind === 'sim' ? 0 : -1, newB: S.badges.filter(b => !before.includes(b)), newGear, newWorld: curWorld().k !== worldBefore ? curWorld().n : null, rankUp: rankOf(S.xp).r[1] !== rankBefore ? rankOf(S.xp).r[1] : null,
     review: c.qs.map((q, i) => ({ qid: mistId(q), lk: lessonFor(q), q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.type === 'order' ? q.correct.map(ix => q.items[ix].replace(/<[^>]+>/g, '')).join(' ← ') : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : q.options[q.answer], ex: q.ex })).filter(x => deferred(c.kind) || !x.ok) };
+  if (lesson) L0.lesson = lesson;
   L0.imp = improveNotes(c, correct, n); L0.love = loveLine(c, correct, n); L0.rushN = c.rushN || 0;
   if (explainQ) S.explainQ = explainQ;
   if (c.duo) {
@@ -4793,7 +4877,7 @@ function reportHTML(o, fromCloud) {
   <div class="small">מוכנות (הערכה, לא ציון רשמי): <b>${R == null ? 'עוד אין מספיק שאלות קשות' : R + (R >= 75 ? ' · אזור מחוננים' : R >= 55 ? ' · אזור מצטיינים' : ' · בדרך')}</b></div>
   <div class="small">מחברת טעויות: ${(o.mist || []).length} פתוחות${due ? ` (${due} לחזרה היום)` : ''} · ${o.fixed || 0} תוקנו${toExam != null && toExam >= 0 ? ` · ${toExam} ימים למבחן` : ''}</div>
   ${rec.length ? `<div class="recs"><div class="eyebrow">מה כדאי לעשות</div>${rec.slice(0, 3).map(r => `<p>${r}</p>`).join('')}</div>` : ''}
-  ${more.length ? `<div class="small rmore">${more.map(l => `<div>${l}</div>`).join('')}</div>` : ''}${xn ? `<div class="small">משימות בונוס השבוע: <b>${xn}</b> (מעבר למשימה היומית)</div>` : ''}
+  ${more.length ? `<div class="small rmore">${more.map(l => `<div>${l}</div>`).join('')}</div>` : ''}${masteryLine(o)}${xn ? `<div class="small">משימות בונוס השבוע: <b>${xn}</b> (מעבר למשימה היומית)</div>` : ''}
   </section>`;
 }
 
@@ -5122,7 +5206,7 @@ function chooseCloudRestore(c, data) {
 function normCloud(o) {
   if (!o || typeof o !== 'object') return o;
   if (Array.isArray(o.missions)) { const m = {}; o.missions.forEach((v, i) => { if (v) m[i] = v; }); o.missions = m; }
-  ['mist', 'rh', 'moods', 'diaLog', 'vouchers', 'rewards', 'badges', 'mh', 'explainLog', 'duoLog', 'dadMsgs', 'appliedB', 'bugs'].forEach(k => { if (o[k] && !Array.isArray(o[k])) o[k] = Object.values(o[k]); if (Array.isArray(o[k])) o[k] = o[k].filter(x => x != null); });
+  ['mist', 'rh', 'moods', 'diaLog', 'vouchers', 'rewards', 'badges', 'mh', 'explainLog', 'duoLog', 'dadMsgs', 'appliedB', 'bugs', 'learnQ'].forEach(k => { if (o[k] && !Array.isArray(o[k])) o[k] = Object.values(o[k]); if (Array.isArray(o[k])) o[k] = o[k].filter(x => x != null); });
   ['stats', 'times', 'rat', 'hard', 'aw', 'bdGift', 'seen', 'arcade', 'own', 'lessons', 'pb', 'firstD'].forEach(k => { if (o[k] == null) o[k] = {}; });
   return o;
 }
@@ -5161,7 +5245,7 @@ async function pullParent(force) {
 }
 
 /* ---- 70-ui/shell.js ---- */
-const APP_VER = '26';
+const APP_VER = '27';
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
 async function doUpdate() {
@@ -5398,6 +5482,7 @@ function nextStep() {
   const nd = nextDay();
   if (nd && nd <= unlocked()) return 'mission';
   if (dueMist().length >= 3 && S.reviewDay !== todayStr()) return 'review';
+  if (dueLearn().length && !S.guest) return 'learn';
   let s = S.bonusDay !== todayStr() ? 'bonus' : nd ? 'done' : 'finished';
   if ((s === 'bonus' || s === 'done') && S.duoWeek !== weekKey() && S.duoSkip !== todayStr() && doneCount(S) >= 2 && !S.guest) s = 'duo';
   if ((s === 'bonus' || s === 'done') && canXtra()) s = 'xtra';
@@ -5415,6 +5500,7 @@ function heroFor(step) {
     const w = weakChapter(), n = xtraToday() + 1;
     return `<section class="card hero xhero"><div class="eyebrow">המשימה של היום הושלמה · בונוס ${n} מתוך ${XTRA_MAX}</div><div class="stage"><div class="grow"><div class="bubble">רוצה עוד? משימת בונוס של 10 שאלות, חצי מהן ב${w.n}. נקודות מלאות, ו-9 מתוך 10 שווה יהלום.</div></div><div class="who">${avatarSVG()}</div></div><button class="btn btn-primary btn-wide" data-act="xtra">משימת בונוס</button><button class="btn btn-ghost btn-wide" data-act="xtraskip" style="margin-top:8px">מספיק להיום</button></section>`;
   }
+  if (step === 'learn') return learnCard('home');
   if (step === 'duo') return `<section class="card hero duohero"><div class="eyebrow">פעם בשבוע · יהלום</div><div class="stage"><div class="grow"><div class="bubble">3 שאלות קשות, פותרים יחד עם אבא. כל אחד אומר בקול מה הוא חושב.</div></div><div class="who">${avatarSVG()}</div></div><button class="btn btn-primary btn-wide" data-act="duo">אתגר עם אבא</button><button class="btn btn-ghost btn-wide" data-act="duoskip" style="margin-top:8px">לא היום</button></section>`;
   if (step === 'resume') {
     const lbl = { practice: 'אימון', review: 'חזרה מהמחברת', sim: 'סימולציה', boss: 'קרב בוס', daily: 'משימה' }[cur.kind];
@@ -5502,12 +5588,13 @@ function drawTrails() {
 function renderIntro(c) {
   const W = worldOf(c.day);
   let title, body, extra, icon;
-  if (c.kind === 'daily') { const M = MODS[c.mod] || MODS.classic; title = `משימה ${c.day}: ${M.n}`; body = briefFor(c.day); extra = M.d; icon = elemIcon(W.k); }
+  if (c.kind === 'lesson') { title = `שיעור: ${lkName(c.lkey)}`; body = 'כשעונים מהר מדי בלי לדעת, או נתקעים הרבה זמן, זה סימן שעוד לא לימדנו את הדרך. עכשיו נלמד אותה.'; extra = `<b>הכלל:</b> ${(LESSONS[c.lkey] || LESSONS.logic)[1]}<br>${c.guide ? 'קודם שיעור צעד אחר צעד, ואחר כך 3 שאלות.' : 'קודם דוגמה פתורה, ואחר כך 3 שאלות.'} בראשונה הרמז כבר פתוח.`; icon = IC.book; }
+  else if (c.kind === 'daily') { const M = MODS[c.mod] || MODS.classic; title = `משימה ${c.day}: ${M.n}`; body = briefFor(c.day); extra = M.d; icon = elemIcon(W.k); }
   else if (c.kind === 'boss') { const B = BOSSES[c.day]; title = B.n; body = `"${B.line}"`; extra = '15 שאלות, 20 דקות. ניצחון = 70%. אין רמזים, אבל אפשר לדלג ולחזור.'; icon = bossSVG(B); }
   else { const per = c.chapters[0].mins; title = (c.path ? `משימה ${c.day}: ` : '') + (c.size === 'full' ? 'סימולציה מלאה' : 'חצי סימולציה'); body = `6 פרקים, בדיוק כמו במבחן האמיתי. בכל פרק ${per} שאלות ו-${per} דקות, כלומר דקה לשאלה. כשהזמן של פרק נגמר עוברים לפרק הבא, ואי אפשר לחזור אחורה.`; extra = c.chapters.map((ch, i) => `${i + 1}. ${ch.n}`).join('<br>'); icon = IC.clock; }
   const goal = diaGoalLine(c);
   app.innerHTML = `<div class="stack"><div class="card intro-card ${c.kind === 'boss' ? 'boss' : ''}" style="--wc:${EC[W.k]}"><span class="ii">${icon}</span><div class="eyebrow">${c.kind === 'sim' ? 'כמו ביום המבחן' : W.n}</div><h2>${title}</h2><p class="brief">${body}</p><div class="mod">${extra}</div>
-  ${goal ? `<button class="diagoal" data-act="diasheet">${DIA}<span>${goal}</span></button>` : ''}<button class="btn ${c.kind === 'boss' ? 'btn-boss' : 'btn-primary'} btn-wide" data-act="go">${c.kind === 'boss' ? 'לקרב!' : 'יאללה!'}</button><button class="btn btn-ghost btn-wide" data-act="quitintro">לא עכשיו</button></div></div>`;
+  ${goal ? `<button class="diagoal" data-act="diasheet">${DIA}<span>${goal}</span></button>` : ''}<button class="btn ${c.kind === 'boss' ? 'btn-boss' : 'btn-primary'} btn-wide" data-act="go">${c.kind === 'boss' ? 'לקרב!' : c.kind === 'lesson' ? (c.guide ? 'לשיעור' : 'לדוגמה') : 'יאללה!'}</button><button class="btn btn-ghost btn-wide" data-act="quitintro">לא עכשיו</button></div></div>`;
   bind();
 }
 function renderQuiz() {
@@ -5553,7 +5640,7 @@ function renderQuiz() {
     const tchip = `<span class="tchip ${r.secs <= 60 ? 'ok' : ''}">${Math.round(r.secs)} שנ׳</span>`;
     const ansTxt = q.type === 'order' ? 'הסדר הנכון למעלה' : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
     const LS = LESSONS[lessonFor(q)] || LESSONS.logic;
-    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4><span class="fbi">${r.ok ? '✓' : IC.book}</span>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4>${r.praise ? `<div class="praise">${IC.bolt}<span>${r.praise}</span></div>` : ''}${r.newRule || strip(q.ex).length < 160 ? `<div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span><span>${LS[1]}</span></div>` : ''}${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}${dadHTML(r.love)}${bugBtn('data-qbug="cur"', mistId(q))}</div>`;
+    fb = r.demo ? `<div class="fb demo"><h4><span class="fbi">${IC.book}</span>דוגמה פתורה</h4><p class="small muted" style="margin:0 0 6px">קרא לאט ונסה להבין כל צעד. אחר כך תורך.</p><p class="solx">${q.ex}</p></div>` : `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4><span class="fbi">${r.ok ? '✓' : IC.book}</span>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4>${r.praise ? `<div class="praise">${IC.bolt}<span>${r.praise}</span></div>` : ''}${r.newRule || strip(q.ex).length < 160 ? `<div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span><span>${LS[1]}</span></div>` : ''}${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}${r.learnQ ? learnNote(r.learnQ) : ''}${dadHTML(r.love)}${bugBtn('data-qbug="cur"', mistId(q))}</div>`;
   }
   const tried = !answered && c.tried && c.tried.i === c.i;
   const hint = tried ? retryBox(q, c.tried) : q.twin && !answered ? `<div class="hintbox"><b>הכלל:</b> ${(LESSONS[lessonFor(q)] || LESSONS.logic)[1]}</div>` : c.hint && !answered ? `<div class="hintbox"><span class="hi">${IC.bulb}</span><div><b>רמז</b><p>${hintText(q, 1)}</p></div></div>` : '';
@@ -5564,8 +5651,8 @@ function renderQuiz() {
     battle = `<div class="battle" style="--bc:${EC[B.el] || '#7B5CFF'}"><div class="fighter"><span class="pic" id="meF">${avatarSVG()}</span><b>${nm()}</b><div class="hp"><i style="width:${c.hp * 20}%"></i></div></div><div class="vs">VS</div><div class="fighter"><span class="pic" id="bossF">${bossSVG(B)}</span><b>${B.n}</b><div class="hp bhp"><i style="width:${bhp}%"></i></div></div></div>`;
   }
   const chTag = c.chapters ? `<div class="chbar"><b>פרק ${c.ch + 1}/${c.chapters.length}</b> · ${c.chapters[c.ch].n}</div>` : '';
-  const hintLbl = c.hint ? 'רמז נפתח' : S.hints > 0 ? `רמז (${S.hints} חינם)` : 'רמז (−3 נק׳)';
-  const foot = answered ? `<button class="btn btn-primary" data-act="next">${c.i === c.qs.length - 1 ? 'לסיכום' : 'לשאלה הבאה'}</button>`
+  const hintLbl = c.hint ? 'רמז נפתח' : c.freeHint ? 'רמז (חינם)' : S.hints > 0 ? `רמז (${S.hints} חינם)` : 'רמז (−3 נק׳)';
+  const foot = answered ? `<button class="btn btn-primary" data-act="next">${r.demo ? 'הבנתי, עכשיו תורי' : c.i === c.qs.length - 1 ? 'לסיכום' : 'לשאלה הבאה'}</button>`
     : deferred(c.kind) ? `<button class="btn btn-ghost" data-act="skip">דלג וחזור אחר כך</button>`
       : (c.mod === 'nohint' || q.champ) ? `<button class="btn btn-ghost" disabled>${q.champ ? 'שאלת האלוף: בלי רמזים' : 'היום בלי רמזים'}</button>` : `<button class="btn btn-ghost btn-hint" data-act="hint" ${c.hint || tried ? 'disabled' : ''}>${IC.bulb}${hintLbl}</button>`;
   const el = Math.floor((Date.now() - c.qStart) / 1000);
@@ -5604,7 +5691,7 @@ function viewResult() {
   const L0 = S.last; if (!L0) return viewHome();
   const st = starsOf(L0.correct, L0.n);
   const B = L0.kind === 'boss' ? BOSSES[L0.day] : null;
-  const title = L0.duo ? 'אתגר עם אבא' : L0.xtra ? 'משימת בונוס' : { practice: 'אימון ' + (CATS[L0.cat] ? CATS[L0.cat].n : ''), review: 'מחברת הטעויות', sim: L0.size === 'full' ? 'סימולציה מלאה' : 'חצי סימולציה', boss: 'קרב מול ' + (B ? B.n : ''), daily: 'משימה ' + L0.day }[L0.kind];
+  const title = L0.duo ? 'אתגר עם אבא' : L0.xtra ? 'משימת בונוס' : { lesson: 'שיעור: ' + (L0.lesson ? lkName(L0.lesson.key) : ''), practice: 'אימון ' + (CATS[L0.cat] ? CATS[L0.cat].n : ''), review: 'מחברת הטעויות', sim: L0.size === 'full' ? 'סימולציה מלאה' : 'חצי סימולציה', boss: 'קרב מול ' + (B ? B.n : ''), daily: 'משימה ' + L0.day }[L0.kind];
   const msg = L0.kind === 'boss' ? (L0.won ? `ניצחת את ${B.n}!` : `${B.n} ניצח הפעם. ההסברים למטה הם הנשק לסיבוב הבא.`) : st === 3 ? 'ביצוע של אלוף.' : st === 2 ? 'עבודה טובה מאוד.' : st === 1 ? 'התחלה טובה. ההסברים למטה הם המקום שבו לומדים הכי הרבה.' : 'יום קשה קורה לכולם. כל טעות נשמרה במחברת ותחזור אליך.';
   const stars = [0, 1, 2].map(i => `<span class="${i < st ? 'on' : 'offs'} ${i === 1 ? 'mid' : ''}">${IC.star.replace('<svg', `<svg class="pop" style="animation-delay:${i * .15}s"`)}</span>`).join('');
   const who = B && !L0.won ? bossSVG(B) : avatarSVG();
@@ -5619,10 +5706,11 @@ function viewResult() {
   const song = L0.newSong && SONGS.find(x => x.id === L0.newSong);
   let top = song ? `<button class="banner songban" data-opensong="${song.id}">${IC.keys}<div class="grow">נפתח שיר חדש בפינת הפסנתר: <b data-nog>${song.n}</b></div></button>` : '';
   if (L0.kind === 'daily' && L0.n && L0.correct === diaNeed(L0.n) - 1) top += `<button class="diagoal near" data-act="diasheet">${DIA}<span>עוד תשובה נכונה אחת והיה כאן יהלום. מחר זה שלך.</span></button>`;
+  if (L0.lesson) top += L0.lesson.pass ? `<div class="banner learnok">${IC.star.replace('<svg', '<svg style="width:40px;height:40px;flex:none;color:var(--gold)"')}<div class="grow"><b>למדת: ${lkName(L0.lesson.key)}</b><div class="small">${L0.lesson.ok} מתוך ${L0.lesson.n} נכון. +20 מטבעות. השאלות האלה ימשיכו להופיע במשימות, כדי שזה יישאר.</div></div></div>` : `<div class="banner calm"><div class="grow"><b>עוד לא, וזה בסדר.</b> ${L0.lesson.ok} מתוך ${L0.lesson.n}. מחר נחזור על השיעור עם שאלות חדשות.</div></div>`;
   if (L0.road) top += `<button class="banner roadban" data-road>${IC.star.replace('<svg', '<svg style="width:40px;height:40px;flex:none;color:var(--gold)"')}<div class="grow">התקדמת בדרך למחוננים: <b>${L0.road}</b>! קיבלת יהלום.</div></button>`;
   if (L0.xtra && xtraToday() >= XTRA_MAX) top += '<div class="banner calm"><div class="grow">עשית היום את כל משימות הבונוס. עבודה רצינית! עכשיו הפסקה: המוח מסדר את מה שלמד גם כשנחים.</div></div>';
   /* cards right below the score: explain-to-dad and how did it feel */
-  const after = (L0.kind === 'daily' ? explainCard() : '') + (wantCheckin(L0) || L0.moodDone ? checkinCard(L0) : '');
+  const after = (L0.kind !== 'lesson' ? learnCard('result') : '') + (L0.kind === 'daily' ? explainCard() : '') + (wantCheckin(L0) || L0.moodDone ? checkinCard(L0) : '');
   return `<div class="stack">${hud()}${top}<section class="card res-hero"><div class="eyebrow">${title}</div><div class="who">${who}</div><div class="stars">${stars}</div><div class="score">${L0.correct}/${L0.n}</div><p class="muted" style="margin:4px 0 0">${msg}</p><div class="gains"><span class="gain">+${L0.pts} נק׳</span><span class="gain c">+${L0.coins} מטבעות</span></div></section>${after}${impHTML(L0)}${L0.chapters ? `<section class="card"><div class="eyebrow" style="margin-bottom:8px">לפי פרקים</div><div class="bars">${L0.chapters.map(ch => `<div class="bar ${ch.c / ch.t < .6 ? 'weak' : ''}"><div class="rw"><span>${ch.n}</span><span>${ch.c}/${ch.t}</span></div><div class="track"><i style="width:${Math.round(ch.c / ch.t * 100)}%"></i></div></div>`).join('')}</div></section>` : ''}${L0.champOk != null ? `<div class="card row small" style="border-color:rgba(255,200,69,.5)">${IC.star.replace('<svg', '<svg style="width:26px;height:26px;color:var(--gold);flex:none"')}<span>שאלת האלוף: ${L0.champOk ? '<b style="color:var(--good)">נכון! הרווחת יהלום.</b>' : 'הפעם לא. ההסבר נמצא למטה.'}</span></div>` : ''}${dv}${chest}${jokeCard(L0.joke)}${nw}${ng}${ru}${nb}${['daily', 'boss', 'sim'].includes(L0.kind) ? `<button class="btn btn-gold btn-wide" data-share="result">${IC.share} שתף בקבוצה של המשפחה</button>` : ''}<button class="btn btn-primary btn-wide" data-go="home">חזרה למסע</button>${rev}</div>`;
 }
 
@@ -5831,7 +5919,7 @@ function bind() {
   on('ocheck', () => { const c = S.cur; if ((c.ord || []).length === c.qs[c.i].items.length) answer(-1, c.ord.slice()); });
   on('resume', () => { if (S.cur && !S.cur.deadline) S.cur.qStart = Date.now(); go('quiz'); });
   on('next', nextQ);
-  on('hint', () => { if (S.hints > 0) { S.hints--; S.cur.freeHint = true; } S.cur.hint = true; save(); renderQuiz(); });
+  on('hint', () => { if (!S.cur.freeHint && S.hints > 0) { S.hints--; S.cur.freeHint = true; } S.cur.hint = true; save(); renderQuiz(); });
   on('skip', () => { const c = S.cur; const to = nextOpen(c); if (to >= 0) { c.i = to; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0); } });
   on('quit', () => modal('לצאת?', deferred(S.cur.kind) ? 'ההתקדמות נשמרת, אבל השעון ממשיך לרוץ.' : 'ההתקדמות נשמרת ואפשר להמשיך מאותה שאלה.', 'יציאה', () => { S.view = 'home'; save(); render(); }));
   on('reset', () => modal('לאפס הכל?', 'כל הנקודות, המטבעות, המשימות והתגים יימחקו. אי אפשר לבטל.', 'כן, לאפס', () => { const keep = { pin: S.pin, appliedB: S.appliedB, prv: S.prv, pmv: S.pmv, pexv: S.pexv, noEx: S.noEx, dadMsgs: S.dadMsgs, rewards: S.rewards }; S = defState(); Object.assign(S, keep); S.cloudForce = 1; SEEN = S.seen; save(); render(); }, 'btn-boss'));
@@ -5839,7 +5927,7 @@ function bind() {
   on('bdgift', () => { S.bdGift[todayStr().slice(0, 4)] = 1; S.coins += 250; S.hints += 3; checkBadges(); SFX.win(); burst(220); save(); render(); modal(`מזל טוב, ${nm()}!`, 'קיבלת 250 מטבעות, 3 רמזים חינם ותג יום הולדת. שתהיה שנה של שיאים!', 'תודה!', () => { }, 'btn-primary', true); });
   on('review', () => { if (!S.mist.length) return; startMission('review', nextDay() || TOTAL); });
   app.querySelectorAll('[data-sim]').forEach(b => b.onclick = () => { if (S.cur) return modal('יש משימה פתוחה', 'קודם סיים את המשימה שהתחלת.', 'להמשיך', () => go('quiz')); startMission('sim', nextDay() || TOTAL, null, b.dataset.sim); });
-  on('go', () => { const c = S.cur; c.intro = false; c.qStart = Date.now(); if (c.kind === 'boss') c.deadline = Date.now() + 20 * 60000; if (c.chapters) c.chDeadline = Date.now() + c.chapters[0].mins * 60000; SFX.tap(); save(); renderQuiz(); });
+  on('go', () => { const c = S.cur; c.intro = false; c.qStart = Date.now(); if (c.kind === 'lesson') { const q0 = c.qs[0]; c.hint = !!q0.scaffold; c.freeHint = !!(q0.scaffold || q0.freehint); if (c.guide) { save(); return startGuide(c.lkey, 'quiz'); } } if (c.kind === 'boss') c.deadline = Date.now() + 20 * 60000; if (c.chapters) c.chDeadline = Date.now() + c.chapters[0].mins * 60000; SFX.tap(); save(); renderQuiz(); });
   on('quitintro', () => { S.cur = null; go('home'); });
   on('nextch', () => { const c = S.cur; c.ch++; c.chBreak = false; c.i = c.chapters[c.ch].s; c.qStart = Date.now(); c.chDeadline = Date.now() + c.chapters[c.ch].mins * 60000; save(); renderQuiz(); });
   on('champyes', () => { const c = S.cur; const q = mkQ(pick(['logic', 'series', 'verbal', 'analog', 'matrix']), 4, .5); q.champ = true; c.qs.push(q); c.i = c.qs.length - 1; c.champ = 'on'; c.hint = false; c.qStart = Date.now(); save(); renderQuiz(); });
@@ -5880,6 +5968,8 @@ function bindV11() {
   on('extoggle', () => { S.noEx = !S.noEx; save(); render(); });
   app.querySelectorAll('[data-road]').forEach(b => b.onclick = () => { S.ptab = 'me'; go('stats'); });
   bindBugs();
+  app.querySelectorAll('[data-learn]').forEach(b => b.onclick = () => startLesson(b.dataset.learn));
+  on('learnlater', () => { (S.learnQ || []).forEach(x => { if (x.at <= todayStr()) x.at = addDays(todayStr(), 1); }); save(); render(); });
   on('xtra', startXtra);
   on('xtraskip', () => { S.xtraSkip = todayStr(); save(); render(); });
 }

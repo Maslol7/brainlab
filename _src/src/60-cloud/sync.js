@@ -102,7 +102,7 @@ function chooseCloudRestore(c, data) {
 function normCloud(o) {
   if (!o || typeof o !== 'object') return o;
   if (Array.isArray(o.missions)) { const m = {}; o.missions.forEach((v, i) => { if (v) m[i] = v; }); o.missions = m; }
-  ['mist', 'rh', 'moods', 'diaLog', 'vouchers', 'rewards', 'badges', 'mh', 'explainLog', 'duoLog', 'dadMsgs', 'appliedB', 'bugs'].forEach(k => { if (o[k] && !Array.isArray(o[k])) o[k] = Object.values(o[k]); if (Array.isArray(o[k])) o[k] = o[k].filter(x => x != null); });
+  ['mist', 'rh', 'moods', 'diaLog', 'vouchers', 'rewards', 'badges', 'mh', 'explainLog', 'duoLog', 'dadMsgs', 'appliedB', 'bugs', 'learnQ'].forEach(k => { if (o[k] && !Array.isArray(o[k])) o[k] = Object.values(o[k]); if (Array.isArray(o[k])) o[k] = o[k].filter(x => x != null); });
   ['stats', 'times', 'rat', 'hard', 'aw', 'bdGift', 'seen', 'arcade', 'own', 'lessons', 'pb', 'firstD'].forEach(k => { if (o[k] == null) o[k] = {}; });
   return o;
 }

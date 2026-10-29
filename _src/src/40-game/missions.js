@@ -110,7 +110,7 @@ function answer(i, val) {
     if (!deferred(c.kind) && c.combo && c.combo % 3 === 0) gain += 10;
     if (c.hint && !c.freeHint) gain = Math.max(0, gain - 3);
     if (deferred(c.kind)) gain = Math.round(gain * 1.5);
-    if (c.kind === 'practice' || c.kind === 'review') gain = Math.round(gain / 2);
+    if (c.kind === 'practice' || c.kind === 'review' || c.kind === 'lesson') gain = Math.round(gain / 2);
     if (!first) gain = Math.round(gain / 2);
   }
   const prev = c.res[c.i]; if (prev) c.pts -= prev.gain;
@@ -119,6 +119,7 @@ function answer(i, val) {
   if (!prev && first) { const r0 = S.rat[q.cat]; if (!rushed) rateQ(q, ok, secs, c); r.praise = praiseFor(q, ok, secs, c, r0); }
   if (!prev) r.love = loveOnStreak(c, ok, first);
   noteMist(q, ok, c, first, noRetry);
+  if (!deferred(c.kind)) { const lq = noteStruggle(q, r, secs, rushed, c); if (lq) r.learnQ = lq; }
   logOnce();
   if (!deferred(c.kind)) {
     if (r.ok && !r.praise && c.nudged === c.i && !rushed) r.praise = 'עצרת, קראת, וזה עבד. ככה פותרים.';
@@ -158,7 +159,7 @@ function nextQ() {
     if (c.kind === 'daily' && !c.champOffered) { c.champOffered = true; c.champ = 'offer'; save(); renderQuiz(); window.scrollTo(0, 0); return; }
     return finish();
   }
-  c.i++; c.hint = false; c.freeHint = false; c.ord = []; c.tried = null; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
+  c.i++; c.hint = !!c.qs[c.i].scaffold; c.freeHint = !!(c.qs[c.i].scaffold || c.qs[c.i].freehint); c.ord = []; c.tried = null; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0);
 }
 /* End of a mission: record it, give points, diamonds and unlocks, then show the result screen once. */
 function finish() {
@@ -171,6 +172,7 @@ function finish() {
   const extraDay = ['sim', 'practice', 'review'].includes(c.kind) && !c.path && c.res.filter(Boolean).length >= 6;
   let n = 0, correct = 0, champOk = null;
   c.qs.forEach((q, i) => {
+    if (q.demo) return;
     const r = c.res[i], good = !!(r && r.ok && !r.second);
     if (!(r && r.rush)) { const s = S.stats[q.cat] || (S.stats[q.cat] = { c: 0, t: 0 }); s.t++; if (good) s.c++; }
     if (q.champ) { champOk = good; return; }
@@ -179,6 +181,7 @@ function finish() {
   const chapters = c.chapters ? c.chapters.map(ch => { let k = 0; for (let j = ch.s; j <= ch.e; j++) if (c.res[j] && c.res[j].ok) k++; return { n: ch.n, c: k, t: ch.e - ch.s + 1 }; }) : null;
   const before = S.badges.slice(), rankBefore = rankOf(S.xp).r[1], gearBefore = Object.keys(gearOn()), worldBefore = curWorld().k;
   if (c.kind === 'review') S.reviewDay = t;
+  const lesson = c.kind === 'lesson' ? lessonDone(c) : null;
   if (counts) { S.missions[c.day] = { c: correct, n, pts: c.pts, date: t }; if (newDay) S.missions[c.day].h = new Date().getHours(); }
   if (counts || extraDay) bumpStreak(t);
   const coins = Math.round(c.pts / 4);
@@ -190,6 +193,7 @@ function finish() {
   const newGear = GEAR.filter(g => gearOn()[g.id] && !gearBefore.includes(g.id)).map(g => g.n);
   const L0 = S.last = { dia, joke, champOk, chapters, size: c.size, mod: c.mod, kind: c.kind, day: c.day, cat: c.cat, correct, n, pts: c.pts, coins, won, chest: counts || c.kind === 'sim' ? 0 : -1, newB: S.badges.filter(b => !before.includes(b)), newGear, newWorld: curWorld().k !== worldBefore ? curWorld().n : null, rankUp: rankOf(S.xp).r[1] !== rankBefore ? rankOf(S.xp).r[1] : null,
     review: c.qs.map((q, i) => ({ qid: mistId(q), lk: lessonFor(q), q: q.prompt, cat: q.cat, ok: !!(c.res[i] && c.res[i].ok), a: q.type === 'order' ? q.correct.map(ix => q.items[ix].replace(/<[^>]+>/g, '')).join(' ← ') : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : q.options[q.answer], ex: q.ex })).filter(x => deferred(c.kind) || !x.ok) };
+  if (lesson) L0.lesson = lesson;
   L0.imp = improveNotes(c, correct, n); L0.love = loveLine(c, correct, n); L0.rushN = c.rushN || 0;
   if (explainQ) S.explainQ = explainQ;
   if (c.duo) {

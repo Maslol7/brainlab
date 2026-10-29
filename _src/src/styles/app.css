@@ -731,3 +731,12 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .bugitem summary{cursor:pointer;line-height:1.5}
 /* reading: the sentence that proves the answer, marked after answering */
 mark.ev{background:rgba(255,200,69,.45);color:inherit;border-radius:4px;padding:0 2px;box-shadow:0 0 0 2px rgba(255,200,69,.45)}
+/* teaching what was not taught well enough */
+.learnnote{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;padding:10px 12px;border-radius:12px;background:rgba(169,139,255,.14);border:1px solid rgba(169,139,255,.45);font-size:.9rem;line-height:1.5}
+.learnnote svg{width:20px;height:20px;flex:none;color:var(--violet);margin-top:2px}
+.learncard{border-color:rgba(169,139,255,.55);background:linear-gradient(155deg,rgba(169,139,255,.24),var(--panel) 65%)}
+.learncard h3{font-size:1.5rem;margin:4px 0 6px}
+.learncard p{margin:0 0 12px;color:var(--ink)}
+.fb.demo{background:rgba(83,168,255,.1);border-color:rgba(83,168,255,.45)}
+.fb.demo .fbi{background:var(--water);color:var(--bg0)}
+.banner.learnok{background:linear-gradient(120deg,rgba(70,224,160,.2),rgba(255,200,69,.14));border-color:rgba(70,224,160,.5)}

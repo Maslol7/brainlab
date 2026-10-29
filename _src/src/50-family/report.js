@@ -62,6 +62,6 @@ function reportHTML(o, fromCloud) {
   <div class="small">מוכנות (הערכה, לא ציון רשמי): <b>${R == null ? 'עוד אין מספיק שאלות קשות' : R + (R >= 75 ? ' · אזור מחוננים' : R >= 55 ? ' · אזור מצטיינים' : ' · בדרך')}</b></div>
   <div class="small">מחברת טעויות: ${(o.mist || []).length} פתוחות${due ? ` (${due} לחזרה היום)` : ''} · ${o.fixed || 0} תוקנו${toExam != null && toExam >= 0 ? ` · ${toExam} ימים למבחן` : ''}</div>
   ${rec.length ? `<div class="recs"><div class="eyebrow">מה כדאי לעשות</div>${rec.slice(0, 3).map(r => `<p>${r}</p>`).join('')}</div>` : ''}
-  ${more.length ? `<div class="small rmore">${more.map(l => `<div>${l}</div>`).join('')}</div>` : ''}${xn ? `<div class="small">משימות בונוס השבוע: <b>${xn}</b> (מעבר למשימה היומית)</div>` : ''}
+  ${more.length ? `<div class="small rmore">${more.map(l => `<div>${l}</div>`).join('')}</div>` : ''}${masteryLine(o)}${xn ? `<div class="small">משימות בונוס השבוע: <b>${xn}</b> (מעבר למשימה היומית)</div>` : ''}
   </section>`;
 }

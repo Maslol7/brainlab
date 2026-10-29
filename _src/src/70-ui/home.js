@@ -4,6 +4,7 @@ function nextStep() {
   const nd = nextDay();
   if (nd && nd <= unlocked()) return 'mission';
   if (dueMist().length >= 3 && S.reviewDay !== todayStr()) return 'review';
+  if (dueLearn().length && !S.guest) return 'learn';
   let s = S.bonusDay !== todayStr() ? 'bonus' : nd ? 'done' : 'finished';
   if ((s === 'bonus' || s === 'done') && S.duoWeek !== weekKey() && S.duoSkip !== todayStr() && doneCount(S) >= 2 && !S.guest) s = 'duo';
   if ((s === 'bonus' || s === 'done') && canXtra()) s = 'xtra';
@@ -21,6 +22,7 @@ function heroFor(step) {
     const w = weakChapter(), n = xtraToday() + 1;
     return `<section class="card hero xhero"><div class="eyebrow">המשימה של היום הושלמה · בונוס ${n} מתוך ${XTRA_MAX}</div><div class="stage"><div class="grow"><div class="bubble">רוצה עוד? משימת בונוס של 10 שאלות, חצי מהן ב${w.n}. נקודות מלאות, ו-9 מתוך 10 שווה יהלום.</div></div><div class="who">${avatarSVG()}</div></div><button class="btn btn-primary btn-wide" data-act="xtra">משימת בונוס</button><button class="btn btn-ghost btn-wide" data-act="xtraskip" style="margin-top:8px">מספיק להיום</button></section>`;
   }
+  if (step === 'learn') return learnCard('home');
   if (step === 'duo') return `<section class="card hero duohero"><div class="eyebrow">פעם בשבוע · יהלום</div><div class="stage"><div class="grow"><div class="bubble">3 שאלות קשות, פותרים יחד עם אבא. כל אחד אומר בקול מה הוא חושב.</div></div><div class="who">${avatarSVG()}</div></div><button class="btn btn-primary btn-wide" data-act="duo">אתגר עם אבא</button><button class="btn btn-ghost btn-wide" data-act="duoskip" style="margin-top:8px">לא היום</button></section>`;
   if (step === 'resume') {
     const lbl = { practice: 'אימון', review: 'חזרה מהמחברת', sim: 'סימולציה', boss: 'קרב בוס', daily: 'משימה' }[cur.kind];

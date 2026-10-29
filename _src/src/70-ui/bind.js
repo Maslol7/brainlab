@@ -17,7 +17,7 @@ function bind() {
   on('ocheck', () => { const c = S.cur; if ((c.ord || []).length === c.qs[c.i].items.length) answer(-1, c.ord.slice()); });
   on('resume', () => { if (S.cur && !S.cur.deadline) S.cur.qStart = Date.now(); go('quiz'); });
   on('next', nextQ);
-  on('hint', () => { if (S.hints > 0) { S.hints--; S.cur.freeHint = true; } S.cur.hint = true; save(); renderQuiz(); });
+  on('hint', () => { if (!S.cur.freeHint && S.hints > 0) { S.hints--; S.cur.freeHint = true; } S.cur.hint = true; save(); renderQuiz(); });
   on('skip', () => { const c = S.cur; const to = nextOpen(c); if (to >= 0) { c.i = to; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0); } });
   on('quit', () => modal('לצאת?', deferred(S.cur.kind) ? 'ההתקדמות נשמרת, אבל השעון ממשיך לרוץ.' : 'ההתקדמות נשמרת ואפשר להמשיך מאותה שאלה.', 'יציאה', () => { S.view = 'home'; save(); render(); }));
   on('reset', () => modal('לאפס הכל?', 'כל הנקודות, המטבעות, המשימות והתגים יימחקו. אי אפשר לבטל.', 'כן, לאפס', () => { const keep = { pin: S.pin, appliedB: S.appliedB, prv: S.prv, pmv: S.pmv, pexv: S.pexv, noEx: S.noEx, dadMsgs: S.dadMsgs, rewards: S.rewards }; S = defState(); Object.assign(S, keep); S.cloudForce = 1; SEEN = S.seen; save(); render(); }, 'btn-boss'));
@@ -25,7 +25,7 @@ function bind() {
   on('bdgift', () => { S.bdGift[todayStr().slice(0, 4)] = 1; S.coins += 250; S.hints += 3; checkBadges(); SFX.win(); burst(220); save(); render(); modal(`מזל טוב, ${nm()}!`, 'קיבלת 250 מטבעות, 3 רמזים חינם ותג יום הולדת. שתהיה שנה של שיאים!', 'תודה!', () => { }, 'btn-primary', true); });
   on('review', () => { if (!S.mist.length) return; startMission('review', nextDay() || TOTAL); });
   app.querySelectorAll('[data-sim]').forEach(b => b.onclick = () => { if (S.cur) return modal('יש משימה פתוחה', 'קודם סיים את המשימה שהתחלת.', 'להמשיך', () => go('quiz')); startMission('sim', nextDay() || TOTAL, null, b.dataset.sim); });
-  on('go', () => { const c = S.cur; c.intro = false; c.qStart = Date.now(); if (c.kind === 'boss') c.deadline = Date.now() + 20 * 60000; if (c.chapters) c.chDeadline = Date.now() + c.chapters[0].mins * 60000; SFX.tap(); save(); renderQuiz(); });
+  on('go', () => { const c = S.cur; c.intro = false; c.qStart = Date.now(); if (c.kind === 'lesson') { const q0 = c.qs[0]; c.hint = !!q0.scaffold; c.freeHint = !!(q0.scaffold || q0.freehint); if (c.guide) { save(); return startGuide(c.lkey, 'quiz'); } } if (c.kind === 'boss') c.deadline = Date.now() + 20 * 60000; if (c.chapters) c.chDeadline = Date.now() + c.chapters[0].mins * 60000; SFX.tap(); save(); renderQuiz(); });
   on('quitintro', () => { S.cur = null; go('home'); });
   on('nextch', () => { const c = S.cur; c.ch++; c.chBreak = false; c.i = c.chapters[c.ch].s; c.qStart = Date.now(); c.chDeadline = Date.now() + c.chapters[c.ch].mins * 60000; save(); renderQuiz(); });
   on('champyes', () => { const c = S.cur; const q = mkQ(pick(['logic', 'series', 'verbal', 'analog', 'matrix']), 4, .5); q.champ = true; c.qs.push(q); c.i = c.qs.length - 1; c.champ = 'on'; c.hint = false; c.qStart = Date.now(); save(); renderQuiz(); });
@@ -66,6 +66,8 @@ function bindV11() {
   on('extoggle', () => { S.noEx = !S.noEx; save(); render(); });
   app.querySelectorAll('[data-road]').forEach(b => b.onclick = () => { S.ptab = 'me'; go('stats'); });
   bindBugs();
+  app.querySelectorAll('[data-learn]').forEach(b => b.onclick = () => startLesson(b.dataset.learn));
+  on('learnlater', () => { (S.learnQ || []).forEach(x => { if (x.at <= todayStr()) x.at = addDays(todayStr(), 1); }); save(); render(); });
   on('xtra', startXtra);
   on('xtraskip', () => { S.xtraSkip = todayStr(); save(); render(); });
 }

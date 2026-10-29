@@ -1,12 +1,13 @@
 function renderIntro(c) {
   const W = worldOf(c.day);
   let title, body, extra, icon;
-  if (c.kind === 'daily') { const M = MODS[c.mod] || MODS.classic; title = `משימה ${c.day}: ${M.n}`; body = briefFor(c.day); extra = M.d; icon = elemIcon(W.k); }
+  if (c.kind === 'lesson') { title = `שיעור: ${lkName(c.lkey)}`; body = 'כשעונים מהר מדי בלי לדעת, או נתקעים הרבה זמן, זה סימן שעוד לא לימדנו את הדרך. עכשיו נלמד אותה.'; extra = `<b>הכלל:</b> ${(LESSONS[c.lkey] || LESSONS.logic)[1]}<br>${c.guide ? 'קודם שיעור צעד אחר צעד, ואחר כך 3 שאלות.' : 'קודם דוגמה פתורה, ואחר כך 3 שאלות.'} בראשונה הרמז כבר פתוח.`; icon = IC.book; }
+  else if (c.kind === 'daily') { const M = MODS[c.mod] || MODS.classic; title = `משימה ${c.day}: ${M.n}`; body = briefFor(c.day); extra = M.d; icon = elemIcon(W.k); }
   else if (c.kind === 'boss') { const B = BOSSES[c.day]; title = B.n; body = `"${B.line}"`; extra = '15 שאלות, 20 דקות. ניצחון = 70%. אין רמזים, אבל אפשר לדלג ולחזור.'; icon = bossSVG(B); }
   else { const per = c.chapters[0].mins; title = (c.path ? `משימה ${c.day}: ` : '') + (c.size === 'full' ? 'סימולציה מלאה' : 'חצי סימולציה'); body = `6 פרקים, בדיוק כמו במבחן האמיתי. בכל פרק ${per} שאלות ו-${per} דקות, כלומר דקה לשאלה. כשהזמן של פרק נגמר עוברים לפרק הבא, ואי אפשר לחזור אחורה.`; extra = c.chapters.map((ch, i) => `${i + 1}. ${ch.n}`).join('<br>'); icon = IC.clock; }
   const goal = diaGoalLine(c);
   app.innerHTML = `<div class="stack"><div class="card intro-card ${c.kind === 'boss' ? 'boss' : ''}" style="--wc:${EC[W.k]}"><span class="ii">${icon}</span><div class="eyebrow">${c.kind === 'sim' ? 'כמו ביום המבחן' : W.n}</div><h2>${title}</h2><p class="brief">${body}</p><div class="mod">${extra}</div>
-  ${goal ? `<button class="diagoal" data-act="diasheet">${DIA}<span>${goal}</span></button>` : ''}<button class="btn ${c.kind === 'boss' ? 'btn-boss' : 'btn-primary'} btn-wide" data-act="go">${c.kind === 'boss' ? 'לקרב!' : 'יאללה!'}</button><button class="btn btn-ghost btn-wide" data-act="quitintro">לא עכשיו</button></div></div>`;
+  ${goal ? `<button class="diagoal" data-act="diasheet">${DIA}<span>${goal}</span></button>` : ''}<button class="btn ${c.kind === 'boss' ? 'btn-boss' : 'btn-primary'} btn-wide" data-act="go">${c.kind === 'boss' ? 'לקרב!' : c.kind === 'lesson' ? (c.guide ? 'לשיעור' : 'לדוגמה') : 'יאללה!'}</button><button class="btn btn-ghost btn-wide" data-act="quitintro">לא עכשיו</button></div></div>`;
   bind();
 }
 function renderQuiz() {
@@ -52,7 +53,7 @@ function renderQuiz() {
     const tchip = `<span class="tchip ${r.secs <= 60 ? 'ok' : ''}">${Math.round(r.secs)} שנ׳</span>`;
     const ansTxt = q.type === 'order' ? 'הסדר הנכון למעלה' : q.type === 'num' ? L(fmt(q.ansv)) + (q.unit || '') : L8[q.answer];
     const LS = LESSONS[lessonFor(q)] || LESSONS.logic;
-    fb = `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4><span class="fbi">${r.ok ? '✓' : IC.book}</span>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4>${r.praise ? `<div class="praise">${IC.bolt}<span>${r.praise}</span></div>` : ''}${r.newRule || strip(q.ex).length < 160 ? `<div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span><span>${LS[1]}</span></div>` : ''}${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}${dadHTML(r.love)}${bugBtn('data-qbug="cur"', mistId(q))}</div>`;
+    fb = r.demo ? `<div class="fb demo"><h4><span class="fbi">${IC.book}</span>דוגמה פתורה</h4><p class="small muted" style="margin:0 0 6px">קרא לאט ונסה להבין כל צעד. אחר כך תורך.</p><p class="solx">${q.ex}</p></div>` : `<div class="fb ${r.ok ? 'ok' : 'no'}"><h4><span class="fbi">${r.ok ? '✓' : IC.book}</span>${r.ok ? (r.second ? pick(['תיקנת!', 'יפה, בניסיון השני!', 'זה הרעיון!']) : pick(['נכון!', 'מעולה!', 'בול!', 'גאוני!', 'סל!', 'גול!', 'פגיעה ישירה!'])) + (r.gain ? ` +${r.gain}` : '') : 'התשובה: ' + ansTxt} ${tchip}</h4>${r.praise ? `<div class="praise">${IC.bolt}<span>${r.praise}</span></div>` : ''}${r.newRule || strip(q.ex).length < 160 ? `<div class="rule"><span class="rt">${r.newRule ? 'כלל חדש' : 'הכלל'}</span><span>${LS[1]}</span></div>` : ''}${r.ok ? `<details class="sol"><summary>איך פותרים</summary><p>${q.ex}</p></details>` : `<p class="solx">${q.ex}</p>`}${mnote(q, r, c)}${r.learnQ ? learnNote(r.learnQ) : ''}${dadHTML(r.love)}${bugBtn('data-qbug="cur"', mistId(q))}</div>`;
   }
   const tried = !answered && c.tried && c.tried.i === c.i;
   const hint = tried ? retryBox(q, c.tried) : q.twin && !answered ? `<div class="hintbox"><b>הכלל:</b> ${(LESSONS[lessonFor(q)] || LESSONS.logic)[1]}</div>` : c.hint && !answered ? `<div class="hintbox"><span class="hi">${IC.bulb}</span><div><b>רמז</b><p>${hintText(q, 1)}</p></div></div>` : '';
@@ -63,8 +64,8 @@ function renderQuiz() {
     battle = `<div class="battle" style="--bc:${EC[B.el] || '#7B5CFF'}"><div class="fighter"><span class="pic" id="meF">${avatarSVG()}</span><b>${nm()}</b><div class="hp"><i style="width:${c.hp * 20}%"></i></div></div><div class="vs">VS</div><div class="fighter"><span class="pic" id="bossF">${bossSVG(B)}</span><b>${B.n}</b><div class="hp bhp"><i style="width:${bhp}%"></i></div></div></div>`;
   }
   const chTag = c.chapters ? `<div class="chbar"><b>פרק ${c.ch + 1}/${c.chapters.length}</b> · ${c.chapters[c.ch].n}</div>` : '';
-  const hintLbl = c.hint ? 'רמז נפתח' : S.hints > 0 ? `רמז (${S.hints} חינם)` : 'רמז (−3 נק׳)';
-  const foot = answered ? `<button class="btn btn-primary" data-act="next">${c.i === c.qs.length - 1 ? 'לסיכום' : 'לשאלה הבאה'}</button>`
+  const hintLbl = c.hint ? 'רמז נפתח' : c.freeHint ? 'רמז (חינם)' : S.hints > 0 ? `רמז (${S.hints} חינם)` : 'רמז (−3 נק׳)';
+  const foot = answered ? `<button class="btn btn-primary" data-act="next">${r.demo ? 'הבנתי, עכשיו תורי' : c.i === c.qs.length - 1 ? 'לסיכום' : 'לשאלה הבאה'}</button>`
     : deferred(c.kind) ? `<button class="btn btn-ghost" data-act="skip">דלג וחזור אחר כך</button>`
       : (c.mod === 'nohint' || q.champ) ? `<button class="btn btn-ghost" disabled>${q.champ ? 'שאלת האלוף: בלי רמזים' : 'היום בלי רמזים'}</button>` : `<button class="btn btn-ghost btn-hint" data-act="hint" ${c.hint || tried ? 'disabled' : ''}>${IC.bulb}${hintLbl}</button>`;
   const el = Math.floor((Date.now() - c.qStart) / 1000);
