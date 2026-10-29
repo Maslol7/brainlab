@@ -1,0 +1,4 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+ const html=require('fs').readFileSync('index.html','utf8'); await p.setContent(`<!doctype html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`); await p.waitForTimeout(200);
+ console.log(JSON.stringify(await p.evaluate(()=>{ minSecs=()=>0; S.lastDone=addDays(todayStr(),-1); S.streak=4; startMission('practice',1,'series'); const c=S.cur; c.intro=false; c.qs.forEach((q,i)=>{ c.i=i; c.qStart=Date.now()-20000; if(q.type==='order') answer(-1,q.correct); else if(q.type==='num') answer(-1,String(q.ansv)); else answer(q.answer); }); finish(); return [S.streak, S.lastDone===todayStr(), curStreak()]; })), errs); await b.close(); })();

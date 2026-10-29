@@ -1,0 +1,20 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch(); const p = await b.newPage({ viewport:{width:390,height:844}, deviceScaleFactor:2 });
+  const errs=[]; p.on('pageerror',e=>errs.push('PE '+e.message+' '+(e.stack||'').split('\n')[1]));
+  const html=require('fs').readFileSync('index.html','utf8');
+  await p.setContent(`<!doctype html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`);
+  await p.waitForTimeout(200); const out={};
+  out.r = await p.evaluate(async ()=>{ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    startMission('sim', 1, null, 'half', false); const c=S.cur; c.intro=false; c.qStart=Date.now(); renderQuiz();
+    const rat0 = JSON.stringify(S.rat), rh0 = (S.rh||[]).length;
+    const q=c.qs[0]; const val = q.type==='num'? null : 0;
+    if (q.type==='num') answer(-1,'1'); else if (q.type==='order') answer(-1,q.correct); else answer(0);
+    const nudged = !!document.querySelector('.nudge'), res0 = !!c.res[0];
+    if (q.type==='num') answer(-1,'1'); else if (q.type==='order') answer(-1,q.correct); else answer(0);
+    await sleep(300);
+    return { nudged, res0, res1: !!c.res[0], rush: c.res[0] && c.res[0].rush, ratSame: JSON.stringify(S.rat)===rat0, rhSame: (S.rh||[]).length===rh0 };
+  });
+  await p.screenshot({path:'/tmp/claude-0/img/v17_simnudge.png'});
+  console.log(JSON.stringify(out,null,1)); console.log('ERRS',errs); await b.close();
+})();

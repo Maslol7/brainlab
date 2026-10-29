@@ -1,0 +1,7 @@
+{
+  "name": "brainlab",
+  "private": true,
+  "description": "מעבדת המוח: build with node tools/build.mjs, test with tests/run-all.sh",
+  "scripts": { "build": "node tools/build.mjs", "release": "node tools/build.mjs --release", "test": "tests/run-all.sh" },
+  "devDependencies": { "acorn": "^8.12.1" }
+}

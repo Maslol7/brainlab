@@ -1,0 +1,4 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+ const html=require('fs').readFileSync('index.html','utf8'); await p.setContent(`<!doctype html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`); await p.waitForTimeout(200);
+ console.log(await p.evaluate(()=>{ S.rh=Array(10).fill(0); startMission('daily',1); const c=S.cur; c.intro=false; const log=[]; for(let k=0;k<5;k++){ c.i=k; c.qs[k]=genFamily(1); c.qs[k].d=1; c.qStart=Date.now()-8000; const q=c.qs[k]; answer(q.answer); const r=c.res[k]; log.push([!!r, r&&r.ok, r&&r.second, r&&r.rush, minSecs(q).toFixed(1), Math.round(S.rat[q.cat]), c.easyRun]); } return log; }), errs); await b.close(); })();

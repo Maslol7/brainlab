@@ -1,0 +1,23 @@
+// Bug report: from the quiz and from the result screen; listed in the parent area.
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 390, height: 844 } }); await ctx.grantPermissions(['clipboard-read', 'clipboard-write']); const p = await ctx.newPage();
+  const errs = []; p.on('pageerror', e => errs.push(e.message));
+  const html = require('fs').readFileSync(process.argv[2] || 'dist/index.html', 'utf8');
+  await p.setContent(`<!doctype html><html><head><meta charset="utf-8"></head><body>${html}</body></html>`); await p.waitForTimeout(200);
+  const out = {};
+  await p.evaluate(() => { startMission('practice', 1, 'matrix'); const c = S.cur; c.qStart = Date.now() - 60000; renderQuiz(); answer((c.qs[0].answer + 1) % c.qs[0].options.length); answer((c.qs[0].answer + 2) % c.qs[0].options.length === c.qs[0].answer ? (c.qs[0].answer + 3) % c.qs[0].options.length : (c.qs[0].answer + 2) % c.qs[0].options.length); });
+  out.mistBefore = await p.evaluate(() => S.mist.length);
+  await p.click('[data-qbug="cur"]'); await p.click('[data-why="wrong"]'); await p.fill('#bugnote', 'לדעתי התשובה ב'); await p.click('.bugsheet [data-m="ok"]'); await p.waitForTimeout(100);
+  out.afterQuiz = await p.evaluate(() => [S.bugs.length, S.bugs[0].why, S.bugs[0].note, S.mist.length, !!document.querySelector('.qbug.done'), S.bugs[0].vis.length > 50, S.bugs[0].opts.length]);
+  await p.screenshot({ path: '/tmp/claude-0/img/bug_quiz.png' });
+  await p.evaluate(() => { S.cur = null; startMission('sim', 1, null, 'half'); const c = S.cur; c.intro = false; c.res = c.qs.map((q, i) => i % 2 ? { ok: false, gain: 0, secs: 30, sel: 0 } : { ok: true, gain: 10, secs: 30 }); finish(); });
+  await p.evaluate(() => document.querySelector('.rev details').open = true);
+  await p.click('[data-qbug="rev0"]'); await p.click('[data-why="unclear"]'); await p.click('.bugsheet [data-m="ok"]'); await p.waitForTimeout(100);
+  out.afterResult = await p.evaluate(() => [S.bugs.length, S.bugs[1].why, !!S.bugs[1].prompt, document.querySelectorAll('.qbug.done').length]);
+  await p.evaluate(() => { S.pin = '1234'; PARENT_OK = true; go('parent'); });
+  out.parent = await p.evaluate(() => [document.querySelectorAll('.bugitem').length, !!document.querySelector('[data-bugcopy="local"]')]);
+  await p.evaluate(() => { window.__clip = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.__clip = t; } }, configurable: true }); });
+  await p.click('[data-bugcopy="local"]'); await p.waitForTimeout(100);
+  out.clip = (await p.evaluate(() => window.__clip)).slice(0, 80);
+  await p.evaluate(() => document.querySelector('.bugitem').open = true); await (await p.$('.bugitem')).screenshot({ path: '/tmp/claude-0/img/bug_parent.png' });
+  console.log(JSON.stringify(out)); console.log(errs.length ? 'ERRORS ' + errs.join('\n') : 'no errors'); await b.close(); process.exit(errs.length ? 1 : 0); })();
