@@ -642,6 +642,41 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .acc .accp svg{width:100%;height:100%}
 .exch{border-color:rgba(143,227,255,.45)}
 .exch svg{flex:none}
+/* v20 */
+.gvis.focus .eq:not(.hl),.gvis.focus .clues li:not(.hl),.gvis.focus .mrow:not(.hl),.gvis.focus .prem p:not(.hl){opacity:.35;transition:opacity .3s}
+.gvis .eq.hl,.gvis .clues li.hl,.gvis .mrow.hl,.gvis .prem p.hl,.gvis .seats.hl{background:rgba(255,176,32,.16);box-shadow:0 0 0 2px #FFB020;border-radius:8px}
+.road.mini{display:flex;align-items:center;gap:12px;width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;border-color:rgba(255,200,69,.45)}
+.road.mini .grow{display:flex;flex-direction:column;gap:2px;min-width:0}
+.road .chev{width:18px;height:18px;opacity:.6;transform:scaleX(-1)}
+.rsteps{display:flex;flex-direction:column-reverse;gap:3px}
+.rsteps i{width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,.12)}
+.rsteps i.ok{background:#46E0A0}.rsteps i.cur{background:#FFC845;box-shadow:0 0 8px #FFC845}
+.road.full{border-color:rgba(255,200,69,.45)}
+.rlist{display:flex;flex-direction:column;gap:8px}
+.rs{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:12px;border:1px solid var(--edge)}
+.rs.ok{opacity:.75}.rs.lock{opacity:.5}
+.rs.cur{border-color:#FFC845;background:rgba(255,200,69,.08)}
+.rn{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:800;background:rgba(255,255,255,.08)}
+.rs.ok .rn{background:#46E0A0;color:#0A0F24}.rs.cur .rn{background:#FFC845;color:#0A0F24}
+.rbar{height:8px;border-radius:99px;background:rgba(255,255,255,.1);margin:8px 0 4px;overflow:hidden}
+.rbar i{display:block;height:100%;background:linear-gradient(90deg,#FFC845,#46E0A0);border-radius:99px}
+.rnext{margin-top:6px;font-size:.9rem;padding:8px 10px;border-radius:10px;background:rgba(83,168,255,.12)}
+.roadban{width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer;border-color:rgba(255,200,69,.6)!important}
+.roadline{padding:6px 10px;border-radius:10px;background:rgba(255,200,69,.1)}
+/* v21 */
+.xhero{background:linear-gradient(155deg,rgba(70,224,160,.22),var(--panel) 60%)}
+/* v22 */
+.bossgame{border-color:color-mix(in srgb,var(--bc) 60%,transparent)}
+.bghead{gap:12px;align-items:center}
+.bgface{width:56px;height:56px;flex:none}
+.bgface svg{width:100%;height:100%}
+.bgscore{display:flex;justify-content:space-between;margin:10px 2px 6px;font-size:.95rem}
+.bgscore b{font-size:1.2rem;color:var(--gold)}
+#bgc{display:block;margin:0 auto;border-radius:14px;touch-action:none;border:1px solid var(--edge)}
+#bgend{margin-top:10px}
+.bgres{text-align:center;padding:10px;border-radius:12px;background:var(--panel);margin-bottom:8px;display:flex;flex-direction:column;gap:2px}
+.bgres.win{background:rgba(70,224,160,.15);border:1px solid #46E0A0}
+.bgres span{color:var(--gold);font-weight:700}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -2102,7 +2137,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '19';
+const APP_VER = '22';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -4135,17 +4170,20 @@ function startGuide(key, back) {
 function renderGuide() {
   const { q, steps, i, key } = G, st = steps[i], last = i === steps.length - 1;
   const ask = st.ask ? `<div class="gask">${st.ask.map(([a, truth]) => { const got = G.ans[a]; return `<div class="garow"><b>${HE_ATTR[a]}</b><button class="chip ${got === 'same' ? (truth === 'same' ? 'ok' : 'no') : ''}" data-ga="${a}:same">קבוע</button><button class="chip ${got === 'diff' ? (truth === 'diff' ? 'ok' : 'no') : ''}" data-ga="${a}:diff">משתנה</button>${got ? `<span class="small">${got === truth ? '✓' : 'בדוק שוב'}</span>` : ''}</div>`; }).join('')}</div>` : '';
+  const qa = st.q ? `<div class="gask"><div class="small" style="margin-bottom:4px">${st.q.label}</div><div class="chips">${st.q.options.map((o, k) => `<button class="chip ${G.qa === k ? (k === st.q.correct ? 'ok' : 'no') : ''}" data-gq="${k}">${o}</button>`).join('')}</div>${G.qa != null ? `<div class="small" style="margin-top:6px">${G.qa === st.q.correct ? '✓ ' + (st.q.yes || 'נכון!') : 'לא בדיוק. נסה שוב.'}</div>` : ''}</div>` : '';
   const opts = st.elim ? `<div class="opts grid gopts">${q.options.map((o, k) => { const why = k === q.answer ? '' : st.elim(k); return `<div class="opt ${k === q.answer ? 'ok' : 'gx'}"><span class="lt">${['א', 'ב', 'ג', 'ד', 'ה'][k]}</span><span class="ob">${o}</span>${k !== q.answer ? `<span class="gwhy">${why || 'נפסלת'}</span>` : ''}</div>`; }).join('')}</div>` : '';
   app.innerHTML = `<div class="stack"><div class="card guide"><div class="row" style="justify-content:space-between"><div class="eyebrow">שיעור קצר · ${SHAPE_KEYS[key]}</div><span class="small muted">${i + 1}/${steps.length}</span></div>
-  <p class="qprompt" style="margin:6px 0">${q.prompt}</p><div class="qvis gvis">${q.vis}</div>${opts}<div class="gstep">${st.t}</div>${ask}
+  <p class="qprompt" style="margin:6px 0">${q.prompt}</p><div class="qvis gvis">${q.vis}</div>${opts}<div class="gstep">${st.t}</div>${ask}${qa}
   <div class="row" style="gap:8px;margin-top:12px">${i ? '<button class="btn btn-ghost" data-g="prev" style="flex:1">חזרה</button>' : ''}<button class="btn btn-primary" data-g="${last ? 'done' : 'next'}" style="flex:2">${last ? (G.back === 'quiz' ? 'עכשיו תורי' : 'סיימתי') : 'הבא'}</button></div></div></div>`;
   const vis = app.querySelector('.gvis'), cells = vis.querySelectorAll('.matrix .mbox, .sseries .fbox, .fan .fbox');
+  if (st.sel) { vis.classList.add('focus'); vis.querySelectorAll(st.sel).forEach(e => e.classList.add('hl')); }
+  app.querySelectorAll('[data-gq]').forEach(b => b.onclick = () => { G.qa = +b.dataset.gq; SFX.tap(); renderGuide(); });
   if (st.hl) { vis.classList.add('focus'); const idx = st.hl === 'last' ? [cells.length - 2, cells.length - 1] : st.hl; idx.forEach(k => cells[k] && cells[k].classList.add('hl')); }
   app.querySelectorAll('[data-ga]').forEach(b => b.onclick = () => { const [a, v] = b.dataset.ga.split(':'); G.ans[a] = v; SFX.tap(); renderGuide(); });
   app.querySelectorAll('[data-g]').forEach(b => b.onclick = () => {
     const a = b.dataset.g; SFX.tap();
-    if (a === 'prev') { G.i--; return renderGuide(); }
-    if (a === 'next') { G.i++; return renderGuide(); }
+    if (a === 'prev') { G.i--; G.qa = null; return renderGuide(); }
+    if (a === 'next') { G.i++; G.qa = null; return renderGuide(); }
     const back = G.back; G = null;
     if (back === 'quiz' && S.cur) { S.cur.qStart = Date.now(); S.view = 'quiz'; save(); renderQuiz(); } else { S.view = 'stats'; S.ptab = 'rules'; save(); render(); }
     window.scrollTo(0, 0);
@@ -4168,7 +4206,7 @@ renderQuiz = function () {
 };
 const _viewRulesTab19 = viewRulesTab;
 viewRulesTab = function () {
-  return `<section><div class="sec-h"><h3>שיעורי צורות</h3><span class="muted small">דוגמה מודרכת, צעד אחרי צעד</span></div><div class="chips">${Object.entries(SHAPE_KEYS).map(([k, n]) => `<button class="chip" data-guidetab="${k}">${n}</button>`).join('')}</div></section>` + _viewRulesTab19.apply(this, arguments);
+  return `<section><div class="sec-h"><h3>שיעורים מודרכים</h3><span class="muted small">דוגמה, צעד אחרי צעד</span></div><div class="chips">${Object.entries(SHAPE_KEYS).map(([k, n]) => `<button class="chip" data-guidetab="${k}">${n}</button>`).join('')}</div></section>` + _viewRulesTab19.apply(this, arguments);
 };
 
 /* ---------- coins: more things worth buying, and a capped weekly exchange ---------- */
@@ -4237,6 +4275,311 @@ bindV11 = function () {
   const ex = app.querySelector('[data-act="exch"]'); if (ex) ex.onclick = () => { if (S.exWeek === weekKey() || S.coins < EX_PRICE || S.noEx) return; modal('להמיר מטבעות ליהלום?', `${EX_PRICE} מטבעות יהפכו ליהלום אחד. אפשר פעם בשבוע.`, 'להמיר', () => { S.coins -= EX_PRICE; S.exWeek = weekKey(); giveDia(1, 'המרה שבועית', []); SFX.coin(); save(); render(); toast('קיבלת יהלום!'); }, 'btn-gold'); };
   const tg = app.querySelector('[data-act="extoggle"]'); if (tg) tg.onclick = () => { S.noEx = !S.noEx; save(); render(); };
 };
+/* ================= V20: LOGIC & MATH TUTORIALS + "THE ROAD" (where he needs to get) ================= */
+Object.assign(SHAPE_KEYS, { op: 'פעולה מומצאת', symbols: 'משוואות סמלים', calendar: 'ימים בשבוע', seating: 'סידור מקומות', order: 'סידור לפי גודל', ifthen: 'אם... אז', syll: 'מסקנה בטוחה', groups: 'חלוקה לקבוצות', magic: 'תיבת קסם' });
+const _guideExample20 = guideExample;
+guideExample = function (key) {
+  const f = { op: () => genOp(1), symbols: () => genSym(1), calendar: () => genCal(1), seating: () => genSeating(2), order: () => genOrder(1), syll: () => genSyll(1), groups: () => genGroups(1), magic: () => genMagic(1) }[key];
+  if (f) return f();
+  if (key === 'ifthen') { const it = LG.find(x => /^אם יורד/.test(x.q) && /לא לקח/.test(x.q)) || LG[0]; const m = mc(it.o); return { cat: 'logic', d: 1, prompt: it.q, vis: '', options: m.options, answer: m.answer, ex: it.ex }; }
+  return _guideExample20(key);
+};
+const pickWrong = (right, pool) => shuffle(pool.filter(v => v !== right)).slice(0, 2).concat(right).sort(() => R() - .5);
+Object.assign(GSTEPS, {
+  op: q => {
+    const m = /(\d+)\s*◆\s*(\d+)/.exec(strip(q.prompt)); const st = [
+      { t: 'הסימן ◆ הוא <b>פעולה מומצאת</b>. לא צריך לדעת אותה מראש: ההגדרה בתוך השאלה אומרת בדיוק מה לעשות עם a ועם b.', sel: '.eq' },
+    ];
+    if (m) { const opts = [m[1], m[2]]; st.push({ t: `בשאלה: ${L(`${m[1]} ◆ ${m[2]}`)}. מה מציבים במקום <b>a</b>?`, q: { label: 'a =', options: opts, correct: 0, yes: 'a הוא תמיד המספר הראשון, ו-b השני.' } }); }
+    st.push({ t: 'כותבים את ההגדרה על דף, ומחליפים כל אות במספר שלה. רק אחר כך מחשבים.' });
+    st.push({ t: q.ex + ' <b>המלכודת:</b> להחליף בין a ל-b.', elim: () => '' });
+    return st;
+  },
+  symbols: q => [
+    { t: 'כל סמל מייצג מספר קבוע. המטרה: לגלות סמל אחד בכל פעם.' },
+    { t: 'מתחילים מהשורה שיש בה <b>רק סוג אחד של סמל</b>. ממנה אפשר לחשב אותו מיד.', sel: '.eq:first-child' },
+    { t: 'מציבים את מה שגילינו בשורה הבאה, ומגלים את הסמל הבא.', sel: '.eq:nth-child(2)' },
+    { t: q.ex, elim: () => '' },
+  ],
+  calendar: q => {
+    const m = /בעוד (\d+) ימים/.exec(strip(q.prompt)); const st = [{ t: 'כל 7 ימים חוזרים <b>לאותו יום בשבוע</b>. שבועות שלמים לא משנים כלום.' }];
+    if (m) { const N = +m[1], r = N % 7; st.push({ t: `צריך רק את <b>השארית</b>: כמה נשאר מ-${N} אחרי שמורידים שבועות שלמים?`, q: { label: `${N} ÷ 7, השארית היא:`, options: pickWrong(r, [0, 1, 2, 3, 4, 5, 6]).map(String), correct: -1, yes: `${N} = 7×${Math.floor(N / 7)} + ${r}.` } }); const s = st[1]; s.q.correct = s.q.options.indexOf(String(r)); }
+    st.push({ t: 'מתקדמים מהיום הנתון רק את מספר הימים של השארית.' });
+    st.push({ t: q.ex, elim: () => '' });
+    return st;
+  },
+  seating: q => [
+    { t: 'מציירים כיסאות ממוספרים, וממלאים בעיפרון. אף פעם לא פותרים רק בראש.', sel: '.seats' },
+    { t: 'מתחילים מ<b>הרמז הכי חזק</b>: מקום קבוע ("במקום 1"), אחר כך קצוות, ואז "יושבים זה ליד זה".', sel: '.clues li' },
+    { t: 'רמזים של "לא" ("לא בקצה", "לא ליד") שומרים לסוף, כדי לפסול אפשרויות.' },
+    { t: q.ex, elim: () => '' },
+  ],
+  order: q => [
+    { t: 'מציירים קו: <b>הכי גדול למעלה, הכי קטן למטה</b>.' },
+    { t: 'מניחים שם אחרי שם, רמז אחרי רמז. "X גבוה מ-Y" אומר: X מעל Y. לא משנה איך המשפט מנוסח.', sel: '.clues li' },
+    { t: q.ex, elim: () => '' },
+  ],
+  ifthen: q => [
+    { t: 'משפט "<b>אם</b> A <b>אז</b> B" אומר רק דבר אחד: כש-A קורה, גם B קורה.' },
+    { t: 'הוא <b>לא</b> אומר מה קורה כש-A לא קורה. וגם אם B קרה, לא בטוח ש-A קרה.' },
+    { t: 'הדבר היחיד שבטוח: אם <b>B לא קרה</b>, גם A לא קרה. (אם לא לקח מטרייה, לא ירד גשם.)' },
+    { t: q.ex, elim: () => '' },
+  ],
+  syll: q => [
+    { t: 'כל קבוצה היא <b>עיגול</b>. "כל X הם Y" אומר: העיגול של X נמצא בתוך העיגול של Y.', sel: '.prem p:first-child' },
+    { t: 'מוסיפים את המשפט השני לאותו ציור.', sel: '.prem p:nth-child(2)' },
+    { t: 'מסקנה <b>בטוחה</b> רק אם היא נכונה בכל ציור אפשרי. מנסים לצייר ציור שבו היא לא נכונה. אם הצלחת, היא לא בטוחה.' },
+    { t: q.ex, elim: () => '' },
+  ],
+  groups: q => [
+    { t: 'מציירים את הקבוצות כעמודות ריקות.' },
+    { t: 'מתחילים ממי <b>שהמקום שלו ידוע</b>, ואז מצמידים את מי שחייב להיות יחד.', sel: '.clues li' },
+    { t: 'רמזי "לא באותה קבוצה" שולחים לצד השני.' },
+    { t: q.ex, elim: () => '' },
+  ],
+  magic: q => [
+    { t: 'מסתכלים על <b>הזוג הראשון</b> ומנחשים חוק: ועוד? כפול? כפול ועוד?', sel: '.mrow:first-child' },
+    { t: 'בודקים את החוק <b>על כל הזוגות</b>. חוק שמתאים רק לזוג אחד הוא מלכודת.', sel: '.mrow:not(:last-child)' },
+    { t: q.ex, elim: () => '' },
+  ],
+});
+
+/* ---------- the road: 5 clear stages, each with a concrete next step ---------- */
+function chapRat(o, k) { const cats = Object.keys(CHAPKEY).filter(c => CHAPKEY[c] === k); const v = cats.map(c => (o.rat || {})[c] ?? 1); return v.reduce((a, b) => a + b, 0) / v.length; }
+function readinessOf(o) {
+  const per = Object.keys(CHAPNAME).map(k => { const h = (o.hard || {})[k]; if (!h || h.t < 5) return null; const cats = Object.keys(CHAPKEY).filter(c => CHAPKEY[c] === k); let ts = 0, tn = 0; cats.forEach(c => { const t = (o.times || {})[c]; if (t) { ts += t.s; tn += t.n; } }); return Math.round(h.c / h.t * Math.min(1, 60 / (tn ? ts / tn : 60)) * 100); }).filter(v => v != null);
+  return per.length >= 3 ? Math.round(per.reduce((a, b) => a + b, 0) / per.length) : null;
+}
+function journey(o = S) {
+  const rh = o.rh || [], calm = rh.slice(-20).filter(v => !v).length;
+  const ms = Object.values(o.missions || {}).filter(Boolean).sort((a, b) => a.date < b.date ? -1 : 1).slice(-4);
+  const good = ms.filter(m => m.c / m.n >= .7).length;
+  const chs = Object.keys(CHAPNAME).map(k => ({ k, n: CHAPNAME[k], r: chapRat(o, k) }));
+  const lv2 = chs.filter(c => c.r >= 2).length, weakest = chs.slice().sort((a, b) => a.r - b.r)[0];
+  const hd = Object.values(o.hard || {}).reduce((a, h) => ({ c: a.c + h.c, t: a.t + h.t }), { c: 0, t: 0 });
+  const R0 = readinessOf(o);
+  const st = [
+    { n: 'עוצר וחושב', d: 'עונה רק אחרי שקרא והבין.', ok: rh.length >= 12 && calm >= 16, p: Math.min(1, calm / 16), now: `${calm} מתוך 16 תשובות רגועות`, next: 'לקרוא כל שאלה עד הסוף, ולפתור בראש לפני שמסתכלים על התשובות.' },
+    { n: 'דיוק יציב', d: '70% ומעלה בשתי משימות מתוך 4 האחרונות.', ok: good >= 2, p: Math.min(1, good / 2), now: `${good} מתוך 2 משימות`, next: 'במשימה הבאה: לבדוק כל תשובה פעם נוספת לפני שלוחצים.' },
+    { n: 'רמה 2 בכל הפרקים', d: 'כל 6 הפרקים עולים לרמה 2. הרמה עולה לבד כשהדיוק עולה.', ok: lv2 >= 6, p: lv2 / 6, now: `${lv2} מתוך 6 פרקים`, next: `הפרק שהכי צריך חיזוק: ${weakest.n}. שיעור מודרך ושני אימונים בו יקדמו אותך הכי מהר.` },
+    { n: 'שאלות קשות', d: '60% הצלחה ב-10 שאלות ברמה 3 ומעלה.', ok: hd.t >= 10 && hd.c / hd.t >= .6, p: Math.min(1, hd.t / 10) * (hd.t ? Math.min(1, hd.c / hd.t / .6) : 0), now: `${hd.t} שאלות קשות, ${hd.t ? Math.round(hd.c / hd.t * 100) : 0}% הצלחה`, next: 'לקחת את שאלת האלוף בסוף כל משימה, ולנסות קרב בוס.' },
+    { n: 'אזור מחוננים', d: 'מוכנות 75 ומעלה: דיוק בשאלות הקשות, בקצב של מבחן.', ok: R0 != null && R0 >= 75, p: R0 == null ? 0 : Math.min(1, R0 / 75), now: R0 == null ? 'עוד אין מספיק נתונים' : `מוכנות ${R0} מתוך 75`, next: 'סימולציה פעם בשבוע, ושאלות קשות בכל משימה.' },
+  ];
+  const latched = o.ms || {};
+  st.forEach((s, i) => { if (latched[i]) s.ok = true; });
+  const cur = st.findIndex(s => !s.ok);
+  return { st, cur: cur < 0 ? st.length : cur, toExam: o.exam ? dayDiff(todayStr(), o.exam) : null };
+}
+function roadMini() {
+  const J = journey(); if (J.cur >= J.st.length) return `<button class="card road mini" data-road><b>הגעת לאזור המחוננים!</b><span class="small muted">עכשיו שומרים על הכושר עד המבחן.</span></button>`;
+  const s = J.st[J.cur];
+  return `<button class="card road mini" data-road><div class="rsteps">${J.st.map((x, i) => `<i class="${x.ok ? 'ok' : i === J.cur ? 'cur' : ''}"></i>`).join('')}</div><div class="grow"><div class="eyebrow">הדרך למחוננים · שלב ${J.cur + 1} מתוך 5</div><b>${s.n}</b><span class="small muted"> · ${s.now}</span></div><span class="chev">${IC.chev}</span></button>`;
+}
+function roadFull() {
+  const J = journey(), left = J.st.length - J.cur, days = J.toExam;
+  const pace = days == null || left === 0 ? '' : days >= left * 12 ? `נשארו ${days} ימים למבחן. כל שלב לוקח בערך שבוע או שבועיים, כלומר <b>יש מספיק זמן לכל השלבים</b>, אם ממשיכים כמעט כל יום.` : `נשארו ${days} ימים למבחן. כדי להגיע לכל השלבים בזמן, כדאי <b>משימה כל יום</b>, ועוד אימון קצר בפרק החלש.`;
+  return `<section class="card road full" data-nog-road><div class="eyebrow">הדרך למחוננים</div><h3 style="margin:2px 0 4px">${J.cur >= 5 ? 'הגעת!' : `שלב ${J.cur + 1}: ${J.st[J.cur].n}`}</h3><p class="small muted" style="margin:0 0 10px">לא מתחרים באף אחד. כל שלב הוא דבר שאתה כבר יודע לעשות, רק יותר טוב.</p>
+  <div class="rlist">${J.st.map((s, i) => `<div class="rs ${s.ok ? 'ok' : i === J.cur ? 'cur' : 'lock'}"><span class="rn">${s.ok ? '✓' : i + 1}</span><div class="grow"><b>${s.n}</b><div class="small muted">${s.d}</div>${i === J.cur ? `<div class="rbar"><i style="width:${Math.round(s.p * 100)}%"></i></div><div class="small">${s.now}</div><div class="rnext"><b>הצעד הבא:</b> ${s.next}</div>` : ''}</div></div>`).join('')}</div>
+  ${pace ? `<p class="small" style="margin:10px 0 0">${pace}</p>` : ''}<p class="small muted" style="margin:6px 0 0">כל שלב חדש שווה יהלום.</p></section>`;
+}
+/* latch stages and reward them once */
+function checkRoad() {
+  const J = journey(); S.ms = S.ms || {}; let got = null;
+  J.st.forEach((s, i) => { if (s.ok && !S.ms[i]) { S.ms[i] = todayStr(); got = s; giveDia(1, `שלב בדרך: ${s.n}`, (S.last && S.last.dia) || []); } });
+  return got;
+}
+const _finish20 = finish;
+finish = function () {
+  const c0 = S.cur, extra = c0 && ['sim', 'practice', 'review'].includes(c0.kind) && !c0.path && c0.res.filter(Boolean).length >= 6;
+  const r = _finish20.apply(this, arguments);
+  if (extra) { const t = todayStr(); if (S.lastDone !== t) { const g = S.lastDone ? dayDiff(S.lastDone, t) : 99; if (g === 1) S.streak++; else if (g > 1 && g < 99 && S.freezes >= g - 1) { S.freezes -= g - 1; S.streak++; } else S.streak = 1; S.lastDone = t; S.best = Math.max(S.best, S.streak); save(); } }
+  if (S.guest) return r;
+  const got = checkRoad(); if (got && S.last) { S.last.road = got.n; save(); render(); }
+  return r;
+};
+const _viewResult20 = viewResult;
+viewResult = function () {
+  let h = _viewResult20.apply(this, arguments); const L0 = S.last;
+  if (L0 && L0.road) h = h.replace('<section class="card res-hero"', `<button class="banner roadban" data-road>${IC.star.replace('<svg', '<svg style="width:40px;height:40px;flex:none;color:var(--gold)"')}<div class="grow">התקדמת בדרך למחוננים: <b>${L0.road}</b>! קיבלת יהלום.</div></button><section class="card res-hero"`);
+  return h;
+};
+const _viewHome20 = viewHome;
+viewHome = function () { const h = _viewHome20.apply(this, arguments); if (S.guest || isDadPhone()) return h; return h.replace(/(<div class="mini">)/, roadMini() + '$1'); };
+const _viewMeTab20 = viewMeTab;
+viewMeTab = function () { return (S.guest ? '' : roadFull()) + _viewMeTab20.apply(this, arguments); };
+const _reportHTML20 = reportHTML;
+reportHTML = function (o, fromCloud) {
+  const h = _reportHTML20.apply(this, arguments);
+  try { const J = journey(normCloud ? normCloud(o) : o); const s = J.st[J.cur]; return h.replace('<div class="verdict', `<div class="small roadline">הדרך למחוננים: <b>שלב ${Math.min(J.cur + 1, 5)} מתוך 5${s ? ` (${s.n}: ${s.now})` : ' (הושלם)'}</b></div><div class="verdict`); } catch (e) { return h; }
+};
+const _bindV11_20 = bindV11;
+bindV11 = function () { _bindV11_20.apply(this, arguments); app.querySelectorAll('[data-road]').forEach(b => b.onclick = () => { S.ptab = 'me'; go('stats'); }); };
+/* latch what was already reached before this version, quietly (no diamonds for the past) */
+if (!S.msInit && !S.guest) { const J = journey(); S.ms = S.ms || {}; J.st.forEach((s, i) => { if (s.ok) S.ms[i] = todayStr(); }); S.msInit = 1; save(); }
+
+/* one-time: a full simulation on a day without a mission used to break the streak; give one shield back */
+if (!S.streakFix20 && S.lastDone && dayDiff(S.lastDone, todayStr()) === 2 && S.last && ['sim', 'practice', 'review'].includes(S.last.kind)) { S.freezes = Math.max(1, S.freezes || 0); }
+S.streakFix20 = 1;
+/* ================= V21: BONUS MISSIONS (up to 2 a day, focused on the weakest chapter) ================= */
+const XTRA_MAX = 2;
+const xtraToday = () => S.xtraDay === todayStr() ? (S.xtraN || 0) : 0;
+const canXtra = () => !S.guest && !isSbx() && missionToday() && xtraToday() < XTRA_MAX && S.xtraSkip !== todayStr();
+function weakChapter() {
+  const chs = Object.keys(CHAPNAME).map(k => ({ k, n: CHAPNAME[k], r: chapRat(S, k) }));
+  return chs.sort((a, b) => a.r - b.r)[0];
+}
+const _nextStep21 = nextStep;
+nextStep = function () {
+  const s = _nextStep21.apply(this, arguments);
+  return (s === 'bonus' || s === 'done') && canXtra() ? 'xtra' : s;
+};
+const _heroFor21 = heroFor;
+heroFor = function (step) {
+  if (step === 'xtra') {
+    const w = weakChapter(), n = xtraToday() + 1;
+    return `<section class="card hero xhero"><div class="eyebrow">המשימה של היום הושלמה · בונוס ${n} מתוך ${XTRA_MAX}</div><div class="stage"><div class="grow"><div class="bubble">רוצה עוד? משימת בונוס של 10 שאלות, חצי מהן ב${w.n}. נקודות מלאות, ו-9 מתוך 10 שווה יהלום.</div></div><div class="who">${avatarSVG()}</div></div><button class="btn btn-primary btn-wide" data-act="xtra">משימת בונוס</button><button class="btn btn-ghost btn-wide" data-act="xtraskip" style="margin-top:8px">מספיק להיום</button></section>`;
+  }
+  let h = _heroFor21.apply(this, arguments);
+  if (step === 'done' && xtraToday() >= XTRA_MAX) h = h.replace(/<\/section>\s*$/, '<p class="small" style="margin-top:6px">יום מצוין. עשית הכל, והמוח ממשיך ללמוד גם בהפסקה. נתראה מחר!</p></section>');
+  return h;
+};
+function startXtra() {
+  const w = weakChapter(), cats = Object.keys(CHAPKEY).filter(c => CHAPKEY[c] === w.k && c !== 'reading');
+  const base = baseDiff(nextDay() || TOTAL);
+  const mix = MIX.daily.filter(c => c !== 'reading');
+  const slots = shuffle(Array.from({ length: 5 }, (_, i) => cats[i % cats.length]).concat(shuffle(mix).slice(0, 5)));
+  startMission('practice', nextDay() || TOTAL, cats[0]);
+  const c = S.cur; c.xtra = 1; c.intro = false;
+  c.qs = slots.map(k => mkQ(k, qDiffFor(k, base), .2));
+  dueMist().slice(0, 1).forEach(m => { c.qs[c.qs.length - 1] = mistQ(m); });
+  c.qStart = Date.now(); save(); renderQuiz();
+}
+/* full points (practice is normally half) */
+const _answer21 = answer;
+answer = function () {
+  const c = S.cur, before = c && c.res[c.i];
+  _answer21.apply(this, arguments);
+  if (!c || !c.xtra || S.cur !== c) return;
+  const r = c.res[c.i];
+  if (r && r !== before && r.gain > 0) { c.pts += r.gain; r.gain *= 2; save(); }
+};
+const _finish21 = finish;
+finish = function () {
+  const c = S.cur, isX = c && c.xtra;
+  let ok = 0, n = 0; if (isX) c.qs.forEach((q, i) => { n++; if (c.res[i] && c.res[i].ok) ok++; });
+  const r = _finish21.apply(this, arguments);
+  if (isX && S.last) {
+    const t = todayStr(); if (S.xtraDay !== t) { S.xtraDay = t; S.xtraN = 0; } S.xtraN++;
+    S.xtraLog = (S.xtraLog || []).concat(t).slice(-40); S.last.xtra = 1;
+    if (n && ok / n >= .9 && S.xtraDia !== t) { S.xtraDia = t; giveDia(1, 'משימת בונוס', S.last.dia || (S.last.dia = [])); }
+    save(); render();
+  }
+  return r;
+};
+const _viewResult21 = viewResult;
+viewResult = function () {
+  let h = _viewResult21.apply(this, arguments); const L0 = S.last;
+  if (L0 && L0.xtra) { h = h.replace(/<div class="eyebrow">אימון[^<]*<\/div>/, '<div class="eyebrow">משימת בונוס</div>'); if (xtraToday() >= XTRA_MAX) h = h.replace('<section class="card res-hero"', '<div class="banner calm"><div class="grow">עשית היום את כל משימות הבונוס. עבודה רצינית! עכשיו הפסקה: המוח מסדר את מה שלמד גם כשנחים.</div></div><section class="card res-hero"'); }
+  return h;
+};
+const _reportHTML21 = reportHTML;
+reportHTML = function (o) {
+  const h = _reportHTML21.apply(this, arguments), t = todayStr();
+  const n = (o.xtraLog ? (Array.isArray(o.xtraLog) ? o.xtraLog : Object.values(o.xtraLog)) : []).filter(d => d && dayDiff(d, t) < 7).length;
+  return n ? h.replace(/<\/section>\s*$/, `<div class="small">משימות בונוס השבוע: <b>${n}</b> (מעבר למשימה היומית)</div></section>`) : h;
+};
+const _bindV11_21 = bindV11;
+bindV11 = function () {
+  _bindV11_21.apply(this, arguments);
+  const x = app.querySelector('[data-act="xtra"]'); if (x) x.onclick = startXtra;
+  const s = app.querySelector('[data-act="xtraskip"]'); if (s) s.onclick = () => { S.xtraSkip = todayStr(); save(); render(); };
+};
+/* ================= V22: BOSS HALF-TIME MINI-GAMES (just for fun) ================= */
+let MG_RAF = null;
+const stopMG = () => { cancelAnimationFrame(MG_RAF); MG_RAF = null; };
+const _renderQuiz22 = renderQuiz;
+renderQuiz = function () {
+  const c = S.cur;
+  if (c && c.kind === 'boss' && !c.intro && !c.mg && S.view === 'quiz' && c.res.filter(Boolean).length >= Math.ceil(c.qs.length / 2)) { c.mg = 1; save(); return renderBossGame(c); }
+  return _renderQuiz22.apply(this, arguments);
+};
+function renderBossGame(c) {
+  clearTimers(); stopMG(); c.lock = false;
+  const B = BOSSES[c.day] || BOSSES[7], order = Object.keys(BOSSES).map(Number).sort((a, b) => a - b), bi = Math.max(0, order.indexOf(c.day));
+  const kind = bi % 2 === 0 ? 'pong' : 'brick', col = EC[B.el] || '#7B5CFF';
+  c.mgStart = Date.now();
+  app.innerHTML = `<div class="stack"><div class="card bossgame" style="--bc:${col}"><div class="row bghead"><span class="bgface">${bossSVG(B)}</span><div class="grow"><div class="eyebrow">הפסקת קרב · רק בשביל הכיף</div><b>${kind === 'pong' ? `פינג פונג מול ${B.n}` : `לשבור את המגן של ${B.n}`}</b><div class="small muted">${kind === 'pong' ? 'הראשון ל-3 נקודות. גוררים את המחבט עם האצבע.' : '40 שניות לשבור את כל הלבנים. גוררים את המחבט.'}</div></div></div>
+  <div class="bgscore" id="bgs"></div><canvas id="bgc"></canvas><div id="bgend"><button class="btn btn-ghost btn-wide" data-mg="skip" style="min-height:40px">לדלג, חזרה לקרב</button></div></div></div>`;
+  const cv = app.querySelector('#bgc'), ctx = cv.getContext('2d'), dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = Math.max(260, cv.parentElement.clientWidth - 28), H = Math.round(Math.min(460, Math.max(320, window.innerHeight * .52)));
+  cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.scale(dpr, dpr);
+  const k = W / 340, pw = W * .22, ph = 10;
+  let px = W / 2, bx = W / 2, ball = null, over = false, pause = 0;
+  const setX = e => { const r = cv.getBoundingClientRect(); px = Math.max(pw / 2, Math.min(W - pw / 2, (e.clientX - r.left) * (W / r.width))); };
+  cv.addEventListener('pointermove', setX); cv.addEventListener('pointerdown', setX);
+  const scoreEl = app.querySelector('#bgs'), endEl = app.querySelector('#bgend');
+  const back = reward => { stopMG(); if (c.deadline) c.deadline += Date.now() - c.mgStart; c.pts += reward; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0); };
+  endEl.querySelector('[data-mg="skip"]').onclick = () => back(0);
+  const finishGame = (win, reward, msg) => {
+    over = true; stopMG(); if (win) { SFX.win(); burst && burst(70); } else SFX.tap();
+    endEl.innerHTML = `<div class="bgres ${win ? 'win' : ''}"><b>${msg}</b>${reward ? `<span>+${reward} נקודות לקרב</span>` : ''}</div><button class="btn btn-primary btn-wide" data-mg="back">חזרה לקרב!</button>`;
+    endEl.querySelector('[data-mg="back"]').onclick = () => back(reward);
+  };
+  const drawBall = (x, y) => { ctx.save(); ctx.shadowColor = '#fff'; ctx.shadowBlur = 12; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x, y, 7 * k, 0, Math.PI * 2); ctx.fill(); ctx.restore(); };
+  const bg = () => { const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#141A3D'); g.addColorStop(1, '#0B1030'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); };
+  const paddle = (x, y, color) => { ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - pw / 2, y, pw, ph, 5) : ctx.rect(x - pw / 2, y, pw, ph); ctx.fill(); };
+  const speed0 = H / 105;
+  const serve = dir => { const a = (R() - .5) * .9; ball = { x: W / 2, y: H / 2, vx: Math.sin(a) * speed0, vy: dir * Math.cos(a) * speed0, s: speed0 }; pause = 40; };
+  const bounce = (padX, dir) => { const off = Math.max(-1, Math.min(1, (ball.x - padX) / (pw / 2))); ball.s = Math.min(ball.s * 1.06, H / 45); ball.vx = off * ball.s * .85; ball.vy = dir * Math.sqrt(Math.max(.2, ball.s * ball.s - ball.vx * ball.vx)); buzz(15); };
+
+  if (kind === 'pong') {
+    let me = 0, him = 0; const ai = W / Math.max(55, 95 - bi * 4);
+    const upd = () => { scoreEl.innerHTML = `<span>אתה <b>${me}</b></span><span><b>${him}</b> ${B.n}</span>`; };
+    upd(); serve(-1);
+    const loop = () => {
+      if (over) return;
+      bg(); ctx.strokeStyle = 'rgba(255,255,255,.15)'; ctx.setLineDash([6, 8]); ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke(); ctx.setLineDash([]);
+      const target = ball.vy < 0 && ball.y < H * .8 ? ball.x : W / 2;
+      bx += Math.max(-ai, Math.min(ai, target - bx)); bx = Math.max(pw / 2, Math.min(W - pw / 2, bx));
+      if (pause > 0) pause--; else { ball.x += ball.vx; ball.y += ball.vy; }
+      if (ball.x < 7 * k || ball.x > W - 7 * k) { ball.vx *= -1; ball.x = Math.max(7 * k, Math.min(W - 7 * k, ball.x)); }
+      const py = H - 24, by = 14;
+      if (ball.vy > 0 && ball.y + 7 * k >= py && ball.y < py + ph && Math.abs(ball.x - px) <= pw / 2 + 6) { ball.y = py - 7 * k; bounce(px, -1); tone(660, 0, .06, 'square', .04); }
+      if (ball.vy < 0 && ball.y - 7 * k <= by + ph && ball.y > by && Math.abs(ball.x - bx) <= pw / 2 + 6) { ball.y = by + ph + 7 * k; bounce(bx, 1); tone(440, 0, .06, 'square', .04); }
+      if (ball.y < -10) { me++; upd(); SFX.ok(); if (me >= 3) return finishGame(true, 40, `ניצחת את ${B.n} בפינג פונג!`); serve(1); }
+      if (ball.y > H + 10) { him++; upd(); tone(200, 0, .15, 'sine', .05); if (him >= 3) return finishGame(false, me * 5, me ? `${B.n} ניצח ${him}:${me}. היה צמוד!` : `${B.n} ניצח הפעם. בקרב הבא!`); serve(-1); }
+      paddle(bx, by, col); paddle(px, H - 24, '#8FE3FF'); drawBall(ball.x, ball.y);
+      MG_RAF = requestAnimationFrame(loop);
+    };
+    MG_RAF = requestAnimationFrame(loop);
+  } else {
+    const cols = 6, rows = 3, gap = 6 * k, bw = (W - gap * (cols + 1)) / cols, bh = 16 * k, top = 46 * k;
+    const bricks = []; for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) bricks.push({ x: gap + q * (bw + gap), y: top + r * (bh + gap), alive: true, r });
+    const end = Date.now() + 40000; let broken = 0;
+    const upd = () => { scoreEl.innerHTML = `<span>נשברו <b>${broken}</b>/${bricks.length}</span><span><b>${Math.max(0, Math.ceil((end - Date.now()) / 1000))}</b> שנ׳</span>`; };
+    serve(-1); ball.x = px; ball.y = H - 40;
+    const loop = () => {
+      if (over) return;
+      if (Date.now() > end) return finishGame(broken === bricks.length, broken * 3, `שברת ${broken} מתוך ${bricks.length} לבנים!`);
+      bg(); upd();
+      if (pause > 0) pause--; else { ball.x += ball.vx; ball.y += ball.vy; }
+      if (ball.x < 7 * k || ball.x > W - 7 * k) { ball.vx *= -1; ball.x = Math.max(7 * k, Math.min(W - 7 * k, ball.x)); }
+      if (ball.y < 7 * k) { ball.vy = Math.abs(ball.vy); }
+      const py = H - 24;
+      if (ball.vy > 0 && ball.y + 7 * k >= py && ball.y < py + ph && Math.abs(ball.x - px) <= pw / 2 + 6) { ball.y = py - 7 * k; bounce(px, -1); tone(620, 0, .05, 'square', .04); }
+      for (const b of bricks) if (b.alive && ball.x > b.x - 4 && ball.x < b.x + bw + 4 && ball.y > b.y - 4 && ball.y < b.y + bh + 4) { b.alive = false; broken++; ball.vy *= -1; tone(880 + b.r * 120, 0, .05, 'triangle', .05); break; }
+      if (broken === bricks.length) return finishGame(true, broken * 3 + 30, `שברת את כל המגן של ${B.n}!`);
+      if (ball.y > H + 10) { serve(-1); ball.x = px; ball.y = H - 40; }
+      const bc = col;
+      bricks.forEach(b => { if (!b.alive) return; ctx.globalAlpha = 1 - b.r * .22; ctx.fillStyle = bc; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(b.x, b.y, bw, bh, 4) : ctx.rect(b.x, b.y, bw, bh); ctx.fill(); });
+      ctx.globalAlpha = 1; paddle(px, py, '#8FE3FF'); drawBall(ball.x, ball.y);
+      MG_RAF = requestAnimationFrame(loop);
+    };
+    MG_RAF = requestAnimationFrame(loop);
+  }
+}
+const _render22 = render;
+render = function () { if (S.view !== 'quiz') stopMG(); return _render22.apply(this, arguments); };
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
