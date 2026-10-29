@@ -677,6 +677,10 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:30;width:100%;heigh
 .bgres{text-align:center;padding:10px;border-radius:12px;background:var(--panel);margin-bottom:8px;display:flex;flex-direction:column;gap:2px}
 .bgres.win{background:rgba(70,224,160,.15);border:1px solid #46E0A0}
 .bgres span{color:var(--gold);font-weight:700}
+/* v23 */
+.qtop{flex-wrap:wrap;row-gap:6px}
+.qvis,.sseries,.series{max-width:100%}
+.sseries,.series{overflow-x:auto;scrollbar-width:none}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -711,8 +715,10 @@ function numCands(ans, cands, n = 4) {
 }
 const fmt = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
 const L = s => `<span class="ltr" dir="ltr">${s}</span>`;
+const UNIT1 = { ' שעות': ' שעה', ' ימים': ' יום', ' דקות': ' דקה', ' שניות': ' שנייה', ' פעימות': ' פעימה', ' שנ׳': ' שנ׳' };
+const unitFor = (v, unit) => v === 1 && UNIT1[unit] ? UNIT1[unit] : unit;
 const numQ = (cat, d, prompt, vis, ans, cands, ex, unit = '') => {
-  const m = mc(numCands(ans, cands).map(v => L(fmt(v)) + unit));
+  const m = mc(numCands(ans, cands).map(v => L(fmt(v)) + unitFor(v, unit)));
   return { cat, d, prompt, vis, options: m.options, answer: m.answer, ex, ansv: ans, unit };
 };
 function pickBank(bank, key, d) {
@@ -866,7 +872,7 @@ function genSeries(d) {
     case 'primes': { const P = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]; const s = ri(0, 4), add = pick([0, 0, 1]); t = P.slice(s, s + 6).map(p => p + add); rule = add ? 'מספרים ראשוניים ועוד 1. (ראשוני = מתחלק רק ב-1 ובעצמו)' : 'מספרים ראשוניים: מתחלקים רק ב-1 ובעצמם.'; break; }
     case 'alt3': { let x = ri(1, 3), k = 1; for (let i = 0; i < 7; i++) { t.push(x); if (i % 2 === 0) { x += k; k++; } else x *= 2; } rule = 'לסירוגין: מוסיפים (1, אחר כך 2, אחר כך 3...) וכופלים ב-2.'; break; }
   }
-  const hide = (d === 3 && R() < .35 && !T.startsWith('interleave')) ? ri(2, t.length - 2) : t.length - 1;
+  const hide = (d === 3 && R() < .35 && !T.startsWith('interleave') && T !== 'primes') ? ri(2, t.length - 2) : t.length - 1;
   const ans = t[hide], prev = t[hide - 1], prev2 = t[hide - 2];
   const cont = prev + (prev - prev2);
   const vis = '<div class="series">' + t.map((v, i) => `<span class="cell${i === hide ? ' q' : ''}">${i === hide ? '?' : v}</span>`).join('<span class="arr">←</span>') + '</div>';
@@ -891,7 +897,7 @@ function cellSVG(c) {
   const r = c.count === 1 ? 21 : c.count === 2 ? 14 : 13;
   return `<svg viewBox="0 0 80 80" class="mcell" aria-hidden="true">${pos.map(p => shapeEl(c.shape, p[0], p[1], r, c.fill)).join('')}</svg>`;
 }
-const ANAME = { shape: ['הצורה', 'צורה'], count: ['מספר הצורות', 'כמות'], fill: ['המילוי', 'סוג מילוי'] };
+const ANAME = { shape: ['הצורה', 'צורה', 'f', 'f'], count: ['מספר הצורות', 'כמות', 'm', 'f'], fill: ['המילוי', 'סוג מילוי', 'm', 'm'] };
 function genMatrix(d) {
   const attrs = ['shape', 'count', 'fill'];
   const vals = { shape: shuffle(SHAPES).slice(0, 3), count: shuffle([1, 2, 3]), fill: shuffle([0, 1, 2]) };
@@ -913,7 +919,7 @@ function genMatrix(d) {
   let grid = '<div class="matrix">';
   for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) grid += (r === 2 && c === 2) ? '<div class="mbox q">?</div>' : `<div class="mbox">${cellSVG(cell(r, c))}</div>`;
   grid += '</div>';
-  const rt = a => { const [n1, n2] = ANAME[a]; const r = rules[a]; return r === 'const' ? `${n1} זהה בכל המשבצות.` : r === 'bycol' ? `${n1} קבוע בכל עמודה (כל שורה חוזרת על אותו רצף).` : r === 'byrow' ? `${n1} קבוע בכל שורה.` : `בכל שורה ובכל עמודה, כל ${n2} מופיע בדיוק פעם אחת.`; };
+  const rt = a => { const [n1, n2, g1, g2] = ANAME[a]; const r = rules[a]; const kv = g1 === 'f' ? 'קבועה' : 'קבוע', ap = g2 === 'f' ? 'מופיעה' : 'מופיע'; return r === 'const' ? `${n1} ${g1 === 'f' ? 'זהה' : 'זהה'} בכל המשבצות.` : r === 'bycol' ? `${n1} ${kv} בכל עמודה (כל שורה חוזרת על אותו רצף).` : r === 'byrow' ? `${n1} ${kv} בכל שורה.` : `בכל שורה ובכל עמודה, כל ${n2} ${ap} בדיוק פעם אחת.`; };
   const mo = mc(opts);
   return { cat: 'matrix', d, prompt: 'איזו משבצת משלימה את הטבלה?', vis: grid, options: mo.options.map(cellSVG), answer: mo.answer, ex: attrs.map(rt).join(' '), meta: { rules, vals, ans, opts: mo.options } };
 }
@@ -994,17 +1000,17 @@ function genSym(d) {
 }
 function genOp(d) {
   const op = pick(OPS); const def = `<div class="eqs"><div class="eq">${L(`a ◆ b = ${op.t}`)}</div></div>`;
-  if (d === 1) { const x = ri(2, 9), y = ri(2, 6); const ans = op.f(x, y); return numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`${x} ◆ ${y}`)}?`, def, ans, [op.f(y, x), ans + y, x * y], `מציבים a = ${x} ו-b = ${y} בהגדרה: ${L(op.t.replace(/a/g, x).replace(/b/g, y))} = ${ans}.`); }
+  if (d === 1) { let x, y, ans, k = 0; do { x = ri(2, 9); y = ri(2, 6); ans = op.f(x, y); } while (ans < 0 && k++ < 50); return numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`${x} ◆ ${y}`)}?`, def, ans, [op.f(y, x), ans + y, x * y], `מציבים a = ${x} ו-b = ${y} בהגדרה: ${L(op.t.replace(/a/g, x).replace(/b/g, y))} = ${ans}.`); }
   if (d === 2) { for (let k = 0; k < 100; k++) { const x = ri(1, 6), y = ri(1, 5), z = ri(1, 4); const in1 = op.f(x, y); if (in1 < 0) continue; const ans = op.f(in1, z); if (ans < 0 || ans > 300) continue; return numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`(${x} ◆ ${y}) ◆ ${z}`)}?`, def, ans, [op.f(x, op.f(y, z)), in1, op.f(z, in1)], `קודם הסוגריים: ${L(`${x} ◆ ${y}`)} = ${in1}. אחר כך: ${L(`${in1} ◆ ${z}`)} = ${ans}.`); } }
   for (let k = 0; k < 100; k++) { const x = ri(2, 9), y = ri(2, 6); const R0 = op.f(x, y); if (R0 < 0) continue; return numQ('code', 3, `הפעולה ◆ מוגדרת כך. אם ${L(`x ◆ ${y} = ${R0}`)}, מה x?`, def, x, [x + 1, x - 1, R0 - y, y], `מציבים x = ${x}: ${L(op.t.replace(/a/g, x).replace(/b/g, y))} = ${R0} ✓. טיפ: כשיש תשובות לבחירה, לפעמים הכי מהיר להציב אותן ולבדוק.`); }
   return genSym(d);
 }
 function genCal(d) {
   const s = ri(0, 6);
-  if (d === 3 && R() < .5) { const D = ri(15, 31); const ans = (s + D - 1) % 7; const m = mc([ans, (ans + 1) % 7, (ans + 6) % 7, (ans + 2) % 7].map(i => DAYS[i])); return { cat: 'code', d, prompt: `ה-1 בחודש יצא ביום ${DAYS[s]}. באיזה יום בשבוע יצא ה-${D} באותו חודש?`, vis: '', options: m.options, answer: m.answer, ex: `מה-1 עד ה-${D} עוברים ${D - 1} ימים. ${D - 1} = 7×${Math.floor((D - 1) / 7)} + ${(D - 1) % 7}. שבועות שלמים מחזירים לאותו יום, אז מתקדמים רק ${(D - 1) % 7} ימים מיום ${DAYS[s]}: יום ${DAYS[ans]}.` }; }
+  if (d === 3 && R() < .5) { const D = ri(15, 31); const ans = (s + D - 1) % 7; const m = mc([ans, (ans + 1) % 7, (ans + 6) % 7, (ans + 2) % 7].map(i => DAYS[i])); return { cat: 'code', d, prompt: `ה-1 בחודש יצא ביום ${DAYS[s]}. באיזה יום בשבוע יצא ה-${D} באותו חודש?`, vis: '', options: m.options, answer: m.answer, ex: `מה-1 עד ה-${D} עוברים ${D - 1} ימים. ${D - 1} = 7×${Math.floor((D - 1) / 7)} + ${(D - 1) % 7}. שבועות שלמים מחזירים לאותו יום, אז ${(D - 1) % 7 === 0 ? `לא מתקדמים בכלל, נשארים ביום ${DAYS[s]}.` : (D - 1) % 7 === 1 ? `מתקדמים יום אחד מיום ${DAYS[s]}: יום ${DAYS[ans]}.` : `מתקדמים רק ${(D - 1) % 7} ימים מיום ${DAYS[s]}: יום ${DAYS[ans]}.`}` }; }
   const N = d === 1 ? ri(9, 30) : ri(40, 150); const ans = (s + N) % 7;
   const m = mc([ans, (ans + 1) % 7, (ans + 6) % 7, (ans + 2) % 7].map(i => DAYS[i]));
-  return { cat: 'code', d, prompt: `היום יום ${DAYS[s]}. איזה יום יהיה בעוד ${N} ימים?`, vis: '', options: m.options, answer: m.answer, ex: `${N} = 7×${Math.floor(N / 7)} + ${N % 7}. כל 7 ימים חוזרים לאותו יום, אז רק השארית ${N % 7} חשובה: מיום ${DAYS[s]} מתקדמים ${N % 7} ימים ומגיעים ליום ${DAYS[ans]}.` };
+  return { cat: 'code', d, prompt: `היום יום ${DAYS[s]}. איזה יום יהיה בעוד ${N} ימים?`, vis: '', options: m.options, answer: m.answer, ex: `${N} = 7×${Math.floor(N / 7)} + ${N % 7}. כל 7 ימים חוזרים לאותו יום, אז רק השארית ${N % 7} חשובה: מיום ${DAYS[s]} ${N % 7 === 0 ? `לא מתקדמים בכלל: זה שוב יום ${DAYS[ans]}.` : N % 7 === 1 ? `מתקדמים יום אחד ומגיעים ליום ${DAYS[ans]}.` : `מתקדמים ${N % 7} ימים ומגיעים ליום ${DAYS[ans]}.`}` };
 }
 function genClock(d) {
   const h = ri(1, 11), m = pick([10, 20, 30, 40, 50]);
@@ -1236,7 +1242,8 @@ Object.assign(MT, {
   remainder(d) { const [a, b] = pick([[3, 4], [4, 5], [3, 5], [5, 6], [4, 7]]), r0 = ri(1, Math.min(a, b) - 1); const l = a * b; const ans = l + r0;
     return numQ('math', d, `כשמחלקים את הממתקים לשקיות של ${a} נשארים ${r0}. כשמחלקים לשקיות של ${b} גם נשארים ${r0}. מה המספר הקטן ביותר של ממתקים (יותר מ-${r0}) שמתאים?`, '', ans, [l, l - r0, ans + l], `אם מורידים ${r0} ממתקים, המספר מתחלק גם ב-${a} וגם ב-${b}. הכפולה המשותפת הקטנה: ${l}. מחזירים את ה-${r0}: ${ans}.`); },
   tempo(d) { const bpm = pick([60, 80, 90, 100, 120, 150]), s = pick([15, 20, 30, 45, 90]); const ans = bpm * s / 60; if (!Number.isInteger(ans)) return MT.tempo(d);
-    return numQ('math', d, `מטרונום מתקתק בקצב של ${bpm} פעימות בדקה. כמה פעימות ישמע ${pick(PEOPLE)[0]} ב-${s} שניות של תרגול פסנתר?`, '', ans, [bpm * s / 100, bpm - s, ans + bpm / 4], `${bpm} פעימות ב-60 שניות = ${bpm / 60} פעימות בשנייה. ב-${s} שניות: ${s} × ${bpm / 60} = ${ans}.`, ' פעימות'); },
+    const who = pick(PEOPLE), ps = bpm / 60 === 1 ? 'פעימה אחת' : `${fmt(bpm / 60)} פעימות`;
+    return numQ('math', d, `מטרונום מתקתק בקצב של ${bpm} פעימות בדקה. כמה פעימות ${g(who, 'ישמע', 'תשמע')} ${who[0]} ב-${s} שניות של תרגול פסנתר?`, '', ans, [bpm * s / 100, bpm - s, ans + bpm / 4], `${bpm} פעימות ב-60 שניות = ${ps} בשנייה. ב-${s} שניות: ${s} × ${fmt(bpm / 60)} = ${ans}. טריק: ${s} שניות הן ${fmt(s / 60)} של דקה, אז ${bpm} × ${fmt(s / 60)} = ${ans}.`, ' פעימות'); },
   ticket(d) { for (;;) { const P = pick([80, 120, 150, 200, 240, 300]), a = pick([10, 20, 25, 50]); const disc = P * a / 100; if (!Number.isInteger(disc)) continue; const what = pick(['כרטיס למשחק כדורגל', 'חולצת כדורסל', 'כרטיס להופעה', 'משחק מחשב חדש']);
     if (d === 1) return numQ('math', d, `${what} עולה ${P} ₪. יש הנחה של ${a}%. כמה ישלמו?`, '', P - disc, [disc, P - a, P + disc], `${a}% מ-${P} = ${disc}. מחיר אחרי הנחה: ${P} − ${disc} = ${P - disc}.`, ' ₪');
     const after = P - disc; return numQ('math', d, `אחרי הנחה של ${a}%, ${what} עולה ${after} ₪. מה היה המחיר המקורי?`, '', P, [Math.round(after * (1 + a / 100)), after + a, after * 2], `אחרי ההנחה משלמים ${100 - a}% מהמחיר המקורי. ${after} הם ${100 - a}%, אז 1% = ${after / (100 - a)}, ו-100% = ${P}. המלכודת: להוסיף ${a}% ל-${after} (זה נותן ${Math.round(after * (1 + a / 100))}, לא נכון).`, ' ₪'); } },
@@ -1269,7 +1276,7 @@ GEN.verbal = genVerbal2; GEN.spatial = genSpatial2; GEN.reading = genReading;
  ['קרח','מוצק','אדים',['גז','חם','ענן','מים'],'מצב צבירה: קרח הוא מים במצב מוצק, אדים הם מים במצב גז.',2],
  ['הר געש','לבה','מעיין',['מים','סלע','נהר','אדמה'],'מה שפורץ החוצה מתוך האדמה: מהר געש פורצת לבה, ממעיין פורצים מים.',2],
  ['רוח','טחנת רוח','זרם מים',['טחנת מים','סכר','גשם','באר'],'מקור אנרגיה והמכונה שמנצלת אותו.',3],
- ['אש','לכבות','צמא',['להרוות','לשתות','מים','יובש'],'הבעיה והפעולה שמסיימת אותה: מכבים אש, מרווים צמא.',3],
+ ['אש','לכבות','צמא',['להרוות','לצמוא','מים','יובש'],'הבעיה והפעולה שמסיימת אותה: מכבים אש, מרווים צמא.',3],
  ['קופאי','קופה','נהג',['הגה','כביש','מכונית','רישיון'],'בעל מקצוע והמקום שממנו הוא עובד: הקופאי יושב ליד הקופה, הנהג מאחורי ההגה.',2],
  ['מדף','סופרמרקט','ספר',['ספרייה','דף','קורא','סופר'],'פריט והמקום שבו הוא נמצא: מדף נמצא בסופרמרקט, ספר נמצא בספרייה.',1],
 ].forEach(([a,b,c,o,ex,d]) => AN.push({a,b,c,o,ex,d}));
@@ -1323,7 +1330,7 @@ const SYL = ['גלו', 'טרי', 'סמי', 'בופ', 'דקו', 'רימ', 'פזו
 function genNonsense(d) {
   const sy = shuffle(SYL);
   if (d <= 2) {
-    const N = shuffle(['כלב', 'חתול', 'סוס', 'דג', 'ציפור']).slice(0, 2), A = shuffle(['גדול', 'קטן', 'מהיר', 'שמח', 'רטוב']).slice(0, 2);
+    const N = shuffle(['כלב', 'חתול', 'סוס', 'דג', 'פיל']).slice(0, 2), A = shuffle(['גדול', 'קטן', 'מהיר', 'שמח', 'רטוב']).slice(0, 2);
     const code = {}; [...N, ...A].forEach((w, i) => code[w] = sy[i]);
     const nf = R() < .5;
     const ph = (n, a) => nf ? `${code[n]} ${code[a]}` : `${code[a]} ${code[n]}`;
@@ -1422,7 +1429,7 @@ function genShapeSeries(d) {
   const deg = Math.abs(da) * 45;
   const ex = [`המחוג מסתובב ${deg}° ${da > 0 ? 'עם' : 'נגד'} כיוון השעון בכל צעד`];
   if (dd) ex.push(`הנקודה זזה ${Math.abs(dd) === 2 ? 'שתי פינות' : 'פינה אחת'} ${dd > 0 ? 'עם' : 'נגד'} כיוון השעון`);
-  if (alt) ex.push('הרקע מתחלף לסירוגין: ריק, אפור, ריק...');
+  if (alt) ex.push('הרקע מתחלף לסירוגין: ריק, אפור, ריק, וכן הלאה');
   return { cat: 'matrix', d, prompt: 'מה הצורה הבאה בסדרה?', vis: `<div class="sseries">${Array.from({ length: len }, (_, i) => `<div class="fbox">${dialSVG(at(i))}</div>`).join('<span class="ar">←</span>')}<span class="ar">←</span><div class="fbox q">?</div></div>`, options: m.options, answer: m.answer, ex: ex.join('. ') + '. טריק: עקוב אחרי כל חלק בנפרד, קודם המחוג, אחר כך הנקודה.' };
 }
 function genShapes(d) { return R() < .4 ? genShapeSeries(d) : genMatrix(Math.min(d, 3)); }
@@ -1437,6 +1444,8 @@ function genTable(d) {
   for (let t = 0; t < 80; t++) {
     const rows = Array.from({ length: 3 }, () => { const a = ri(3, 9), b = ri(2, a - 1); return [a, b, rule.f(a, b)]; });
     if (rows.some(r => r[2] < 0 || r[2] > 200) || new Set(rows.map(r => r[0] + ',' + r[1])).size < 3) continue;
+    const ALT = [(a, b) => a + b, (a, b) => a * b, (a, b) => a - b, (a, b) => 2 * a + b, (a, b) => a + 2 * b, (a, b) => (a + b) * 2, (a, b) => a * b + a, (a, b) => a * b - b, (a, b) => a * a - b, (a, b) => a * a + b].concat(TROWS.map(r => r.f));
+    if (d < 4 && ALT.some(f => f !== rule.f && f(rows[0][0], rows[0][1]) === rows[0][2] && f(rows[1][0], rows[1][1]) === rows[1][2] && f(rows[2][0], rows[2][1]) !== rows[2][2])) continue;
     let hideCol = 2;
     if (d >= 4) { const [a, b, c] = rows[2]; const sols = []; for (let x = 1; x <= 15; x++) if (rule.f(x, b) === c) sols.push(x); if (sols.length !== 1) continue; hideCol = 0; }
     const ans = rows[2][hideCol];
@@ -1469,8 +1478,9 @@ function genSeating(d) {
     const mk = () => {
       const [x, y] = shuffle(names), t = pick(['adj', 'notadj', 'end', 'notend', 'right', 'imm', 'pos']);
       const sits = (g(PEOPLE.find(q => q[0] === x), 'יושב', 'יושבת'));
-      if (t === 'adj') return { t: `${x} ו${y} יושבים זה ליד זה`, f: p => Math.abs(P(p, x) - P(p, y)) === 1 };
-      if (t === 'notadj') return { t: `${x} ו${y} לא יושבים זה ליד זה`, f: p => Math.abs(P(p, x) - P(p, y)) !== 1 };
+      const ff = [x, y].every(nm => (PEOPLE.find(q => q[0] === nm) || [])[1] === 'f'), pl = ff ? 'יושבות זו ליד זו' : 'יושבים זה ליד זה';
+      if (t === 'adj') return { t: `${x} ו${y} ${pl}`, f: p => Math.abs(P(p, x) - P(p, y)) === 1 };
+      if (t === 'notadj') return { t: `${x} ו${y} לא ${pl}`, f: p => Math.abs(P(p, x) - P(p, y)) !== 1 };
       if (t === 'end') return { t: `${x} ${sits} באחד הקצוות`, f: p => P(p, x) === 0 || P(p, x) === n - 1, g: 1 };
       if (t === 'notend') return { t: `${x} לא ${sits} באף קצה`, f: p => P(p, x) !== 0 && P(p, x) !== n - 1, g: 1 };
       if (t === 'right') return { t: `המקום של ${x} מימין למקום של ${y} (לא בהכרח צמוד)`, f: p => P(p, x) < P(p, y) };
@@ -1822,7 +1832,7 @@ function genGroups(d) {
     const ct = c => c.t === 'with' ? `${ppl[c.i]} ו${ppl[c.j]} ${same}.` : c.t === 'apart' ? `${ppl[c.i]} ו${ppl[c.j]} לא ${same}.` : `${ppl[c.i]} בקבוצה ${M.teams[c.k]}.`;
     const groups = M.teams.map((tn, t) => `${M.lab ? 'הקבוצה ' + tn : 'זוג'}: ${ppl.filter((_, j) => sol[j] === t).join(', ')}`).join(' · ');
     const m = mc(opts);
-    return { cat: 'logic', d, lk: 'groups', prompt, vis: `<p class="ctx">${M.ctx(M.n)}</p><ul class="clues grp">${shuffle(chosen).map(c => `<li>${ct(c)}</li>`).join('')}</ul>`, options: m.options, answer: m.answer,
+    return { cat: 'logic', d, lk: 'groups', prompt, vis: `<p class="ctx">${M.ctx(M.n)} החברים: ${ppl.join(', ')}.</p><ul class="clues grp">${shuffle(chosen).map(c => `<li>${ct(c)}</li>`).join('')}</ul>`, options: m.options, answer: m.answer,
       ex: `${groups}. טריק: מציירים ${M.lab ? 'שתי עמודות' : 'שלושה זוגות ריקים'}, ממקמים קודם את מי שהמקום שלו ידוע, ובכל רמז "לא ${same}" שולחים לצד השני.` };
   }
   return genLogic(Math.min(d, 3));
@@ -1839,7 +1849,7 @@ const FAM = [
   ['איתי הוא נכד של סבתא של רוני, אבל הוא לא אח של רוני. מה איתי לרוני?', ['בן דוד', 'דוד', 'אחיין', 'אבא'], 'נכד של סבתא שלה הוא הילד של אחד מהילדים שלה. אם הוא לא אח של רוני, הוא הילד של דוד או דודה: בן דוד.', 2],
   ['האמא של האמא של האבא של נועה. מה היא לנועה?', ['סבתא רבא', 'סבתא', 'דודה', 'בת דודה'], 'אמא של אבא = סבתא. אמא של סבתא = סבתא רבא.', 2],
   ['לשירה יש 2 אחים. לכל אחד מהם יש בדיוק אחות אחת. כמה ילדים במשפחה?', ['3', '4', '5', '6'], 'האחות של כל אחד מהאחים היא שירה עצמה. 2 בנים ושירה = 3.', 2],
-  ['לאבא של מאיה יש 3 אחים, ולכל אחד מהם 2 ילדים. לאמא של מאיה אין אחים ואחיות. כמה בני דודים ובנות דודות יש למאיה?', ['6', '8', '3', '5'], 'רק מצד אבא יש דודים: 3 × 2 = 6.', 2],
+  ['לאבא של מאיה יש 3 אחים ואין לו אחיות. לכל אחד מהאחים יש 2 ילדים. לאמא של מאיה אין אחים ואחיות. כמה בני דודים ובנות דודות יש למאיה?', ['6', '8', '3', '5'], 'רק מצד אבא יש דודים: 3 × 2 = 6.', 2],
   ['עמית מצביע על תמונה ואומר: "אין לי אחים ואחיות, אבל האבא של האיש בתמונה הוא הבן של אבא שלי." מי האיש בתמונה?', ['הבן של עמית', 'עמית עצמו', 'אבא של עמית', 'האחיין של עמית'], 'הבן של אבא של עמית, כשאין לו אחים, הוא עמית עצמו. אז האבא של האיש בתמונה הוא עמית, והאיש הוא הבן שלו.', 3],
   ['רון הוא אבא של דן. דן הוא אבא של גיל. מה רון לבת של גיל?', ['סבא רבא', 'סבא', 'דוד', 'סבא רבא רבא'], 'רון → דן → גיל → הבת. שלושה דורות למטה: סבא רבא.', 3],
   ['אמא של נוי היא אחות של אבא של עומר. מי זאת אמא של אמא של נוי, בשביל עומר?', ['סבתא שלו', 'דודה שלו', 'אין לה קשר אליו', 'סבתא רבא שלו'], 'אמא של נוי ואבא של עומר הם אחים. אז אמא שלה היא גם אמא של אבא של עומר: הסבתא שלו.', 3],
@@ -1907,10 +1917,10 @@ function awardDiamonds(c, correct, n) {
   if (c.kind === 'daily') { if (p >= .9) giveDia(1, `3 כוכבים במשימה ${c.day}`, out); if (correct === n) giveDia(1, `משימה ${c.day} מושלמת`, out); }
   if (c.kind === 'boss' && p >= .7) giveDia(p >= .9 ? 3 : 2, `ניצחון על ${BOSSES[c.day] ? BOSSES[c.day].n : 'בוס'}`, out);
   if (c.kind === 'daily' || c.kind === 'boss') {
-    if (S.streak >= 7 && S.streak % 7 === 0 && (aw.streak || 0) < S.streak) { aw.streak = S.streak; giveDia(2, `רצף של ${S.streak} ימים`, out); }
+    const ms7 = Math.floor(S.streak / 7) * 7; if (ms7 >= 7 && (aw.streak || 0) < ms7) { aw.streak = ms7; giveDia(2, `רצף של ${ms7} ימים`, out); }
     WORLDS.forEach(W => { if (worldDone(W) === 15 && !aw['w' + W.k]) { aw['w' + W.k] = 1; giveDia(3, `סיום ${W.n}`, out); } });
   }
-  if (c.kind === 'sim' && p >= .8) { const wk = Math.floor(dayDiff(S.start, todayStr()) / 7); if (aw.simWeek !== wk) { aw.simWeek = wk; giveDia(3, 'סימולציה מלאה ב-80% ומעלה', out); } }
+  if (c.kind === 'sim' && c.size === 'full' && p >= .8) { const wk = Math.floor(dayDiff(S.start, todayStr()) / 7); if (aw.simWeek !== wk) { aw.simWeek = wk; giveDia(3, 'סימולציה מלאה ב-80% ומעלה', out); } }
   return out;
 }
 function unlockJoke(c, correct, n) {
@@ -2137,7 +2147,7 @@ function openSbxTools() {
   bindSandbox();
 }
 /* ================= V7: UPDATES + BACKUP ================= */
-const APP_VER = '22';
+const APP_VER = '23';
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { }
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
@@ -2165,7 +2175,7 @@ setTimeout(() => checkUpdate(false), 1500);
 
 /* backup / restore (parent area) */
 const backupName = () => `brainlab-${ME.name === 'יונתן' ? 'yonatan' : 'backup'}-${todayStr()}.json`;
-function backupText() { const o = JSON.parse(JSON.stringify(S)); o.cur = null; o._key = KEY; o._ver = APP_VER; o._at = new Date().toISOString(); return JSON.stringify(o); }
+function backupText() { const o = JSON.parse(JSON.stringify(S)); o.cur = null; delete o.pin; o._key = KEY; o._ver = APP_VER; o._at = new Date().toISOString(); return JSON.stringify(o); }
 async function doBackup() {
   save();
   const txt = backupText(), file = new File([txt], backupName(), { type: 'application/json' });
@@ -2208,12 +2218,21 @@ const cloudSet = c => { try { localStorage.setItem(CLOUD_KEY, JSON.stringify(c))
 const cloudOn = () => { const c = cloudCfg(); return !!(c.url && c.code); };
 const newCode = () => { const a = new Uint8Array(15); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = ri(0, 255)); return Array.from(a, b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join(''); };
 const cloudPath = c => `${c.url.replace(/\/+$/, '')}/brainlab/${c.code}.json`;
-function cloudPayload() { const o = JSON.parse(JSON.stringify(S)); o.cur = null; delete o.pin; o._at = new Date().toISOString(); o._ver = APP_VER; return JSON.stringify(o); }
+function cloudPayload() { const o = JSON.parse(JSON.stringify(S)); o.cur = null; delete o.pin; delete o.cloudForce; o._at = new Date().toISOString(); o._ver = APP_VER; o._prof = PROF.id; return JSON.stringify(o); }
 let cloudT = null;
 function cloudSoon() { const c = cloudCfg(); if (!c.url || !c.code || c.role !== 'kid' || isSbx()) return; clearTimeout(cloudT); cloudT = setTimeout(cloudPut, 6000); }
 async function cloudPut() {
   const c = cloudCfg(); if (!c.url || !c.code || c.role !== 'kid' || isSbx()) return false;
-  try { const r = await fetch(cloudPath(c), { method: 'PUT', body: cloudPayload() }); c.err = r.ok ? null : 'שגיאה ' + r.status; if (r.ok) c.last = Date.now(); }
+  try {
+    if (!S.cloudForce) {
+      const g = await cloudGet(c);
+      if (g.err) { c.err = g.err; cloudSet(c); return false; }
+      const R0 = g.data;
+      if (R0 && R0._prof && R0._prof !== PROF.id) { c.err = 'הקוד שייך לפרופיל אחר'; cloudSet(c); return false; }
+      if (R0 && (R0.xp || 0) > (S.xp || 0) && Object.keys(R0.missions || {}).length >= doneCount(S)) { c.err = 'בענן יש התקדמות חדשה יותר. אפשר לטעון אותה ("טען מהענן")'; cloudSet(c); return false; }
+    }
+    const r = await fetch(cloudPath(c), { method: 'PUT', body: cloudPayload() }); c.err = r.ok ? null : 'שגיאה ' + r.status; if (r.ok) { c.last = Date.now(); if (S.cloudForce) { S.cloudForce = 0; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } } }
+  }
   catch (e) { c.err = 'אין חיבור'; }
   cloudSet(c); return !c.err;
 }
@@ -2257,7 +2276,15 @@ function bindCloud() {
     if (!/^https:\/\/[^ ]+\.(firebaseio\.com|firebasedatabase\.app)\/?$/.test(url)) return msg('צריך מזהה פרויקט או כתובת של Firebase Realtime Database.');
     if (code.length < 15) return msg(role === 'kid' ? 'קוד קצר מדי.' : 'צריך להזין את קוד המשפחה מהטלפון של ' + ME.name + '.');
     msg(''); const c = { url, code, role };
-    if (role === 'kid') { cloudSet(c); const ok = await cloudPut(); if (!ok) { msg('לא הצלחתי לשמור. בדוק את הכתובת ואת הכללים.'); cloudSet({}); return; } }
+    if (role === 'kid') {
+      const typed = (document.getElementById('ccode').value || '').trim();
+      if (typed) {
+        const g = await cloudGet(c); if (g.err) return msg('לא הצלחתי לקרוא: ' + g.err);
+        if (g.data && g.data._prof && g.data._prof !== PROF.id) return msg(`הקוד הזה שייך ל${(PROFILES[g.data._prof] || {}).name || 'פרופיל אחר'}. לכל ילד יש קוד משלו.`);
+        if (g.data && Object.keys(g.data.missions || {}).length) return chooseCloudRestore(c, g.data);
+      }
+      cloudSet(c); S.cloudForce = 1; const ok = await cloudPut(); if (!ok) { msg('לא הצלחתי לשמור. בדוק את הכתובת ואת הכללים.'); cloudSet({}); return; }
+    }
     else { const g = await cloudGet(c); if (g.err) return msg('לא הצלחתי לקרוא: ' + g.err); if (!g.data) return msg('אין עדיין נתונים בקוד הזה.'); cloudSet(c); }
     toast('מחובר לענן'); render();
   };
@@ -2275,6 +2302,19 @@ async function findDb(id) {
     try { const res = await fetch(`${u}/brainlab/probe_000000000000000.json`, { cache: 'no-store' }); if (res.status === 200 || res.status === 401) return u; } catch (e) { }
   }
   return null;
+}
+
+function chooseCloudRestore(c, data) {
+  const n = Object.keys(data.missions || {}).length;
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card" role="dialog" aria-modal="true"><h4>בענן כבר יש התקדמות</h4><p>בקוד הזה שמורות ${n} משימות${data._at ? `, עודכן ${agoTxt(Date.parse(data._at))}` : ''}. מה לעשות?</p><div class="stack" style="gap:8px"><button class="btn btn-primary" data-m="load">לטעון את ההתקדמות מהענן לטלפון הזה</button><button class="btn btn-ghost" data-m="over">להחליף את מה שבענן (${doneCount(S)} משימות בטלפון הזה)</button><button class="btn btn-ghost" data-m="no">ביטול</button></div></div>`;
+  app.appendChild(m);
+  m.addEventListener('click', async e => {
+    const b = e.target.closest('[data-m]'); if (e.target === m || (b && b.dataset.m === 'no')) return m.remove(); if (!b) return;
+    m.remove();
+    if (b.dataset.m === 'load') { cloudSet(c); const d = normCloud(data); d.pin = S.pin; restoreFrom(JSON.stringify(d)); return; }
+    modal('בטוח?', `ההתקדמות שבענן (${n} משימות) תימחק ותוחלף.`, 'כן, להחליף', async () => { cloudSet(c); S.cloudForce = 1; save(); await cloudPut(); toast('מחובר לענן'); render(); }, 'btn-boss');
+  });
 }
 /* ================= APP V3: ELEMENTS ================= */
 document.documentElement.setAttribute('dir', 'rtl');
@@ -2326,8 +2366,8 @@ function dayDiff(a, b) { const [y1, m1, d1] = a.split('-').map(Number), [y2, m2,
 function addDays(s, n) { const [y, m, d] = s.split('-').map(Number); return todayStr(new Date(y, m - 1, d + n)); }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function defState() { return { start: todayStr(), xp: 0, coins: 0, streak: 0, best: 0, lastDone: null, freezes: 0, hints: 0, missions: {}, stats: {}, times: {}, rat: {}, seen: {}, badges: [], exam: '2027-01-15', cur: null, view: 'home', own: { skin: ['auto'] }, skin: 'auto', sound: true, mist: [], arcade: { sprint: 0, piano: 0, kupa: 0 }, bdGift: {}, last: null, openW: null, dia: 0, diaLog: [], rewards: [], vouchers: [], pin: null, jokes: 0, aw: {} }; }
-function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.start) { const d = defState(); const o = Object.assign(d, s); o.own = { skin: ['auto'].concat(((s.own || {}).skin || []).filter(x => SKINS[x] && x !== 'auto')) }; if (!SKINS[o.skin]) o.skin = 'auto'; o.arcade = Object.assign({ sprint: 0, piano: 0, kupa: 0 }, s.arcade || {}); if (['avatar'].includes(o.view)) o.view = 'home'; if (o.exam === '2026-12-21') o.exam = '2027-01-15'; return o; } } catch (e) { } return defState(); }
-let S = load(); SEEN = S.seen;
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.start) { const d = defState(); const o = Object.assign(d, s); o.own = { skin: ['auto'].concat(((s.own || {}).skin || []).filter(x => SKINS[x] && x !== 'auto')) }; if (!SKINS[o.skin]) o.skin = 'auto'; o.arcade = Object.assign({ sprint: 0, piano: 0, kupa: 0 }, s.arcade || {}); if (['avatar'].includes(o.view)) o.view = 'home'; if (o.exam === '2026-12-21' && !o.examMig) o.exam = '2027-01-15'; o.examMig = 1; return o; } } catch (e) { } return defState(); }
+let S = load(); sanitizeState(); SEEN = S.seen;
 function save() { S.seen = SEEN; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } cloudSoon(); }
 const nm = () => ME.name;
 const unlocked = () => Math.min(TOTAL, dayDiff(S.start, todayStr()) + 1);
@@ -2793,7 +2833,7 @@ function nextQ() {
 function finish() {
   clearTimers();
   const c = S.cur; let n = 0, correct = 0, champOk = null;
-  c.qs.forEach((q, i) => { const r = c.res[i]; const s = S.stats[q.cat] || (S.stats[q.cat] = { c: 0, t: 0 }); s.t++; if (r && r.ok) s.c++; if (q.champ) { champOk = !!(r && r.ok); return; } n++; if (r && r.ok) correct++; });
+  c.qs.forEach((q, i) => { const r = c.res[i], good = !!(r && r.ok && !r.second); const s = S.stats[q.cat] || (S.stats[q.cat] = { c: 0, t: 0 }); s.t++; if (good) s.c++; if (q.champ) { champOk = good; return; } n++; if (good) correct++; });
   const chapters = c.chapters ? c.chapters.map(ch => { let k = 0; for (let j = ch.s; j <= ch.e; j++) if (c.res[j] && c.res[j].ok) k++; return { n: ch.n, c: k, t: ch.e - ch.s + 1 }; }) : null;
   const before = S.badges.slice(), rankBefore = rankOf(S.xp).r[1], gearBefore = Object.keys(gearOn()), worldBefore = curWorld().k;
   if (c.kind === 'review') S.reviewDay = todayStr();
@@ -3060,7 +3100,7 @@ function bind() {
   on('hint', () => { if (S.hints > 0) { S.hints--; S.cur.freeHint = true; } S.cur.hint = true; save(); renderQuiz(); });
   on('skip', () => { const c = S.cur; const to = nextOpen(c); if (to >= 0) { c.i = to; c.qStart = Date.now(); save(); renderQuiz(); window.scrollTo(0, 0); } });
   on('quit', () => modal('לצאת?', deferred(S.cur.kind) ? 'ההתקדמות נשמרת, אבל השעון ממשיך לרוץ.' : 'ההתקדמות נשמרת ואפשר להמשיך מאותה שאלה.', 'יציאה', () => { S.view = 'home'; save(); render(); }));
-  on('reset', () => modal('לאפס הכל?', 'כל הנקודות, המטבעות, המשימות והתגים יימחקו. אי אפשר לבטל.', 'כן, לאפס', () => { S = defState(); SEEN = S.seen; save(); render(); }, 'btn-boss'));
+  on('reset', () => modal('לאפס הכל?', 'כל הנקודות, המטבעות, המשימות והתגים יימחקו. אי אפשר לבטל.', 'כן, לאפס', () => { const keep = { pin: S.pin, appliedB: S.appliedB, prv: S.prv, pmv: S.pmv, pexv: S.pexv, noEx: S.noEx, dadMsgs: S.dadMsgs, rewards: S.rewards }; S = defState(); Object.assign(S, keep); S.cloudForce = 1; SEEN = S.seen; save(); render(); }, 'btn-boss'));
   on('chest', () => { const amt = ri(15, 40) + (starsOf(S.last.correct, S.last.n) === 3 || S.last.won ? 20 : 0); S.last.chest = amt; S.coins += amt; SFX.coin(); later(SFX.coin, 120); burst(60); save(); render(); });
   on('bdgift', () => { S.bdGift[todayStr().slice(0, 4)] = 1; S.coins += 250; S.hints += 3; checkBadges(); SFX.win(); burst(220); save(); render(); modal(`מזל טוב, ${nm()}!`, 'קיבלת 250 מטבעות, 3 רמזים חינם ותג יום הולדת. שתהיה שנה של שיאים!', 'תודה!', () => { }, 'btn-primary', true); });
   on('review', () => { if (!S.mist.length) return; startMission('review', nextDay() || TOTAL); });
@@ -3198,13 +3238,12 @@ const _render = render; render = function () { applyGuest(); return _render.appl
 function guestOnboard() {
   let isFriend = false; try { isFriend = /[?&]friend\b/.test(location.search); } catch (e) { }
   if (!isFriend || S.guest || isSbx() || Object.keys(S.missions).length || S.xp) return;
-  try { history.replaceState(null, '', location.pathname); } catch (e) { }
   ME.name = ''; render();
   const m = document.createElement('div'); m.className = 'modal';
   m.innerHTML = `<div class="card" role="dialog" aria-modal="true"><h4>ברוך הבא למעבדת המוח</h4><p>אימון יומי למבחן המחוננים. ההתקדמות שלך נשמרת רק בטלפון שלך.</p><input class="txt" id="gname" maxlength="14" placeholder="איך קוראים לך?" style="width:100%;margin-bottom:12px"><button class="btn btn-primary btn-wide" data-m="ok">יאללה</button></div>`;
   app.appendChild(m);
   const inp = m.querySelector('#gname'); setTimeout(() => inp.focus(), 50);
-  const ok = () => { const n = inp.value.trim().replace(/[<>&"]/g, ''); if (!n) { inp.style.borderColor = 'var(--bad)'; return; } S.guest = { name: n }; S.start = todayStr(); save(); m.remove(); render(); };
+  const ok = () => { const n = inp.value.trim().replace(/[<>&"]/g, ''); if (!n) { inp.style.borderColor = 'var(--bad)'; return; } S.guest = { name: n }; S.start = todayStr(); save(); try { history.replaceState(null, '', location.pathname); } catch (e) { } m.remove(); render(); };
   inp.onkeydown = e => { if (e.key === 'Enter') ok(); };
   m.querySelector('[data-m="ok"]').onclick = ok;
 }
@@ -3225,7 +3264,7 @@ const DAD_DEF = ['תזכור, אבא אוהב אותך.', 'אבא גאה בך. �
 const DAD_HARD = ['קשה? זה בסדר. אבא אוהב אותך, וזה לא תלוי בציון.', 'נשימה עמוקה. אבא איתך.', 'גם אלופים מפספסים. אבא אוהב אותך.'];
 const dadList = () => (S.dadMsgs && S.dadMsgs.length) ? S.dadMsgs : S.guest ? null : DAD_DEF;
 function dadNext(list) { if (!list) return ''; S.loveI = ((S.loveI || 0) + 1) % list.length; return list[S.loveI]; }
-const dadHTML = t => t ? `<div class="love">${IC.heart || '♥'}<span>${t}</span></div>` : '';
+const dadHTML = t => t ? `<div class="love">${IC.heart || '♥'}<span>${esc(t)}</span></div>` : '';
 function loveLine(c, correct, n) {
   if (!['daily', 'boss', 'sim'].includes(c.kind)) return '';
   const lost = c.kind === 'boss' && correct / n < .7, low = correct / n < .5;
@@ -3242,7 +3281,7 @@ function loveOnStreak(c, ok, first) {
   c.loveShown = true; return pick(l);
 }
 function dadMsgSection() {
-  const cur = (S.dadMsgs && S.dadMsgs.length ? S.dadMsgs : S.guest ? [] : DAD_DEF).join('\n');
+  const cur = (S.dadMsgs && S.dadMsgs.length ? S.dadMsgs : S.guest ? [] : DAD_DEF).map(esc).join('\n');
   return `<section class="card stack" style="gap:8px"><h4 style="font-size:1.15rem">הודעות מאבא</h4><p class="small muted" style="margin:0">מופיעות מדי פעם בסוף משימה, וגם כשיש רצף של טעויות (פעם אחת במשימה). שורה לכל הודעה.</p><textarea class="txt" id="dadmsgs" style="width:100%;height:130px;line-height:1.6">${cur}</textarea><button class="btn btn-primary" data-act="dadsave" style="min-height:44px">שמור</button></section>`;
 }
 
@@ -3558,7 +3597,7 @@ viewResult = function () {
 const _viewHome14 = viewHome;
 viewHome = function () {
   let h = _viewHome14.apply(this, arguments);
-  if (!S.diaHelpSeen && doneCount(S) >= 1) h = h.replace('<section class="card hero"', `<button class="diagoal" data-act="diasheet">${DIA}<span>איך מרוויחים יהלומים, ומה מקבלים עליהם? לחץ כאן</span></button><section class="card hero"`);
+  if (!S.diaHelpSeen && doneCount(S) >= 1) h = h.replace(/<section class="card hero/, `<button class="diagoal" data-act="diasheet">${DIA}<span>איך מרוויחים יהלומים, ומה מקבלים עליהם? לחץ כאן</span></button>$&`);
   return h;
 };
 
@@ -3811,7 +3850,7 @@ function pickExplain(c) {
   return { d: todayStr(), p: q.prompt, v: q.vis || '', a, ex: q.ex, done: 0 };
 }
 function explainCard() {
-  const e = S.explainQ; if (!e || e.d !== todayStr()) return '';
+  const e = S.explainQ; if (!e || e.d !== todayStr() || S.guest) return '';
   return e.done ? `<section class="card explain"><b>הסברת לאבא. כל הכבוד!</b></section>`
     : `<section class="card explain"><div class="eyebrow">אתגר הערב</div><b>תסביר לאבא איך פתרת את השאלה הזאת:</b><p class="small" style="margin:6px 0 10px">${strip(e.p).slice(0, 140)}</p><button class="btn btn-primary btn-wide" data-act="explained">הסברתי לאבא (+10 מטבעות)</button></section>`;
 }
@@ -3859,13 +3898,13 @@ finish = function () {
   const c = S.cur;
   const newDay = c && (c.kind === 'daily' || c.kind === 'boss' || (c.kind === 'sim' && c.path)) && !S.missions[c.day];
   const ex = c && c.kind === 'daily' && (!S.explainQ || S.explainQ.d !== todayStr()) ? pickExplain(c) : null;
-  const duo = c && c.duo, duoOk = duo ? c.res.filter(r => r && r.ok).length : 0;
+  const duo = c && c.duo, duoOk = duo ? c.res.filter(r => r && r.ok && !r.second).length : 0;
   const rushN = c ? (c.rushN || 0) : 0;
   const r = _finish16.apply(this, arguments);
   if (newDay && S.missions[c.day]) S.missions[c.day].h = new Date().getHours();
   if (S.last) S.last.rushN = rushN;
   if (ex) S.explainQ = ex;
-  if (duo) { S.duoWeek = weekKey(); S.duoLog = (S.duoLog || []).concat(todayStr()).slice(-12); if (duoOk >= 2 && S.last) giveDia(1, 'אתגר עם אבא', S.last.dia || (S.last.dia = [])); }
+  if (duo) { if (S.last) S.last.duo = 1; S.duoWeek = weekKey(); S.duoLog = (S.duoLog || []).concat(todayStr()).slice(-12); if (duoOk >= 2 && S.last) giveDia(1, 'אתגר עם אבא', S.last.dia || (S.last.dia = [])); }
   save(); if (ex || duo) render();
   return r;
 };
@@ -3877,14 +3916,14 @@ viewResult = function () {
   return h;
 };
 const _viewHome16 = viewHome;
-viewHome = function () { const h = _viewHome16.apply(this, arguments); const m = morningHint(); return m ? h.replace('<section class="card hero"', m + '<section class="card hero"') : h; };
+viewHome = function () { const h = _viewHome16.apply(this, arguments); const m = morningHint(); return m ? h.replace(/<section class="card hero/, m + '$&') : h; };
 const _viewParent16 = viewParent;
 viewParent = function () { const h = _viewParent16.apply(this, arguments); if (!PARENT_OK) return h; const pe = parentExplainCard(); return pe ? h.replace(/(<section class="card stack report"[\s\S]*?<\/section>)/, `$1${pe}`) : h; };
 const _reportHTML16 = reportHTML;
 reportHTML = function (o, fromCloud) {
   const h = _reportHTML16.apply(this, arguments), t = todayStr(), M = Object.values(o.missions || {}).filter(Boolean);
   const lines = [];
-  const md = (o.moods || []).slice(-3); if (md.length) lines.push(`${PROF.g === 'f' ? 'מה היא אמרה' : 'מה הוא אמר'} אחרי משימות: ${md.map(x => `${(MOODS.find(m => m[0] === x.m) || [, x.m])[1]}${x.acc != null ? ` (${x.acc}%)` : ''}`).join(' · ')}`);
+  const md = (o.moods || []).slice(-3); if (md.length) lines.push(`${PROF.g === 'f' ? 'מה היא אמרה' : 'מה הוא אמר'} אחרי משימות: ${md.map(x => `${(MOODS.find(m => m[0] === x.m) || [, esc(String(x.m))])[1]}${x.acc != null ? ` (${x.acc}%)` : ''}`).join(' · ')}`);
   const exN = o.explainLog ? o.explainLog.filter(d => dayDiff(d, t) < 7).length : 0; if (o.explainLog) lines.push(`${PROF.g === 'f' ? 'הסבירה' : 'הסביר'} לאבא השבוע: ${exN} פעמים`);
   if (o.duoLog && o.duoLog.length) lines.push(`אתגר עם אבא: ${o.duoLog.length} פעמים (אחרון ${o.duoLog[o.duoLog.length - 1].split('-').reverse().join('.')})`);
   const mor = M.filter(m => m.h != null && m.h < 9), lat = M.filter(m => m.h != null && m.h >= 12);
@@ -3958,7 +3997,7 @@ const _viewHome17 = viewHome;
 viewHome = function () {
   const h = _viewHome17.apply(this, arguments);
   if (!isDadPhone() || isSbx()) return h;
-  return h.replace('<section class="card hero"', `<button class="banner dadban" data-go="parent"><span style="width:40px;height:40px;flex:none">${IC.chart}</span><div class="grow"><b>זה הטלפון של אבא</b><div class="small muted">לדוח של ${ME.name} מהענן</div></div></button><section class="card hero"`);
+  return h.replace(/<section class="card hero/, `<button class="banner dadban" data-go="parent"><span style="width:40px;height:40px;flex:none">${IC.chart}</span><div class="grow"><b>זה הטלפון של אבא</b><div class="small muted">לדוח של ${ME.name} מהענן</div></div></button>$&`);
 };
 /* ================= V18: DAD MANAGES DIAMONDS FROM HIS PHONE (parent channel in the cloud) ================= */
 /* The kid's phone owns the state and writes it. Dad's phone writes only to a side node (<code>-p):
@@ -3984,7 +4023,7 @@ async function pullParent(force) {
     if (P.rv && P.rv !== S.prv) { S.rewards = arr(P.rewards); S.prv = P.rv; ch = true; }
     if (P.exv && P.exv !== S.pexv) { S.noEx = !!P.noEx; S.pexv = P.exv; ch = true; }
     if (P.mv && P.mv !== S.pmv) { S.dadMsgs = arr(P.dadMsgs); S.pmv = P.mv; ch = true; }
-    if (ch) { save(); if (S.view !== 'quiz') render(); }
+    if (ch) { save(); if (['home', 'shop', 'stats', 'arcade'].includes(S.view) && !document.querySelector('.modal') && !(typeof G !== 'undefined' && G)) render(); }
     if (msgs.length) toast(msgs.join('<br>'), 5000);
   } finally { P_BUSY = false; }
 }
@@ -4055,7 +4094,7 @@ const SC2 = [
   ['הוא ___ מאוד לפני ההופעה, אבל ברגע שעלה לבמה הלחץ ___.', ['התרגש / נעלם', 'נרגע / נעלם', 'התרגש / גבר', 'שמח / התחיל'], '"אבל" מבטא ניגוד: לפני ההופעה התרגש, ועל הבמה הלחץ נעלם.', 1],
   ['ככל שמתאמנים ___, כך הביצועים ___.', ['יותר / משתפרים', 'פחות / משתפרים', 'יותר / נחלשים', 'לאט / נעלמים'], '"ככל ש... כך" מחבר שני דברים שמשתנים יחד: יותר אימון, ביצועים טובים יותר.', 1],
   ['אף שהמגדלור היה רחוק, הוא ___ אותו בבירור דרך ה___.', ['ראה / משקפת', 'לא ראה / משקפת', 'שמע / משקפת', 'ראה / אוזניות'], '"אף ש" מבטא ניגוד: רחוק, ובכל זאת ראה. ורואים דרך משקפת, לא דרך אוזניות.', 1],
-  ['הניסוי ___ בפעם הראשונה, ולכן המדענית ___ אותו מההתחלה.', ['נכשל / ניסתה', 'הצליח / ניסתה', 'נכשל / חגגה', 'הצליח / שכחה'], '"ולכן" מבטא סיבה ותוצאה: הניסוי נכשל, ולכן ניסתה שוב.', 2],
+  ['הניסוי ___ בפעם הראשונה, ולכן המדענית ___ אותו שוב מההתחלה.', ['נכשל / ערכה', 'הצליח / ערכה', 'נכשל / חגגה', 'הצליח / שכחה'], '"ולכן" מבטא סיבה ותוצאה: הניסוי נכשל, ולכן ניסתה שוב.', 2],
   ['המכונית נסעה ___ כל כך, שהנהג לא הספיק ___ ברמזור.', ['מהר / לעצור', 'לאט / לעצור', 'מהר / לנסוע', 'בזהירות / לבלום'], '"כל כך... ש" מתאר תוצאה: נסעה מהר מדי, ולכן לא הספיק לעצור.', 2],
   ['ה___ של הצמח סופגים מים מהאדמה, וה___ קולטים את אור השמש.', ['שורשים / עלים', 'עלים / שורשים', 'פרחים / שורשים', 'זרעים / גבעולים'], 'השורשים נמצאים באדמה, והעלים פונים אל השמש.', 2],
   ['הספר היה ___ מכדי לסיים אותו בערב אחד, ולכן הוא ___ את הקריאה לכמה ימים.', ['ארוך / חילק', 'קצר / חילק', 'ארוך / קיצר', 'מעניין / הפסיק'], '"מכדי" אומר שמשהו גדול מדי בשביל משהו אחר. ספר ארוך מדי, ולכן חילק את הקריאה.', 2],
@@ -4466,7 +4505,7 @@ answer = function () {
 const _finish21 = finish;
 finish = function () {
   const c = S.cur, isX = c && c.xtra;
-  let ok = 0, n = 0; if (isX) c.qs.forEach((q, i) => { n++; if (c.res[i] && c.res[i].ok) ok++; });
+  let ok = 0, n = 0; if (isX) c.qs.forEach((q, i) => { n++; if (c.res[i] && c.res[i].ok && !c.res[i].second) ok++; });
   const r = _finish21.apply(this, arguments);
   if (isX && S.last) {
     const t = todayStr(); if (S.xtraDay !== t) { S.xtraDay = t; S.xtraN = 0; } S.xtraN++;
@@ -4580,6 +4619,73 @@ function renderBossGame(c) {
 }
 const _render22 = render;
 render = function () { if (S.view !== 'quiz') stopMG(); return _render22.apply(this, arguments); };
+/* ================= V23: ROBUSTNESS PASS ================= */
+/* 1. nothing can finish twice (timer ticks after a mission already ended) */
+const _finish23 = finish;
+finish = function () {
+  if (!S.cur) return;
+  const r = _finish23.apply(this, arguments);
+  /* streak milestones, also when the streak grew through a simulation or practice */
+  const aw = S.aw || (S.aw = {}), ms7 = Math.floor((S.streak || 0) / 7) * 7;
+  if (ms7 >= 7 && (aw.streak || 0) < ms7) { aw.streak = ms7; giveDia(2, `רצף של ${ms7} ימים`, (S.last && S.last.dia) || []); save(); }
+  return r;
+};
+const _endChapter23 = endChapter;
+endChapter = function () { if (!S.cur) return; return _endChapter23.apply(this, arguments); };
+
+/* 2. a double tap on "next" must not land on the hint or on an answer of the new question */
+let TAP_LOCK = 0, TAP_KEY = '';
+const _renderQuiz23 = renderQuiz;
+renderQuiz = function () {
+  const c = S.cur, key = c ? `${c.i}|${!!c.res[c.i]}|${!!c.intro}|${!!c.chBreak}|${c.champ || ''}` : '';
+  if (key !== TAP_KEY) { TAP_KEY = key; TAP_LOCK = Date.now() + 380; }
+  return _renderQuiz23.apply(this, arguments);
+};
+app.addEventListener('click', e => {
+  if (Date.now() < TAP_LOCK && e.target.closest('[data-opt],[data-act="hint"],[data-act="next"],[data-act="skip"],[data-act="tcheck"],[data-act="go"]')) { e.stopPropagation(); e.preventDefault(); }
+}, true);
+
+/* 3. tolerate old, partial or cloud-shaped state */
+function sanitizeState() {
+  try {
+    normCloud(S);
+    const d = defState(); Object.keys(d).forEach(k => { if (S[k] == null && d[k] != null) S[k] = d[k]; });
+    if (S.cur) {
+      const c = S.cur, ok = Array.isArray(c.qs) && c.qs.length && c.qs.every(q => q && CATS[q.cat]) && c.i >= 0 && c.i < c.qs.length;
+      if (!ok) { S.cur = null; if (S.view === 'quiz') S.view = 'home'; } else if (!Array.isArray(c.res)) c.res = c.res ? Object.values(c.res) : [];
+    }
+    if (S.view === 'result' && (!S.last || !Array.isArray(S.last.review) || !Array.isArray(S.last.newB))) S.view = 'home';
+    S.mist = (S.mist || []).filter(m => m && m.q && CATS[m.q.cat]);
+    SEEN = S.seen || (S.seen = {});
+  } catch (e) { console.error('sanitize', e); }
+}
+sanitizeState();
+const _restoreFrom23 = restoreFrom;
+restoreFrom = function (txt) { try { const o = JSON.parse(txt); normCloud(o); txt = JSON.stringify(o); } catch (e) { } return _restoreFrom23.call(this, txt); };
+const _render23 = render;
+render = function () {
+  try { return _render23.apply(this, arguments); }
+  catch (e) {
+    console.error('render failed', e);
+    try { S.cur = null; S.view = 'home'; save(); return _render23.apply(this, arguments); }
+    catch (e2) { app.innerHTML = `<div class="card stack" style="margin-top:20px"><b>משהו השתבש</b><p class="small muted">${esc(String(e2 && e2.message || e2))}</p><button class="btn btn-primary" onclick="location.reload()">לטעון מחדש</button></div>`; }
+  }
+};
+
+/* 4. the sandbox must not touch the real cloud settings */
+const _cloudSection23 = cloudSection;
+cloudSection = () => isSbx() ? '<section class="card small muted">ענן: לא זמין במצב בדיקה.</section>' : _cloudSection23();
+
+/* 5. cloud requests never hang forever */
+const _fetch23 = window.fetch.bind(window);
+window.fetch = (u, o = {}) => {
+  if (/firebaseio|firebasedatabase/.test(String(u)) && !o.signal && window.AbortController) { const ac = new AbortController(); setTimeout(() => ac.abort(), 9000); o = Object.assign({}, o, { signal: ac.signal }); }
+  return _fetch23(u, o);
+};
+
+/* 6. small result titles */
+const _viewResult23 = viewResult;
+viewResult = function () { let h = _viewResult23.apply(this, arguments); if (S.last && S.last.duo) h = h.replace(/<div class="eyebrow">אימון[^<]*<\/div>/, '<div class="eyebrow">אתגר עם אבא</div>'); return h; };
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 </script>
