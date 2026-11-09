@@ -62,14 +62,14 @@ function genOp(d) {
   const op = pick(OPS); const def = `<div class="eqs"><div class="eq">${L(`a ◆ b = ${op.t}`)}</div></div>`;
   if (d === 1) {
     let x, y, ans, k = 0; do { x = ri(2, 9); y = ri(2, 6); ans = op.f(x, y); } while (ans < 2 && k++ < 50);
-    const ex = cxRule(OP_RULE) + opDef(op) + opWho(x, y) + opCalc(op, x, y, true) + cxAns(L(`${x} ◆ ${y} = ${ans}`));
+    const ex = cxRule(OP_RULE) + opDef(op) + opMorphHTML(op.t, x, y, ans) + opWho(x, y) + opCalc(op, x, y, true) + cxAns(L(`${x} ◆ ${y} = ${ans}`));
     return { ...withHint(numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`${x} ◆ ${y}`)}?`, def, ans, [op.f(y, x), ans + y, x * y], ex), `ב-${L(`${x} ◆ ${y}`)} המספר הראשון הוא ${L(`a = ${x}`)} והשני ${L(`b = ${y}`)}. הציבו אותם בהגדרה ${L(op.t)}.`, op.h(x, y)), lk: 'op' };
   }
   if (d === 2) {
     for (let k = 0; k < 100; k++) {
       const x = ri(1, 6), y = ri(1, 5), z = ri(1, 4); const in1 = op.f(x, y); if (in1 < 0) continue; const ans = op.f(in1, z); if (ans < 2 || ans > 300) continue;
       const ex = cxRule(OP_RULE + ' קודם מה שבסוגריים, ואת התוצאה שלו מכניסים בתור a.') + opDef(op)
-        + `<span class="cx-steps">${cxStep(1, [[`(${x} ◆ ${y})`, 'קודם הסוגריים']])}</span>` + opWho(x, y) + opCalc(op, x, y, false)
+        + opMorphHTML(op.t, x, y, in1) + `<span class="cx-steps">${cxStep(1, [[`(${x} ◆ ${y})`, 'קודם הסוגריים']])}</span>` + opWho(x, y) + opCalc(op, x, y, false)
         + `<span class="cx-steps">${cxStep(2, [[`${opPut('a', in1)} ◆ ${opPut('b', '', z)}`, `התוצאה ${in1} נכנסת בתור a`]])}</span>` + opWho(in1, z) + opCalc(op, in1, z, true)
         + cxAns(L(`(${x} ◆ ${y}) ◆ ${z} = ${ans}`));
       return { ...withHint(numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`(${x} ◆ ${y}) ◆ ${z}`)}?`, def, ans, [op.f(x, op.f(y, z)), in1, op.f(z, in1)], ex), `קודם הסוגריים: חשבו ${L(`${x} ◆ ${y}`)} לפי ההגדרה. את התוצאה מכניסים בתור a, ואת ${z} בתור b.`, `${L(`${x} ◆ ${y} = ${in1}`)}. עכשיו חשבו ${L(`${in1} ◆ ${z}`)}, שוב לפי ההגדרה ${L(op.t)}.`), lk: 'op' };
@@ -77,7 +77,7 @@ function genOp(d) {
   }
   for (let k = 0; k < 100; k++) {
     const x = ri(2, 9), y = ri(2, 6); const R0 = op.f(x, y); if (R0 < 1) continue;
-    const ex = cxRule('כותבים את ההגדרה עם x במקום a. אחר כך הולכים אחורה: כל פעולה מבטלים בפעולה ההפוכה.') + opDef(op) + opWho('x', y)
+    const ex = cxRule('כותבים את ההגדרה עם x במקום a. אחר כך הולכים אחורה: כל פעולה מבטלים בפעולה ההפוכה.') + opDef(op) + opMorphHTML(op.t, 'x', y, R0) + opWho('x', y)
       + `<span class="cx-steps">${cxStep(1, [`${opPut('a ◆ b', 'x', y)} = ${opPut(op.t, 'x', y)} = ${R0}`])}${op.inv(x, y, R0).map((l, i) => cxStep(i + 2, [l.length > 1 ? l : l[0]])).join('')}</span>`
       + `<span class="cx-check">בדיקה: ${L(`${opPut('a ◆ b', x, y)} = ${opPut(op.t, x, y)} = ${R0}`)} ✓</span>` + cxAns(L(`x = ${x}`));
     return { ...withHint(numQ('code', 3, `הפעולה ◆ מוגדרת כך. אם ${L(`x ◆ ${y} = ${R0}`)}, מה x?`, def, x, [x + 1, x - 1, R0 - y, y], ex), `בהגדרה ${L(op.t)}, כאן ${L(`b = ${y}`)} והתוצאה ${R0}. איזה מספר חסר במקום a?`, `הציבו ${L(`b = ${y}`)}: ${L(`${op.t.replace(/b/g, y).replace(/a/g, 'x')} = ${R0}`)}. נסו להציב בזה את התשובות לבחירה.`), lk: 'op' };

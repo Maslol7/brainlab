@@ -21,3 +21,5 @@ app.addEventListener('click', e => {
 if (S.pendingSong) { if (S.last) S.last.newSong = S.pendingSong; delete S.pendingSong; }
 /* the journey trail follows the nodes when the phone turns */
 addEventListener('resize', () => { if (app.querySelector('.path')) drawTrails(); });
+/* one-time message from dad (v28) */
+setTimeout(dadPraise, 1800);

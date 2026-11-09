@@ -1,0 +1,22 @@
+// The one-time message from dad: shows once on Yonatan's home with +1 diamond, never twice, never for Romi.
+const { chromium } = require('playwright'); const fs = require('fs');
+(async () => { const b = await chromium.launch(); const ctx = await b.newContext({ serviceWorkers: 'block', viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+  const html = fs.readFileSync(process.argv[2] || 'dist/index.html', 'utf8');
+  await ctx.route(/maslol7/, r => r.fulfill({ body: r.request().url().includes('version.json') ? '{"v":"1"}' : html, contentType: r.request().url().includes('version.json') ? 'application/json' : 'text/html; charset=utf-8' }));
+  const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  const seed = async (kid) => { await p.goto('https://maslol7.github.io/brainlab/?kid=' + kid); await p.waitForTimeout(200);
+    await p.evaluate(k => { const m = {}; for (let i = 1; i <= 15; i++) m[i] = { c: 8, n: 10, pts: 100, date: '2026-10-' + String(10 + i).padStart(2, '0') }; localStorage.setItem(PROF.key, JSON.stringify(Object.assign(defState(), { missions: m, best: 10, streak: 4, dia: 26, view: 'home' }))); }, kid);
+    await p.reload(); await p.waitForTimeout(2400); };
+  const out = {};
+  await seed('yonatan');
+  out.y1 = await p.evaluate(() => ({ modal: !!document.querySelector('.modal .dadmsg'), text: (document.querySelector('.modal p') || {}).textContent, dia: S.dia, flag: !!S.aw.dad28, log: S.diaLog[0] }));
+  await p.screenshot({ path: '/tmp/claude-0/img/dad_msg.png' });
+  await p.click('.modal [data-m="ok"]'); await p.waitForTimeout(200);
+  out.closed = await p.evaluate(() => !document.querySelector('.modal'));
+  await p.reload(); await p.waitForTimeout(2400);
+  out.y2 = await p.evaluate(() => ({ modal: !!document.querySelector('.modal .dadmsg'), dia: S.dia }));
+  await seed('romi');
+  out.r = await p.evaluate(() => ({ modal: !!document.querySelector('.modal .dadmsg'), dia: S.dia }));
+  console.log(JSON.stringify(out));
+  const ok = out.y1.modal && out.y1.dia === 27 && out.y1.flag && out.closed && !out.y2.modal && out.y2.dia === 27 && !out.r.modal && out.r.dia === 26 && !errs.length;
+  console.log(errs.length ? 'ERRORS ' + errs.join('\n') : 'no errors'); console.log(ok ? 'PASS' : 'FAIL'); await b.close(); process.exit(ok ? 0 : 1); })();

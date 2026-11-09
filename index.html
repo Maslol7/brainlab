@@ -1022,6 +1022,69 @@ mark.ev{background:rgba(255,200,69,.45);color:inherit;border-radius:4px;padding:
 .fxl .shi{width:17px;height:17px;margin:0}
 .fxt{font-size:.72rem;color:var(--muted)}
 .fxa{color:var(--muted);font-size:1rem;line-height:1}
+
+/* ---------- animated solutions ---------- */
+.anim{display:block;position:relative;margin:10px 0;padding:36px 10px 10px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--edge);text-align:center}
+.an-cap{display:block;margin-top:10px;font-size:.88rem;color:var(--ink);line-height:1.5}
+.an-again{position:absolute;top:6px;inset-inline-start:6px;font-size:.75rem;padding:3px 9px;border-radius:99px;background:var(--panel2);border:1px solid var(--edge);color:var(--muted)}
+@media (prefers-reduced-motion: reduce){.anim *{animation-duration:.01s!important;animation-delay:0s!important}}
+/* cube net folding */
+.fold{position:relative;display:inline-block;perspective:700px;margin:18px auto 10px;direction:ltr}
+.fold-cube{position:absolute;inset:0;transform-style:preserve-3d;transform:translate(0,0) rotateX(-14deg) rotateY(16deg);animation:foldSpin 2.2s ease-in-out var(--sp) both}
+@keyframes foldSpin{from{transform:translate(0,0) rotateX(-14deg) rotateY(16deg)}to{transform:translate(var(--tx),var(--ty)) rotateX(-14deg) rotateY(196deg)}}
+.fold-root{position:absolute;width:var(--u);height:var(--u);transform-style:preserve-3d}
+.nf{position:absolute;inset:0;width:var(--u);height:var(--u);display:grid;place-items:center;transform-style:preserve-3d;backface-visibility:hidden;background:#2F5D93;border:2px solid #CFE3FF;border-radius:3px;font-size:1.15rem;color:#fff;box-sizing:border-box}
+.nf>b{font-weight:400;pointer-events:none;backface-visibility:hidden}
+.nf.fa{background:var(--acc);color:var(--on-acc)}
+.nf.fb{background:#FFC845;color:#2E2100}
+.nf.d-r{inset:auto;left:100%;top:0;transform-origin:left center;animation:fR .7s ease-in-out var(--dl) both}
+.nf.d-l{inset:auto;right:100%;top:0;transform-origin:right center;animation:fL .7s ease-in-out var(--dl) both}
+.nf.d-d{inset:auto;top:100%;left:0;transform-origin:center top;animation:fD .7s ease-in-out var(--dl) both}
+.nf.d-u{inset:auto;bottom:100%;left:0;transform-origin:center bottom;animation:fU .7s ease-in-out var(--dl) both}
+@keyframes fR{to{transform:rotateY(90deg)}}
+@keyframes fL{to{transform:rotateY(-90deg)}}
+@keyframes fD{to{transform:rotateX(-90deg)}}
+@keyframes fU{to{transform:rotateX(90deg)}}
+/* rotation vs mirror */
+.rot-row{display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
+.rot-item{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:140px}
+.rot-spin,.rot-flip{display:block;width:84px;height:84px;color:var(--ink)}
+.rot-spin svg,.rot-flip svg{width:100%;height:100%}
+.rot-spin{animation:rotTo 1.6s cubic-bezier(.5,0,.2,1) .6s both}
+.rot-flip{animation:flipX 1.2s ease-in-out 1s both}
+@keyframes rotTo{from{transform:rotate(0)}to{transform:rotate(var(--deg))}}
+@keyframes flipX{0%{transform:scaleX(1)}100%{transform:scaleX(-1)}}
+.rot-flip .pc{fill:rgba(255,92,122,.55)}
+.rot-lbl{font-size:.78rem;color:var(--muted);line-height:1.35}
+/* invented operation morph */
+.opm{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center;font-family:var(--f-display);font-weight:700;font-size:1.35rem;direction:ltr}
+.mf{position:relative;display:inline-grid;place-items:center;min-width:1.3em;height:1.6em;border-radius:8px;perspective:200px}
+.mf>span{grid-area:1/1;backface-visibility:hidden;transition:none}
+.mf .m1{animation:mOut .45s ease-in var(--dl) both}
+.mf .m2{animation:mIn .45s ease-out calc(var(--dl) + .4s) both;padding:0 4px;border-radius:8px}
+.mf.ma .m1,.mf.ma .m2{color:var(--acc)}
+.mf.mb .m1,.mf.mb .m2{color:var(--gold)}
+.mf.ma .m2{background:var(--acc-soft)}
+.mf.mb .m2{background:rgba(255,200,69,.18)}
+@keyframes mOut{to{transform:rotateX(90deg);opacity:0}}
+@keyframes mIn{from{transform:rotateX(-90deg);opacity:0}to{transform:none;opacity:1}}
+.mo{color:var(--ink)}
+.mres{animation:fadeUp .5s ease-out 2.8s both}
+.mres b{color:var(--gold)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* two blanks */
+.s2viz{display:block;margin:10px 0;padding:12px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid var(--edge)}
+.s2s{display:block;line-height:1.7}
+.s2w{color:var(--gold);background:rgba(255,200,69,.14);padding:0 4px;border-radius:5px}
+mark.s2c{background:var(--acc-soft);color:var(--acc);border-radius:5px;padding:0 3px;font-weight:700}
+.s2rel{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 6px}
+.s2box{padding:6px 12px;border-radius:10px;background:rgba(255,200,69,.16);border:1px solid rgba(255,200,69,.5);font-weight:700}
+.s2arr{display:flex;flex-direction:column;align-items:center;font-size:1.3rem;color:var(--acc);line-height:1}
+.s2arr i{font-style:normal;font-size:.7rem;color:var(--muted);margin-top:2px}
+.s2why{display:block;font-size:.86rem;color:var(--muted)}
+/* message from dad */
+.dadmsg{display:block;line-height:1.65}
+.dadgem{display:block;text-align:center;font-size:2.6rem;color:#FFC845;text-shadow:0 0 18px rgba(255,200,69,.55);margin-bottom:6px;animation:fadeUp .6s ease-out both}
 </style>
 <div id="app" dir="rtl" lang="he"></div>
 <canvas id="fx" hidden></canvas>
@@ -1869,7 +1932,7 @@ const SC2 = [
 ].map(([s, o, ex, d]) => ({ s, o, ex, d }));
 function genSC2(d) {
   const it = pickBank(SC2, 'sc2', Math.min(d, 3)), m = mc(it.o);
-  return { cat: 'verbal', d, lk: 'sentence2', prompt: 'איזה זוג מילים משלים את המשפט? (לפי הסדר)', vis: `<div class="sentence">${it.s.split('___').join('<span class="gap">?</span>')}</div>`, options: m.options, answer: m.answer, ex: it.ex };
+  return { cat: 'verbal', d, lk: 'sentence2', prompt: 'איזה זוג מילים משלים את המשפט? (לפי הסדר)', vis: `<div class="sentence">${it.s.split('___').join('<span class="gap">?</span>')}</div>`, options: m.options, answer: m.answer, ex: sentence2Viz(it.s, it.o[0]) + it.ex };
 }
 const HOM = [
   ['אכלתי מרק עם ___.', 'הכדור נחת בדיוק על ___ היד שלו.', ['כף', 'מזלג', 'אצבע', 'קערה'], '"כף" היא גם כלי אוכל וגם החלק הפנימי של היד.', 1],
@@ -2130,7 +2193,7 @@ function genRotation(d) {
     const ki = ri(1, 3), correct = rs[ki];
     const wrong = shuffle(ms).slice(0, 3);
     const m = mc([correct, ...wrong].map(c => polySVG(c)));
-    return withHint({ cat: 'spatial', d, prompt: 'איזו צורה היא אותה צורה בדיוק, רק מסובבת? (בלי להפוך אותה כמו במראה)', vis: `<div class="polybig">${polySVG(cs)}</div>`, options: m.options, answer: m.answer, ex: 'שלוש הצורות האחרות הן תמונת מראה של המקורית: כדי לקבל אותן צריך "להפוך" את הצורה, לא רק לסובב. טריק: מצא חלק בולט (זנב או פינה) ובדוק לאיזה צד הוא פונה ביחס לשאר הצורה.' },
+    return withHint({ cat: 'spatial', d, prompt: 'איזו צורה היא אותה צורה בדיוק, רק מסובבת? (בלי להפוך אותה כמו במראה)', vis: `<div class="polybig">${polySVG(cs)}</div>`, options: m.options, answer: m.answer, ex: rotAnimHTML(cs, ki) + 'שלוש הצורות האחרות הן תמונת מראה של המקורית: כדי לקבל אותן צריך "להפוך" את הצורה, לא רק לסובב. טריק: מצא חלק בולט (זנב או פינה) ובדוק לאיזה צד הוא פונה ביחס לשאר הצורה.' },
       `הצורה בנויה מ-${L(n)} משבצות, ושלוש מהתשובות הן תמונת מראה שלה. בחרו חלק בולט בצורה ובדקו לאיזה צד הוא פונה.`,
       ki === 2 ? `בתשובה הנכונה הצורה עומדת הפוך: סובבו אותה חצי סיבוב בראש. החלק הבולט שהיה למעלה עובר למטה, ומה שהיה בצד אחד עובר לצד השני.` : `בתשובה הנכונה הצורה מסובבת רבע סיבוב, אז היא ${W === H ? 'שוכבת על צד אחר' : `נהיית ${L(H + 1)} על ${L(W + 1)} במקום ${L(W + 1)} על ${L(H + 1)}`}. בדקו לאן הלך החלק הבולט.`);
   }
@@ -2169,7 +2232,7 @@ function genNet(d) {
     const sk = pa[0] === pb[0] && Math.abs(pa[1] - pb[1]) === 2 && has(pa[0], (pa[1] + pb[1]) / 2) ? 'בעמודה' : pa[1] === pb[1] && Math.abs(pa[0] - pb[0]) === 2 && has((pa[0] + pb[0]) / 2, pa[1]) ? 'בשורה' : '';
     const nb = nc.map((_, i) => i).filter(i => Math.abs(nc[i][0] - pa[0]) + Math.abs(nc[i][1] - pa[1]) === 1).map(i => sy[i]);
     const nh2 = sk ? `כלל הדילוג: בקו ישר, המשבצת שאחרי השכנה היא הפאה הנגדית. חפשו ${sk} של ${sy[ai]} סימן שרחוק ממנו שתי משבצות.` : `שימו את ${sy[ai]} על השולחן. ${nb.length > 1 ? `${nb.join(' ו-')} מתקפלים למעלה ונהיים קירות` : `${nb[0]} מתקפל למעלה ונהיה קיר`}. המשיכו לקפל: איזה סימן נוחת למעלה, מעל ${sy[ai]}?`;
-    return withHint({ cat: 'spatial', d, prompt: `מקפלים את הפריסה לקובייה. איזה סימן יהיה בפאה שמול ${sy[ai]}?`, vis: `<div class="netwrap">${svg}</div>`, options: m.options, answer: m.answer, ex: `${sy[ai]} ו-${sy[bi]} נמצאים בפאות נגדיות. כלל: פאות נגדיות אף פעם לא נוגעות זו בזו בפריסה. בשורה ישרה, משבצת ועוד משבצת אחריה ("דילוג על אחת") הן נגדיות. אם לא בשורה ישרה, נסה לדמיין את הקיפול צעד אחרי צעד מהפאה שמסומנת.` }, `הפאה המסומנת היא ${sy[ai]}. סימן שנוגע בה בפריסה לא יכול להיות מולה. אילו סימנים נוגעים ב-${sy[ai]}?`, nh2);
+    return withHint({ cat: 'spatial', d, prompt: `מקפלים את הפריסה לקובייה. איזה סימן יהיה בפאה שמול ${sy[ai]}?`, vis: `<div class="netwrap">${svg}</div>`, options: m.options, answer: m.answer, ex: foldNetHTML(nc, sy, ai, bi) + `${sy[ai]} ו-${sy[bi]} נמצאים בפאות נגדיות. כלל: פאות נגדיות אף פעם לא נוגעות זו בזו בפריסה. בשורה ישרה, משבצת ועוד משבצת אחריה ("דילוג על אחת") הן נגדיות. אם לא בשורה ישרה, נסה לדמיין את הקיפול צעד אחרי צעד מהפאה שמסומנת.` }, `הפאה המסומנת היא ${sy[ai]}. סימן שנוגע בה בפריסה לא יכול להיות מולה. אילו סימנים נוגעים ב-${sy[ai]}?`, nh2);
   }
   return genRotation(d);
 }
@@ -2385,14 +2448,14 @@ function genOp(d) {
   const op = pick(OPS); const def = `<div class="eqs"><div class="eq">${L(`a ◆ b = ${op.t}`)}</div></div>`;
   if (d === 1) {
     let x, y, ans, k = 0; do { x = ri(2, 9); y = ri(2, 6); ans = op.f(x, y); } while (ans < 2 && k++ < 50);
-    const ex = cxRule(OP_RULE) + opDef(op) + opWho(x, y) + opCalc(op, x, y, true) + cxAns(L(`${x} ◆ ${y} = ${ans}`));
+    const ex = cxRule(OP_RULE) + opDef(op) + opMorphHTML(op.t, x, y, ans) + opWho(x, y) + opCalc(op, x, y, true) + cxAns(L(`${x} ◆ ${y} = ${ans}`));
     return { ...withHint(numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`${x} ◆ ${y}`)}?`, def, ans, [op.f(y, x), ans + y, x * y], ex), `ב-${L(`${x} ◆ ${y}`)} המספר הראשון הוא ${L(`a = ${x}`)} והשני ${L(`b = ${y}`)}. הציבו אותם בהגדרה ${L(op.t)}.`, op.h(x, y)), lk: 'op' };
   }
   if (d === 2) {
     for (let k = 0; k < 100; k++) {
       const x = ri(1, 6), y = ri(1, 5), z = ri(1, 4); const in1 = op.f(x, y); if (in1 < 0) continue; const ans = op.f(in1, z); if (ans < 2 || ans > 300) continue;
       const ex = cxRule(OP_RULE + ' קודם מה שבסוגריים, ואת התוצאה שלו מכניסים בתור a.') + opDef(op)
-        + `<span class="cx-steps">${cxStep(1, [[`(${x} ◆ ${y})`, 'קודם הסוגריים']])}</span>` + opWho(x, y) + opCalc(op, x, y, false)
+        + opMorphHTML(op.t, x, y, in1) + `<span class="cx-steps">${cxStep(1, [[`(${x} ◆ ${y})`, 'קודם הסוגריים']])}</span>` + opWho(x, y) + opCalc(op, x, y, false)
         + `<span class="cx-steps">${cxStep(2, [[`${opPut('a', in1)} ◆ ${opPut('b', '', z)}`, `התוצאה ${in1} נכנסת בתור a`]])}</span>` + opWho(in1, z) + opCalc(op, in1, z, true)
         + cxAns(L(`(${x} ◆ ${y}) ◆ ${z} = ${ans}`));
       return { ...withHint(numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`(${x} ◆ ${y}) ◆ ${z}`)}?`, def, ans, [op.f(x, op.f(y, z)), in1, op.f(z, in1)], ex), `קודם הסוגריים: חשבו ${L(`${x} ◆ ${y}`)} לפי ההגדרה. את התוצאה מכניסים בתור a, ואת ${z} בתור b.`, `${L(`${x} ◆ ${y} = ${in1}`)}. עכשיו חשבו ${L(`${in1} ◆ ${z}`)}, שוב לפי ההגדרה ${L(op.t)}.`), lk: 'op' };
@@ -2400,7 +2463,7 @@ function genOp(d) {
   }
   for (let k = 0; k < 100; k++) {
     const x = ri(2, 9), y = ri(2, 6); const R0 = op.f(x, y); if (R0 < 1) continue;
-    const ex = cxRule('כותבים את ההגדרה עם x במקום a. אחר כך הולכים אחורה: כל פעולה מבטלים בפעולה ההפוכה.') + opDef(op) + opWho('x', y)
+    const ex = cxRule('כותבים את ההגדרה עם x במקום a. אחר כך הולכים אחורה: כל פעולה מבטלים בפעולה ההפוכה.') + opDef(op) + opMorphHTML(op.t, 'x', y, R0) + opWho('x', y)
       + `<span class="cx-steps">${cxStep(1, [`${opPut('a ◆ b', 'x', y)} = ${opPut(op.t, 'x', y)} = ${R0}`])}${op.inv(x, y, R0).map((l, i) => cxStep(i + 2, [l.length > 1 ? l : l[0]])).join('')}</span>`
       + `<span class="cx-check">בדיקה: ${L(`${opPut('a ◆ b', x, y)} = ${opPut(op.t, x, y)} = ${R0}`)} ✓</span>` + cxAns(L(`x = ${x}`));
     return { ...withHint(numQ('code', 3, `הפעולה ◆ מוגדרת כך. אם ${L(`x ◆ ${y} = ${R0}`)}, מה x?`, def, x, [x + 1, x - 1, R0 - y, y], ex), `בהגדרה ${L(op.t)}, כאן ${L(`b = ${y}`)} והתוצאה ${R0}. איזה מספר חסר במקום a?`, `הציבו ${L(`b = ${y}`)}: ${L(`${op.t.replace(/b/g, y).replace(/a/g, 'x')} = ${R0}`)}. נסו להציב בזה את התשובות לבחירה.`), lk: 'op' };
@@ -3629,6 +3692,51 @@ Object.assign(GSTEPS, {
   ],
 });
 
+/* ---- 20-learn/visuals.js ---- */
+/* ---------- animated solutions ----------
+   Small CSS animations that show the idea of a solution, played once when the solution opens,
+   with a "שוב" button to replay. They live inside q.ex, so only inline elements (span, svg). */
+function replayAnim(btn) { const w = btn.closest('.anim'); if (!w) return; const c = w.cloneNode(true); w.replaceWith(c); }
+const animBox = (body, cap) => `<span class="anim">${body}${cap ? `<span class="an-cap">${cap}</span>` : ''}<button type="button" class="an-again" onclick="replayAnim(this)">${IC.share ? '↻' : '↻'} שוב</button></span>`;
+
+/* cube net: the net folds into a cube around the marked face, then the cube turns to show the face opposite it.
+   nc = net cells [[x,y]...], sy = symbols, ai = the marked face, bi = its opposite. Folds go away from the viewer. */
+function foldNetHTML(nc, sy, ai, bi) {
+  const at = (x, y) => nc.findIndex(c => c[0] === x && c[1] === y);
+  const kids = {}, depth = { [ai]: 0 }, seen = new Set([ai]), q = [ai];
+  while (q.length) { const i = q.shift(), [x, y] = nc[i]; kids[i] = [];
+    for (const [dx, dy, d] of [[1, 0, 'r'], [-1, 0, 'l'], [0, 1, 'd'], [0, -1, 'u']]) { const j = at(x + dx, y + dy); if (j >= 0 && !seen.has(j)) { seen.add(j); depth[j] = depth[i] + 1; kids[i].push([j, d]); q.push(j); } } }
+  const maxD = Math.max(...Object.values(depth));
+  const face = (i, d) => `<span class="nf${i === ai ? ' fa' : i === bi ? ' fb' : ''}${d ? ' d-' + d : ''}" style="--dl:${(depth[i] - 1) * .7 + .4}s"><b>${sy[i]}</b>${kids[i].map(([j, dd]) => face(j, dd)).join('')}</span>`;
+  const W = Math.max(...nc.map(c => c[0])) + 1, H = Math.max(...nc.map(c => c[1])) + 1, u = 44;
+  const tx = W * u / 2 - (nc[ai][0] * u + u / 2), ty = H * u / 2 - (nc[ai][1] * u + u / 2);
+  const spin = maxD * .7 + 1.2;
+  const body = `<span class="fold" style="--u:${u}px;width:${W * u}px;height:${H * u}px"><span class="fold-cube" style="--sp:${spin}s;--tx:${tx}px;--ty:${ty}px;transform-origin:${nc[ai][0] * u + u / 2}px ${nc[ai][1] * u + u / 2}px ${-u / 2}px"><span class="fold-root" style="left:${nc[ai][0] * u}px;top:${nc[ai][1] * u}px">${face(ai, '')}</span></span></span>`;
+  return animBox(body, `מקפלים סביב ${sy[ai]}, ומסובבים את הקובייה: מאחוריו נמצא ${sy[bi]}.`);
+}
+/* rotation: the shape turns to the right answer; a mirror image only flips */
+function rotAnimHTML(cs, ki) {
+  const deg = ki * 90, turn = ki === 2 ? 'חצי סיבוב' : ki === 1 ? 'רבע סיבוב עם כיוון השעון' : 'רבע סיבוב נגד כיוון השעון';
+  const body = `<span class="rot-row"><span class="rot-item"><span class="rot-spin" style="--deg:${deg}deg">${polySVG(cs)}</span><span class="rot-lbl">מסובבים: ${turn}</span></span><span class="rot-item"><span class="rot-flip">${polySVG(cs)}</span><span class="rot-lbl">מראה: הופכים. את זה אי אפשר לקבל בסיבוב</span></span></span>`;
+  return animBox(body, '');
+}
+/* invented operation: every a turns into the first number, every b into the second, then the calculation */
+function opMorphHTML(t, x, y, res) {
+  const mf = (from, to, cls, dl) => `<span class="mf ${cls}" style="--dl:${dl}s"><span class="m1">${from}</span><span class="m2">${to}</span></span>`;
+  const expr = [...t].map(ch => ch === 'a' ? mf('a', x, 'ma', .7) : ch === 'b' ? mf('b', y, 'mb', 1.6) : ch === ' ' ? ' ' : `<span class="mo">${ch}</span>`).join('');
+  const body = `<span class="opm" dir="ltr">${mf('a', x, 'ma', .7)} <span class="mo">◆</span> ${mf('b', y, 'mb', 1.6)} <span class="mo">=</span> ${expr}${res != null ? ` <span class="mres">= <b>${res}</b></span>` : ''}</span>`;
+  return animBox(body, `כל a הופך ל-${x} (המספר הראשון), כל b הופך ל-${y} (השני). רק אחר כך מחשבים.`);
+}
+/* two blanks: the connector word decides the direction between the two parts */
+const S2_CONN = [[/למרות|אף ש|אף על פי|בכל זאת|אבל|אך|אלא/, 'ניגוד', '⇄', 'שני החלקים הפוכים זה לזה', 1], [/ולכן|לכן|ובגלל זה|כתוצאה/, 'סיבה ותוצאה', '←', 'מה שלפני המילה גורם למה שאחריה', 0], [/כי |בגלל|מכיוון|משום/, 'סיבה', '→', 'מה שאחרי המילה הוא הסיבה למה שלפניה', 0], [/ככל ש|וגם|גם /, 'יחד', '⇈', 'שני הדברים הולכים יחד', 1]];
+function sentence2Viz(s, pair) {
+  const [w1, w2] = String(pair).split('/').map(x => x.trim());
+  const c = S2_CONN.find(([re]) => re.test(s)); if (!c) return '';
+  const m = c[0].exec(s)[0];
+  let k = 0; const filled = s.split('___').map((p, i, a) => i < a.length - 1 ? p + `<b class="s2w">${[w1, w2][k++] || ''}</b>` : p).join('').replace(m, `<mark class="s2c">${m}</mark>`);
+  return `<span class="s2viz"><span class="s2s">${filled}</span>${c[4] ? `<span class="s2rel"><span class="s2box">${w1}</span><span class="s2arr">${c[2]}<i>${c[1]}</i></span><span class="s2box">${w2}</span></span>` : ''}<span class="s2why">"${m.trim()}" = ${c[1]}: ${c[3]}.</span></span>`;
+}
+
 /* ---- 20-learn/mastery.js ---- */
 /* ---------- teaching what we did not teach well enough ----------
    A wrong answer given too fast (a guess) or after a long time stuck is a sign that this KIND of question
@@ -4092,7 +4200,7 @@ function exchangeCard() {
 }
 
 /* ---- 40-game/missions.js ---- */
-/* question categories of each mission kind (reading passages appear only every third day, see startMission) */
+/* question categories of each mission kind (reading passages appear every second day, see startMission) */
 const MIX = {
   daily: ['verbal', 'analog', 'reading', 'series', 'matrix', 'spatial', 'math', 'math', 'logic', 'code'],
   boss: ['verbal', 'verbal', 'analog', 'analog', 'verbal', 'series', 'series', 'matrix', 'matrix', 'spatial', 'math', 'math', 'math', 'logic', 'code'],
@@ -4156,8 +4264,8 @@ function startMission(kind, day, cat, size, path) {
     const tp = kind === 'boss' ? .3 : mod === 'typed' ? 1 : .2;
     qs = shuffle(slots).map(c => mkQ(c, kind === 'boss' ? hard(c) : qDiffFor(c, base), tp));
     if (kind === 'daily') dueMist().slice(0, 2).forEach((m, j) => { qs[qs.length - 1 - j * 3] = mistQ(m); });
-    /* long reading passages are tiring: only every third day */
-    if (kind === 'daily' && day % 3 !== 0) qs = qs.map(q => q.cat === 'reading' && !q.rev ? mkQ('verbal', q.d, .2) : q);
+    /* long reading passages are tiring: every second day */
+    if (kind === 'daily' && day % 2 !== 0) qs = qs.map(q => q.cat === 'reading' && !q.rev ? mkQ('verbal', q.d, .2) : q);
   }
   S.cur = { kind, day, cat: cat || null, qs, i: 0, res: [], pts: 0, combo: 0, hint: false, qStart: Date.now(), deadline: null, hp: 5, mod, size,
     path: !!path, intro: kind === 'daily' || kind === 'sim' || kind === 'boss', chapters, ch: 0, chDeadline: null, chBreak: false, tin: '' };
@@ -4907,6 +5015,14 @@ function dadMsgSection() {
   const cur = (S.dadMsgs && S.dadMsgs.length ? S.dadMsgs : S.guest ? [] : DAD_DEF).map(esc).join('\n');
   return `<section class="card stack" style="gap:8px"><h4 style="font-size:1.15rem">הודעות מאבא</h4><p class="small muted" style="margin:0">מופיעות מדי פעם בסוף משימה, וגם כשיש רצף של טעויות (פעם אחת במשימה). שורה לכל הודעה.</p><textarea class="txt" id="dadmsgs" style="width:100%;height:130px;line-height:1.6">${cur}</textarea><button class="btn btn-primary" data-act="dadsave" style="min-height:44px">שמור</button></section>`;
 }
+/* one-time: a message from dad about keeping at it, with one diamond. Given when shown, so a closed window still counts. */
+function dadPraise() {
+  if (PROF.id !== 'yonatan' || S.guest || isSbx() || isDadPhone() || (S.aw || {}).dad28 || S.view !== 'home' || app.querySelector('.modal')) return;
+  const n = Object.keys(S.missions || {}).length, best = Math.max(S.best || 0, S.streak || 0);
+  if (n < 5) return;
+  (S.aw || (S.aw = {})).dad28 = todayStr(); giveDia(1, 'מאבא: על ההתמדה', []); save();
+  modal('הודעה מאבא', `<span class="dadmsg"><span class="dadgem">◆</span>יונתן, ראיתי מה עשית. כבר ${n} משימות${best >= 3 ? `, ורצף שיא של ${best} ימים` : ''}. מה שהכי משמח אותי זה לא הנקודות. זו ההתמדה: אתה חוזר כל יום ומתאמן, גם כשהשאלות קשות. ככה בונים מוח חזק.<br><br>אני גאה בך. קיבלת ממני יהלום אחד על ההתמדה.<br><b>אבא</b></span>`, 'תודה אבא!', () => renderView(), 'btn-primary', true);
+}
 
 /* ---- 50-family/dadphone.js ---- */
 const CC_KEY = 'bl-cloudcache-' + PROF.id;
@@ -5245,7 +5361,7 @@ async function pullParent(force) {
 }
 
 /* ---- 70-ui/shell.js ---- */
-const APP_VER = '27';
+const APP_VER = '28';
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
 async function doUpdate() {
@@ -5998,6 +6114,8 @@ app.addEventListener('click', e => {
 if (S.pendingSong) { if (S.last) S.last.newSong = S.pendingSong; delete S.pendingSong; }
 /* the journey trail follows the nodes when the phone turns */
 addEventListener('resize', () => { if (app.querySelector('.path')) drawTrails(); });
+/* one-time message from dad (v28) */
+setTimeout(dadPraise, 1800);
 
 render(); guestOnboard();
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

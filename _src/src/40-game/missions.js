@@ -1,4 +1,4 @@
-/* question categories of each mission kind (reading passages appear only every third day, see startMission) */
+/* question categories of each mission kind (reading passages appear every second day, see startMission) */
 const MIX = {
   daily: ['verbal', 'analog', 'reading', 'series', 'matrix', 'spatial', 'math', 'math', 'logic', 'code'],
   boss: ['verbal', 'verbal', 'analog', 'analog', 'verbal', 'series', 'series', 'matrix', 'matrix', 'spatial', 'math', 'math', 'math', 'logic', 'code'],
@@ -62,8 +62,8 @@ function startMission(kind, day, cat, size, path) {
     const tp = kind === 'boss' ? .3 : mod === 'typed' ? 1 : .2;
     qs = shuffle(slots).map(c => mkQ(c, kind === 'boss' ? hard(c) : qDiffFor(c, base), tp));
     if (kind === 'daily') dueMist().slice(0, 2).forEach((m, j) => { qs[qs.length - 1 - j * 3] = mistQ(m); });
-    /* long reading passages are tiring: only every third day */
-    if (kind === 'daily' && day % 3 !== 0) qs = qs.map(q => q.cat === 'reading' && !q.rev ? mkQ('verbal', q.d, .2) : q);
+    /* long reading passages are tiring: every second day */
+    if (kind === 'daily' && day % 2 !== 0) qs = qs.map(q => q.cat === 'reading' && !q.rev ? mkQ('verbal', q.d, .2) : q);
   }
   S.cur = { kind, day, cat: cat || null, qs, i: 0, res: [], pts: 0, combo: 0, hint: false, qStart: Date.now(), deadline: null, hp: 5, mod, size,
     path: !!path, intro: kind === 'daily' || kind === 'sim' || kind === 'boss', chapters, ch: 0, chDeadline: null, chBreak: false, tin: '' };

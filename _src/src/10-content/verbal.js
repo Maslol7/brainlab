@@ -312,7 +312,7 @@ const SC2 = [
 ].map(([s, o, ex, d]) => ({ s, o, ex, d }));
 function genSC2(d) {
   const it = pickBank(SC2, 'sc2', Math.min(d, 3)), m = mc(it.o);
-  return { cat: 'verbal', d, lk: 'sentence2', prompt: 'איזה זוג מילים משלים את המשפט? (לפי הסדר)', vis: `<div class="sentence">${it.s.split('___').join('<span class="gap">?</span>')}</div>`, options: m.options, answer: m.answer, ex: it.ex };
+  return { cat: 'verbal', d, lk: 'sentence2', prompt: 'איזה זוג מילים משלים את המשפט? (לפי הסדר)', vis: `<div class="sentence">${it.s.split('___').join('<span class="gap">?</span>')}</div>`, options: m.options, answer: m.answer, ex: sentence2Viz(it.s, it.o[0]) + it.ex };
 }
 const HOM = [
   ['אכלתי מרק עם ___.', 'הכדור נחת בדיוק על ___ היד שלו.', ['כף', 'מזלג', 'אצבע', 'קערה'], '"כף" היא גם כלי אוכל וגם החלק הפנימי של היד.', 1],
