@@ -1,6 +1,6 @@
 function bind() {
   if (app.querySelector('.path')) requestAnimationFrame(drawTrails);
-  app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { const g = b.dataset.go; if (g === 'sprint') SP = null; if (g === 'piano') PN = null; if (g === 'kupa') KP = null; go(g); });
+  app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { const g = b.dataset.go; if (g === 'sprint') SP = null; if (g === 'piano') PN = null; if (g === 'kupa') KP = null; if (g === 'legends') LGS = null; go(g); });
   app.querySelectorAll('[data-opt]').forEach(b => b.onclick = () => answer(+b.dataset.opt));
   app.querySelectorAll('[data-practice]').forEach(b => b.onclick = () => { if (S.cur) return modal('יש משימה פתוחה', 'קודם סיים את המשימה שהתחלת, או צא ממנה.', 'להמשיך במשימה', () => go('quiz')); startMission('practice', nextDay() || TOTAL, b.dataset.practice); });
   app.querySelectorAll('[data-skin]').forEach(b => b.onclick = () => buySkin(b.dataset.skin));

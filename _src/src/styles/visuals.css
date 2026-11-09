@@ -60,3 +60,21 @@ mark.s2c{background:var(--acc-soft);color:var(--acc);border-radius:5px;padding:0
 /* message from dad */
 .dadmsg{display:block;line-height:1.65}
 .dadgem{display:block;text-align:center;font-size:2.6rem;color:#FFC845;text-shadow:0 0 18px rgba(255,200,69,.55);margin-bottom:6px;animation:fadeUp .6s ease-out both}
+/* great football moments */
+.lg-list{display:flex;flex-direction:column;gap:10px}
+.lg-card{display:flex;align-items:center;gap:12px;text-align:start;padding:12px 14px;border-radius:16px;background:var(--panel);border:1px solid var(--edge);color:var(--ink)}
+.lg-card b{display:block;font-size:1.02rem}.lg-card small{color:var(--muted);font-size:.8rem}
+.lg-yr{font-weight:800;font-size:1.05rem;color:#E8364F;min-width:3.2em;text-align:center;font-variant-numeric:tabular-nums}
+.lg-st{display:inline-flex;gap:2px;color:var(--edge);font-size:1rem}.lg-st i{font-style:normal}.lg-st i.on{color:var(--gold)}
+.lg-st.big{font-size:1.8rem;justify-content:center;display:flex}
+.lg .qbar b{font-size:1rem}
+.lg-tm{font-weight:800;font-size:1.3rem;min-width:2ch;text-align:center;color:var(--gold);font-variant-numeric:tabular-nums}
+.lg-stage{position:relative;border-radius:16px;overflow:hidden;touch-action:none;background:#2E8B47}
+.lg-stage canvas{display:block;touch-action:none}
+.lg-cap{position:absolute;bottom:10px;inset-inline:8px;text-align:center;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);pointer-events:none;font-size:.95rem}
+.lg-pane{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.lg-pane[hidden]{display:none}
+.lg-pane p{margin:0;line-height:1.55;font-size:.95rem}
+.lg-pane .row{gap:8px}.lg-pane .row .btn{flex:1;min-height:44px}
+.lg-goal{font-size:2.4rem;font-weight:900;text-align:center;color:var(--gold);letter-spacing:.04em}
+.lg-ctl{min-height:48px;justify-content:center;align-items:center;text-align:center;flex-direction:column;gap:8px}

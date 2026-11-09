@@ -81,6 +81,7 @@ function renderView() {
   if (S.view === 'sprint') return renderSprint();
   if (S.view === 'kupa') return renderKupa();
   if (S.view === 'piano') return renderPiano();
+  if (S.view === 'legends') return renderLegends();
   const v = S.view;
   const views = { home: viewHome, arcade: viewArcade, shop: viewShop, stats: viewStats, tips: viewTips, result: viewResult, me: viewMe, parent: viewParent };
   app.innerHTML = (views[v] || viewHome)() + nav(v);
