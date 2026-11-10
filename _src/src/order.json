@@ -34,6 +34,8 @@
  "40-game/calm.js",
  "40-game/xtra.js",
  "40-game/arcade.js",
+ "40-game/fb-engine.js",
+ "40-game/fb-render.js",
  "40-game/legends.js",
  "40-game/songs.js",
  "40-game/minigames.js",
