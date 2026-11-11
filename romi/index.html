@@ -8,14 +8,14 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="סלטה">
+<meta name="apple-mobile-web-app-title" content="סלטה למוח">
 <meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 </head>
 <body>
-<title>סלטה</title>
+<title>סלטה למוח</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="color-scheme" content="light dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -415,7 +415,7 @@ function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e
 /* ---------- סלטה: Romi's English words app. Base: page, small helpers, toast and modal ---------- */
 document.documentElement.setAttribute('dir', 'rtl');
 document.documentElement.setAttribute('lang', 'he');
-const APP_VER = '35';
+const APP_VER = '36';
 const APP_URL = 'https://maslol7.github.io/brainlab/romi/';
 const app = document.getElementById('app');
 const NAME = 'רומי';
@@ -529,7 +529,7 @@ const KEY = 'salta-romi-v1';
 const DAD_DEF = ['רומי, אבא אוהב אותך.', 'אבא גאה בך. לא בגלל הציון, בגלל שאת מתאמנת.', 'כמו באקרובטיקה: עוד אימון ועוד אימון, ופתאום זה קל. אבא איתך.', 'טעות היא חלק מהאימון. אבא סומך עלייך.', 'אבא אוהב אותך. עכשיו לכי לשתות מים ולעשות גלגלון.', 'כל מילה שלמדת היא שלך לתמיד. אבא גאה בך.'];
 const DAD_HARD = ['קשה? זה בסדר. אבא אוהב אותך, וזה לא תלוי בציון.', 'נשימה עמוקה. גם באימון לא כל קפיצה יוצאת בפעם הראשונה. אבא איתך.'];
 function fresh() {
-  return { v: 1, start: todayStr(), lists: [JSON.parse(JSON.stringify(LIST_1104)), JSON.parse(JSON.stringify(LIST0)), JSON.parse(JSON.stringify(LIST_EXAM))], p: {}, candy: 0, candyAll: 0, days: {}, sessions: 0, tests: [], stickers: [], own: { leo: ['violet'], rib: ['pink'] }, leo: 'violet', rib: 'pink', best: {}, dadMsgs: null, dadI: 0, sound: 1, rate: .85, pin: '', seen: {}, view: 'home', pv: '' };
+  return { v: 1, start: todayStr(), lists: [JSON.parse(JSON.stringify(LIST_1104)), JSON.parse(JSON.stringify(LIST0)), JSON.parse(JSON.stringify(LIST_EXAM))], p: {}, candy: 0, candyAll: 0, days: {}, sessions: 0, tests: [], stickers: [], own: { leo: ['violet'], rib: ['pink'] }, leo: 'violet', rib: 'pink', best: {}, dadMsgs: null, dadI: 0, sound: 1, rate: .85, pin: '', seen: { pin36: 1 }, view: 'home', pv: '' };
 }
 function norm(o) {
   const f = fresh();
@@ -539,7 +539,9 @@ function norm(o) {
   if (o.dadMsgs) o.dadMsgs = arr(o.dadMsgs);
   for (const k in o.p) { const q = o.p[k]; q.wr = arr(q.wr); }
   /* lists that ship with a version are added once, also to a phone that already has data */
-  o.seen = o.seen || {}; if (!o.seen.exam1123b) { o.seen.exam1123 = o.seen.exam1123b = 1; [LIST_1104, LIST_EXAM].forEach(L => { o.lists = o.lists.filter(l => l.id !== L.id || L === LIST_1104); if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
+  o.seen = o.seen || {};
+  if (!o.seen.pin36) { o.seen.pin36 = 1; o.pin = ''; }   /* v36: dad chooses the parent code again (one was typed wrong) */
+  if (!o.seen.exam1123b) { o.seen.exam1123 = o.seen.exam1123b = 1; [LIST_1104, LIST_EXAM].forEach(L => { o.lists = o.lists.filter(l => l.id !== L.id || L === LIST_1104); if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
   return o;
 }
 let S = (() => { try { const r = localStorage.getItem(KEY); if (r) return norm(JSON.parse(r)); } catch (e) { } return fresh(); })();
@@ -959,7 +961,7 @@ VIEWS.home = () => {
   on('[data-pack]', b => startPractice(listById(b.dataset.pack)));
   on('[data-act="dadnote"]', () => { S.dadNote = null; save(); render(); });
   if (isBday() && !(S.bday || {})[t.slice(0, 4)]) later(bdayGift, 500);
-  else if (!S.seen.welcome) later(welcome, 400);
+  else if (!S.seen.welcome && !S.seen.wDefer) later(welcome, 400);
 };
 function greet() {
   const h = new Date().getHours(), s = streak();
@@ -970,7 +972,7 @@ function dadNoteHTML() { return S.dadNote ? `<button class="note" data-act="dadn
 function welcome() {
   if (S.view !== 'home' || document.querySelector('.modal')) return;
   S.seen.welcome = 1; save();
-  modal('ברוכה הבאה לסלטה', `<div class="center">${romiSVG()}</div><p>כאן מתאמנים על המילים באנגלית להכתבה, ועל עוד הרבה מילים.</p><p>כל מילה עוברת <b>7 שלבים</b> עד כוכב. על כל תשובה נכונה מקבלים ממתק, ובממתקים קונים בגדי התעמלות לדמות שלך.</p><p class="small muted">אם לא שומעים את המילים, בדקי שהצליל בטלפון פתוח.</p>`, [['יאללה!', () => say('Hello Romi! Let\'s practice!')]]);
+  modal('ברוכה הבאה לסלטה למוח', `<div class="center">${romiSVG()}</div><p>כאן מתאמנים על המילים באנגלית להכתבה, ועל עוד הרבה מילים.</p><p>כל מילה עוברת <b>7 שלבים</b> עד כוכב. על כל תשובה נכונה מקבלים ממתק, ובממתקים קונים בגדי התעמלות לדמות שלך.</p><p class="small muted">אם לא שומעים את המילים, בדקי שהצליל בטלפון פתוח.</p>`, [['יאללה!', () => say('Hello Romi! Let\'s practice!')]]);
 }
 /* tap a word: hear it, see it letter by letter, see the steps */
 function wordCard(k, lid) {
@@ -1546,16 +1548,31 @@ VIEWS.parent = () => {
   <section class="card stack"><h3>הודעות מאבא</h3><p class="small muted">מופיעות מדי פעם בסוף אימון, ופעם אחת כשיש רצף טעויות. שורה לכל הודעה.</p><textarea class="txt" id="dadmsgs" rows="6">${esc(((dad ? arr((PDOC || {}).dadMsgs) : S.dadMsgs) || DAD_DEF).join('\n'))}</textarea><button class="btn btn-ghost" data-act="dadsave">שמור</button></section>
   ${dad ? '' : settingsHTML()}
   ${cloudSection()}
-  <p class="small muted center">סלטה · גרסה ${APP_VER}</p></div>`;
+  <p class="small muted center">סלטה למוח · גרסה ${APP_VER}</p></div>`;
   bindParent();
 };
+/* the parent code: typed twice when it is set (a typo locked dad out once), and "forgot the code" asks a multiplication a child will not do by heart */
+let PIN_TRY = null;
 function pinGate() {
-  const set = !S.pin;
-  app.innerHTML = `<div class="page">${topBar('אזור הורים')}<section class="card stack center"><h3>${set ? 'בחר קוד של 4 ספרות' : 'קוד הורים'}</h3><p class="small muted">${set ? 'הקוד שומר שרק אבא נכנס לכאן.' : ''}</p>
-  <input class="txt pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"><button class="btn btn-main" data-act="pin">${set ? 'שמירה' : 'כניסה'}</button></section></div>`;
+  const set = !S.pin, again = set && PIN_TRY;
+  app.innerHTML = `<div class="page">${topBar('אזור הורים')}<section class="card stack center"><h3>${again ? 'עוד פעם, לאישור' : set ? 'בחר קוד של 4 ספרות' : 'קוד הורים'}</h3><p class="small muted">${set ? 'הקוד שומר שרק אבא נכנס לכאן.' : ''}</p>
+  <input class="txt pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"><button class="btn btn-main" data-act="pin">${again ? 'אישור' : set ? 'המשך' : 'כניסה'}</button>
+  ${set ? '' : '<button class="chip" data-act="forgot">שכחתי את הקוד</button>'}</section></div>`;
   const inp = document.getElementById('pin'); setTimeout(() => inp && inp.focus(), 100);
-  const go2 = () => { const v = inp.value.trim(); if (!/^\d{4}$/.test(v)) return toast('4 ספרות'); if (set) { S.pin = v; save(); } else if (v !== S.pin) { inp.value = ''; return toast('קוד לא נכון'); } PARENT_OK = true; render(); };
+  const go2 = () => {
+    const v = inp.value.trim(); if (!/^\d{4}$/.test(v)) return toast('4 ספרות');
+    if (set && !again) { PIN_TRY = v; return render(); }
+    if (again) { if (v !== PIN_TRY) { PIN_TRY = null; toast('הקודים לא זהים. מתחילים מחדש.'); return render(); } S.pin = v; PIN_TRY = null; save(); toast('הקוד נשמר'); }
+    else if (v !== S.pin) { inp.value = ''; return toast('קוד לא נכון'); }
+    PARENT_OK = true; render();
+  };
   on('[data-act="pin"]', go2); inp.onkeydown = e => { if (e.key === 'Enter') go2(); };
+  on('[data-act="forgot"]', () => {
+    const a = ri(23, 89), b = ri(23, 89);
+    let ans = '';   /* the modal is removed before its button runs, so keep the typed answer as it is typed */
+    const m = modal('איפוס קוד ההורים', `<p>כמה זה <b dir="ltr">${a} × ${b}</b>? אחרי תשובה נכונה בוחרים קוד חדש.</p><input class="txt" id="fq" inputmode="numeric" pattern="[0-9]*" autocomplete="off">`, [['איפוס', () => { if (+ans !== a * b) return toast('לא נכון'); S.pin = ''; PIN_TRY = null; save(); render(); }], ['ביטול']]);
+    const q = m.querySelector('#fq'); if (q) { q.oninput = () => { ans = q.value; }; setTimeout(() => q.focus(), 100); }
+  });
 }
 const curListOf = D => { const t = todayStr(), c = arr(D.lists).filter(l => l.src === 'class'); return c.filter(l => l.date && l.date >= t).sort((a, b) => a.date < b.date ? -1 : 1)[0] || c[c.length - 1]; };
 function pctWith(D, l) { const M = maxSt(l); return Math.round(l.words.reduce((a, w) => a + Math.min(1, ((D.p || {})[kOf(w)] || {}).st / M || 0), 0) / (l.words.length || 1) * 100); }
@@ -1611,6 +1628,8 @@ function bindParent() {
   on('[data-act="note"]', async () => { const t = document.getElementById('note').value.trim(); if (!t) return; if (dad) { PDOC.note = { id: Date.now(), t }; if (!await pPut(cloudCfg(), PDOC)) return toast('השליחה נכשלה'); } else { S.dadNote = t; save(); } toast('נשלח'); document.getElementById('note').value = ''; });
   on('[data-act="dadsave"]', async () => { const l = document.getElementById('dadmsgs').value.split('\n').map(s => s.trim()).filter(Boolean); if (dad) { PDOC.dadMsgs = l; PDOC.mv = Date.now(); if (!await pPut(cloudCfg(), PDOC)) return toast('השמירה נכשלה'); } else S.dadMsgs = l.length ? l : null; save(); toast('נשמר'); });
   on('[data-act="dv"]', () => { S.dadVoice = S.dadVoice === 0 ? 1 : 0; save(); render(); });
+  on('[data-act="pinchg"]', () => { S.pin = ''; PIN_TRY = null; PARENT_OK = false; save(); render(); });
+  on('[data-act="wagain"]', () => { S.seen.welcome = 0; S.seen.wDefer = 1; save(); toast('ההודעה תופיע כשרומי תפתח את האפליקציה בפעם הבאה'); render(); });
   on('[data-act="snd"]', () => { S.sound = S.sound ? 0 : 1; save(); render(); });
   on('[data-rate]', b => { S.rate = +b.dataset.rate; save(); say('Neighbor, flower, mountain'); render(); });
   on('[data-act="ten"]', () => say('Hello Romi! This is how I say mountain.'));
@@ -1630,6 +1649,8 @@ async function removeList(id) {
 function settingsHTML() {
   const ve = voiceFor('en'), vh = voiceFor('he');
   return `<section class="card stack"><h3>צליל ודיבור</h3>
+  <div class="row"><span class="grow">קוד ההורים</span><button class="chip" data-act="pinchg">שינוי</button></div>
+  <div class="row"><span class="grow">הודעת הפתיחה לרומי</span><button class="chip" data-act="wagain">${S.seen.welcome ? 'להציג שוב' : 'תופיע לה'}</button></div>
   <div class="row"><span class="grow">צלילים</span><button class="chip" data-act="snd">${S.sound ? 'פועלים' : 'כבויים'}</button></div>
   <div class="row"><span class="grow">הקול של אבא במקום קול הטלפון</span><button class="chip" data-act="dv">${S.dadVoice === 0 ? 'כבוי' : 'פועל'}</button></div>
   <div class="row"><span class="grow">מהירות הקראה</span>${[[.7, 'איטית'], [.85, 'רגילה'], [1, 'מהירה']].map(([r, t]) => `<button class="chip ${S.rate === r ? 'on' : ''}" data-rate="${r}">${t}</button>`).join('')}</div>
@@ -1851,7 +1872,8 @@ function bindCloud() {
 /* ---- romi/src/99-main.js ---- */
 /* ---------- start-up ---------- */
 function boot() {
-  if (!['home', 'lists', 'shop'].includes(S.view)) S.view = 'home';   /* a session is not resumed after the app closes */
+  if (!['home', 'lists', 'shop'].includes(S.view)) S.view = 'home';
+  if (S.seen.wDefer) { delete S.seen.wDefer; save(); }   /* dad asked to show the welcome again: it waits for the next opening */   /* a session is not resumed after the app closes */
   render();
   kidPull(true); if (isKidCloud() && !Object.keys(VOICE).length) voicePull();
   if (isDad()) dadLoad();

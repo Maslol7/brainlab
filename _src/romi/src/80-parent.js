@@ -19,16 +19,31 @@ VIEWS.parent = () => {
   <section class="card stack"><h3>הודעות מאבא</h3><p class="small muted">מופיעות מדי פעם בסוף אימון, ופעם אחת כשיש רצף טעויות. שורה לכל הודעה.</p><textarea class="txt" id="dadmsgs" rows="6">${esc(((dad ? arr((PDOC || {}).dadMsgs) : S.dadMsgs) || DAD_DEF).join('\n'))}</textarea><button class="btn btn-ghost" data-act="dadsave">שמור</button></section>
   ${dad ? '' : settingsHTML()}
   ${cloudSection()}
-  <p class="small muted center">סלטה · גרסה ${APP_VER}</p></div>`;
+  <p class="small muted center">סלטה למוח · גרסה ${APP_VER}</p></div>`;
   bindParent();
 };
+/* the parent code: typed twice when it is set (a typo locked dad out once), and "forgot the code" asks a multiplication a child will not do by heart */
+let PIN_TRY = null;
 function pinGate() {
-  const set = !S.pin;
-  app.innerHTML = `<div class="page">${topBar('אזור הורים')}<section class="card stack center"><h3>${set ? 'בחר קוד של 4 ספרות' : 'קוד הורים'}</h3><p class="small muted">${set ? 'הקוד שומר שרק אבא נכנס לכאן.' : ''}</p>
-  <input class="txt pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"><button class="btn btn-main" data-act="pin">${set ? 'שמירה' : 'כניסה'}</button></section></div>`;
+  const set = !S.pin, again = set && PIN_TRY;
+  app.innerHTML = `<div class="page">${topBar('אזור הורים')}<section class="card stack center"><h3>${again ? 'עוד פעם, לאישור' : set ? 'בחר קוד של 4 ספרות' : 'קוד הורים'}</h3><p class="small muted">${set ? 'הקוד שומר שרק אבא נכנס לכאן.' : ''}</p>
+  <input class="txt pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"><button class="btn btn-main" data-act="pin">${again ? 'אישור' : set ? 'המשך' : 'כניסה'}</button>
+  ${set ? '' : '<button class="chip" data-act="forgot">שכחתי את הקוד</button>'}</section></div>`;
   const inp = document.getElementById('pin'); setTimeout(() => inp && inp.focus(), 100);
-  const go2 = () => { const v = inp.value.trim(); if (!/^\d{4}$/.test(v)) return toast('4 ספרות'); if (set) { S.pin = v; save(); } else if (v !== S.pin) { inp.value = ''; return toast('קוד לא נכון'); } PARENT_OK = true; render(); };
+  const go2 = () => {
+    const v = inp.value.trim(); if (!/^\d{4}$/.test(v)) return toast('4 ספרות');
+    if (set && !again) { PIN_TRY = v; return render(); }
+    if (again) { if (v !== PIN_TRY) { PIN_TRY = null; toast('הקודים לא זהים. מתחילים מחדש.'); return render(); } S.pin = v; PIN_TRY = null; save(); toast('הקוד נשמר'); }
+    else if (v !== S.pin) { inp.value = ''; return toast('קוד לא נכון'); }
+    PARENT_OK = true; render();
+  };
   on('[data-act="pin"]', go2); inp.onkeydown = e => { if (e.key === 'Enter') go2(); };
+  on('[data-act="forgot"]', () => {
+    const a = ri(23, 89), b = ri(23, 89);
+    let ans = '';   /* the modal is removed before its button runs, so keep the typed answer as it is typed */
+    const m = modal('איפוס קוד ההורים', `<p>כמה זה <b dir="ltr">${a} × ${b}</b>? אחרי תשובה נכונה בוחרים קוד חדש.</p><input class="txt" id="fq" inputmode="numeric" pattern="[0-9]*" autocomplete="off">`, [['איפוס', () => { if (+ans !== a * b) return toast('לא נכון'); S.pin = ''; PIN_TRY = null; save(); render(); }], ['ביטול']]);
+    const q = m.querySelector('#fq'); if (q) { q.oninput = () => { ans = q.value; }; setTimeout(() => q.focus(), 100); }
+  });
 }
 const curListOf = D => { const t = todayStr(), c = arr(D.lists).filter(l => l.src === 'class'); return c.filter(l => l.date && l.date >= t).sort((a, b) => a.date < b.date ? -1 : 1)[0] || c[c.length - 1]; };
 function pctWith(D, l) { const M = maxSt(l); return Math.round(l.words.reduce((a, w) => a + Math.min(1, ((D.p || {})[kOf(w)] || {}).st / M || 0), 0) / (l.words.length || 1) * 100); }
@@ -84,6 +99,8 @@ function bindParent() {
   on('[data-act="note"]', async () => { const t = document.getElementById('note').value.trim(); if (!t) return; if (dad) { PDOC.note = { id: Date.now(), t }; if (!await pPut(cloudCfg(), PDOC)) return toast('השליחה נכשלה'); } else { S.dadNote = t; save(); } toast('נשלח'); document.getElementById('note').value = ''; });
   on('[data-act="dadsave"]', async () => { const l = document.getElementById('dadmsgs').value.split('\n').map(s => s.trim()).filter(Boolean); if (dad) { PDOC.dadMsgs = l; PDOC.mv = Date.now(); if (!await pPut(cloudCfg(), PDOC)) return toast('השמירה נכשלה'); } else S.dadMsgs = l.length ? l : null; save(); toast('נשמר'); });
   on('[data-act="dv"]', () => { S.dadVoice = S.dadVoice === 0 ? 1 : 0; save(); render(); });
+  on('[data-act="pinchg"]', () => { S.pin = ''; PIN_TRY = null; PARENT_OK = false; save(); render(); });
+  on('[data-act="wagain"]', () => { S.seen.welcome = 0; S.seen.wDefer = 1; save(); toast('ההודעה תופיע כשרומי תפתח את האפליקציה בפעם הבאה'); render(); });
   on('[data-act="snd"]', () => { S.sound = S.sound ? 0 : 1; save(); render(); });
   on('[data-rate]', b => { S.rate = +b.dataset.rate; save(); say('Neighbor, flower, mountain'); render(); });
   on('[data-act="ten"]', () => say('Hello Romi! This is how I say mountain.'));
@@ -103,6 +120,8 @@ async function removeList(id) {
 function settingsHTML() {
   const ve = voiceFor('en'), vh = voiceFor('he');
   return `<section class="card stack"><h3>צליל ודיבור</h3>
+  <div class="row"><span class="grow">קוד ההורים</span><button class="chip" data-act="pinchg">שינוי</button></div>
+  <div class="row"><span class="grow">הודעת הפתיחה לרומי</span><button class="chip" data-act="wagain">${S.seen.welcome ? 'להציג שוב' : 'תופיע לה'}</button></div>
   <div class="row"><span class="grow">צלילים</span><button class="chip" data-act="snd">${S.sound ? 'פועלים' : 'כבויים'}</button></div>
   <div class="row"><span class="grow">הקול של אבא במקום קול הטלפון</span><button class="chip" data-act="dv">${S.dadVoice === 0 ? 'כבוי' : 'פועל'}</button></div>
   <div class="row"><span class="grow">מהירות הקראה</span>${[[.7, 'איטית'], [.85, 'רגילה'], [1, 'מהירה']].map(([r, t]) => `<button class="chip ${S.rate === r ? 'on' : ''}" data-rate="${r}">${t}</button>`).join('')}</div>

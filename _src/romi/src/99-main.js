@@ -1,6 +1,7 @@
 /* ---------- start-up ---------- */
 function boot() {
-  if (!['home', 'lists', 'shop'].includes(S.view)) S.view = 'home';   /* a session is not resumed after the app closes */
+  if (!['home', 'lists', 'shop'].includes(S.view)) S.view = 'home';
+  if (S.seen.wDefer) { delete S.seen.wDefer; save(); }   /* dad asked to show the welcome again: it waits for the next opening */   /* a session is not resumed after the app closes */
   render();
   kidPull(true); if (isKidCloud() && !Object.keys(VOICE).length) voicePull();
   if (isDad()) dadLoad();

@@ -66,10 +66,20 @@ const { chromium, devices } = require('playwright');
   await p.evaluate(() => { S.candy = 100; save(); }); await p.click('.foot [data-go="shop"]'); await p.click('[data-buy="leo:mint"]'); await p.click('.modal [data-mi="0"]');
   ok(await p.evaluate(() => S.leo === 'mint' && S.candy === 75), 'buy a leotard');
   // parent: PIN, paste a list, it becomes a class list
-  await p.click('[data-go="home"]'); await p.click('.foot [data-go="parent"]'); await p.fill('#pin', '1234'); await p.click('[data-act="pin"]');
+  await p.click('[data-go="home"]'); await p.click('.foot [data-go="parent"]'); await p.fill('#pin', '1234'); await p.click('[data-act="pin"]'); await p.fill('#pin', '1234'); await p.click('[data-act="pin"]');
   await p.evaluate(() => { const d = document.querySelector('.newlist details'); if (d) d.open = true; });
   await p.fill('#paste', '1. Window – חלון 🪟\n2. Yellow - צהוב\n3. Ice cream – גלידה 🍦\nההכתבה ב-2.12'); await p.click('[data-act="parse"]'); await p.click('[data-act="savelist"]');
   ok(await p.evaluate(() => S.lists.length === 4 && S.lists.some(l => /-12-02$/.test(l.date) && l.words.length === 3)), 'a pasted list is saved with its date');
+  // the parent code: change it, a typo is caught, forgot-the-code works
+  ok(await p.evaluate(() => S.pin === '1234'), 'parent code set after typing it twice');
+  await p.click('[data-act="pinchg"]'); await p.fill('#pin', '3734'); await p.click('[data-act="pin"]'); await p.fill('#pin', '3743'); await p.click('[data-act="pin"]');
+  ok(await p.evaluate(() => !S.pin && !PIN_TRY), 'two different codes are not saved');
+  await p.fill('#pin', '3734'); await p.click('[data-act="pin"]'); await p.fill('#pin', '3734'); await p.click('[data-act="pin"]');
+  ok(await p.evaluate(() => S.pin === '3734' && S.view === 'parent'), 'changed code saved');
+  await p.evaluate(() => { PARENT_OK = false; render(); }); await p.click('[data-act="forgot"]');
+  const q = await p.evaluate(() => document.querySelector('.modal b').textContent.split('×').map(Number)); await p.fill('#fq', String(q[0] * q[1])); await p.click('.modal [data-mi="0"]');
+  ok(await p.evaluate(() => S.pin === '' && !!document.querySelector('#pin')), 'forgot the code: reset after the right answer');
+  await p.fill('#pin', '1234'); await p.click('[data-act="pin"]'); await p.fill('#pin', '1234'); await p.click('[data-act="pin"]');
   // one-tap paste from WhatsApp (the clipboard)
   await p.evaluate(() => navigator.clipboard.writeText('הכתבה ב-9.12\n1. Kitchen – מטבח 🍳\n2. Garden – גינה 🌻'));
   await p.click('[data-act="clip"]'); await p.waitForTimeout(300);

@@ -68,7 +68,7 @@ VIEWS.home = () => {
   on('[data-pack]', b => startPractice(listById(b.dataset.pack)));
   on('[data-act="dadnote"]', () => { S.dadNote = null; save(); render(); });
   if (isBday() && !(S.bday || {})[t.slice(0, 4)]) later(bdayGift, 500);
-  else if (!S.seen.welcome) later(welcome, 400);
+  else if (!S.seen.welcome && !S.seen.wDefer) later(welcome, 400);
 };
 function greet() {
   const h = new Date().getHours(), s = streak();
@@ -79,7 +79,7 @@ function dadNoteHTML() { return S.dadNote ? `<button class="note" data-act="dadn
 function welcome() {
   if (S.view !== 'home' || document.querySelector('.modal')) return;
   S.seen.welcome = 1; save();
-  modal('ברוכה הבאה לסלטה', `<div class="center">${romiSVG()}</div><p>כאן מתאמנים על המילים באנגלית להכתבה, ועל עוד הרבה מילים.</p><p>כל מילה עוברת <b>7 שלבים</b> עד כוכב. על כל תשובה נכונה מקבלים ממתק, ובממתקים קונים בגדי התעמלות לדמות שלך.</p><p class="small muted">אם לא שומעים את המילים, בדקי שהצליל בטלפון פתוח.</p>`, [['יאללה!', () => say('Hello Romi! Let\'s practice!')]]);
+  modal('ברוכה הבאה לסלטה למוח', `<div class="center">${romiSVG()}</div><p>כאן מתאמנים על המילים באנגלית להכתבה, ועל עוד הרבה מילים.</p><p>כל מילה עוברת <b>7 שלבים</b> עד כוכב. על כל תשובה נכונה מקבלים ממתק, ובממתקים קונים בגדי התעמלות לדמות שלך.</p><p class="small muted">אם לא שומעים את המילים, בדקי שהצליל בטלפון פתוח.</p>`, [['יאללה!', () => say('Hello Romi! Let\'s practice!')]]);
 }
 /* tap a word: hear it, see it letter by letter, see the steps */
 function wordCard(k, lid) {

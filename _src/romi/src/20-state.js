@@ -3,7 +3,7 @@ const KEY = 'salta-romi-v1';
 const DAD_DEF = ['רומי, אבא אוהב אותך.', 'אבא גאה בך. לא בגלל הציון, בגלל שאת מתאמנת.', 'כמו באקרובטיקה: עוד אימון ועוד אימון, ופתאום זה קל. אבא איתך.', 'טעות היא חלק מהאימון. אבא סומך עלייך.', 'אבא אוהב אותך. עכשיו לכי לשתות מים ולעשות גלגלון.', 'כל מילה שלמדת היא שלך לתמיד. אבא גאה בך.'];
 const DAD_HARD = ['קשה? זה בסדר. אבא אוהב אותך, וזה לא תלוי בציון.', 'נשימה עמוקה. גם באימון לא כל קפיצה יוצאת בפעם הראשונה. אבא איתך.'];
 function fresh() {
-  return { v: 1, start: todayStr(), lists: [JSON.parse(JSON.stringify(LIST_1104)), JSON.parse(JSON.stringify(LIST0)), JSON.parse(JSON.stringify(LIST_EXAM))], p: {}, candy: 0, candyAll: 0, days: {}, sessions: 0, tests: [], stickers: [], own: { leo: ['violet'], rib: ['pink'] }, leo: 'violet', rib: 'pink', best: {}, dadMsgs: null, dadI: 0, sound: 1, rate: .85, pin: '', seen: {}, view: 'home', pv: '' };
+  return { v: 1, start: todayStr(), lists: [JSON.parse(JSON.stringify(LIST_1104)), JSON.parse(JSON.stringify(LIST0)), JSON.parse(JSON.stringify(LIST_EXAM))], p: {}, candy: 0, candyAll: 0, days: {}, sessions: 0, tests: [], stickers: [], own: { leo: ['violet'], rib: ['pink'] }, leo: 'violet', rib: 'pink', best: {}, dadMsgs: null, dadI: 0, sound: 1, rate: .85, pin: '', seen: { pin36: 1 }, view: 'home', pv: '' };
 }
 function norm(o) {
   const f = fresh();
@@ -13,7 +13,9 @@ function norm(o) {
   if (o.dadMsgs) o.dadMsgs = arr(o.dadMsgs);
   for (const k in o.p) { const q = o.p[k]; q.wr = arr(q.wr); }
   /* lists that ship with a version are added once, also to a phone that already has data */
-  o.seen = o.seen || {}; if (!o.seen.exam1123b) { o.seen.exam1123 = o.seen.exam1123b = 1; [LIST_1104, LIST_EXAM].forEach(L => { o.lists = o.lists.filter(l => l.id !== L.id || L === LIST_1104); if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
+  o.seen = o.seen || {};
+  if (!o.seen.pin36) { o.seen.pin36 = 1; o.pin = ''; }   /* v36: dad chooses the parent code again (one was typed wrong) */
+  if (!o.seen.exam1123b) { o.seen.exam1123 = o.seen.exam1123b = 1; [LIST_1104, LIST_EXAM].forEach(L => { o.lists = o.lists.filter(l => l.id !== L.id || L === LIST_1104); if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
   return o;
 }
 let S = (() => { try { const r = localStorage.getItem(KEY); if (r) return norm(JSON.parse(r)); } catch (e) { } return fresh(); })();
