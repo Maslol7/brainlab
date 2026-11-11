@@ -34,12 +34,12 @@ VIEWS.vrec = () => {
 };
 async function vrBegin() {
   if (!recOK()) return toast('הטלפון הזה לא מאפשר הקלטה כאן');
-  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); } catch (e) { return toast('צריך לאשר גישה למיקרופון (הגדרות ← ספארי ← מיקרופון)', 4500); }
+  const stream = await getMic(); if (!stream) return;
   const type = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
   const mr = new MediaRecorder(stream, type ? { mimeType: type } : {}), parts = [];
   mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
   mr.onstart = () => { VR.t0 = performance.now(); };
-  mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); if (VR && VR.ph === 'proc') vrSplit(new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' })); };
+  mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); audioMode('playback'); if (VR && VR.ph === 'proc') vrSplit(new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' })); };
   Object.assign(VR, { mr, stream, ph: 'rec', i: 0, marks: [], t0: performance.now() }); mr.start(); render();
 }
 function vrNext() {

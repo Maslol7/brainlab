@@ -86,7 +86,7 @@ const { chromium, devices } = require('playwright');
   await p.click('[data-act="vrall"]'); await p.click('[data-act="vrgo"]'); await p.waitForTimeout(600);
   const nw = await p.evaluate(() => VR.l.words.length);
   for (let i = 0; i < nw; i++) { await p.waitForTimeout(700); await p.click('[data-act="vrnext"]'); }
-  await p.waitForTimeout(2500);
+  await p.waitForFunction(() => VR && VR.ph === 'review', null, { timeout: 15000 }).catch(() => { });
   ok(await p.evaluate(n => VR && VR.ph === 'review' && Object.keys(VR.clips).length === n, nw), 'one-take recording splits into every word');
   await p.click('[data-act="vrsave"]');
   ok(await p.evaluate(() => S.view === 'parent' && curList().words.every(w => VOICE[kOf(w)])), 'one-take recording saved');

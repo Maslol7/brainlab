@@ -415,7 +415,7 @@ function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e
 /* ---------- סלטה: Romi's English words app. Base: page, small helpers, toast and modal ---------- */
 document.documentElement.setAttribute('dir', 'rtl');
 document.documentElement.setAttribute('lang', 'he');
-const APP_VER = '34';
+const APP_VER = '35';
 const APP_URL = 'https://maslol7.github.io/brainlab/romi/';
 const app = document.getElementById('app');
 const NAME = 'רומי';
@@ -495,13 +495,20 @@ function parseList(text) {
   }
   return out;
 }
-/* ---------- the English test on 23.11.2026 (My Way 2, unit 1): Magic E and long vowel sounds ----------
-   The book's vocabulary pages are behind the school's login, so this list covers the two spelling topics the teacher named. */
+/* ---------- the English test on 23.11.2026: unit 1 of My Way 2 (pages 28-69). These are the vocabulary boxes of pages 28, 36, 44, 56 and 64.
+   The test asks to recognise, match and complete, so this list stops at "build from letters" (4 steps, see maxSt) ---------- */
 const LIST_EXAM = {
   id: 'e-2026-11-23', t: 'מבחן 23.11', date: '2026-11-23', src: 'class', kind: 'exam', he: false,
-  words: [W('cape', 'גלימה', '🦸'), W('kite', 'עפיפון', '🪁'), W('bike', 'אופניים', '🚲'), W('home', 'בית', '🏠'), W('bone', 'עצם', '🦴'), W('cube', 'קובייה', '🧊'), W('tube', 'שפופרת', '🧴'), W('five', 'חמש', '🖐️'),
-    W('rain', 'גשם', '🌧️'), W('play', 'לשחק', '🎲'), W('tree', 'עץ', '🌳'), W('sea', 'ים', '🌊'), W('boat', 'סירה', '⛵'), W('snow', 'שלג', '❄️'), W('night', 'לילה', '🌙'), W('blue', 'כחול', '🔵')],
+  words: [
+    W('bridge', 'גשר', '🌉'), W('palace', 'ארמון', '🏰'), W('tour bus', 'אוטובוס סיורים', '🚌'), W('clock', 'שעון', '🕰️'), W('flag', 'דגל', '🇬🇧'), W('home', 'בית', '🏠'), W('game', 'משחק', '🎲'), W('scone', ['סקון', 'לחמניית סקון'], '🥯'),
+    W('learn', 'ללמוד', '📚'), W('art', 'אמנות', '🎨'), W('math', ['חשבון', 'מתמטיקה'], '➗'), W('English', 'אנגלית', '🔤'), W('test', 'מבחן', '📝'), W('today', 'היום', '📅'), W('lesson', 'שיעור', '🧑‍🏫'), W('grade', ['כיתה', 'ציון'], '5️⃣'), W('go away', ['לך מכאן', 'לכי מכאן'], '👋'),
+    W('world', 'עולם', '🌍'), W('country', ['ארץ', 'מדינה'], '🗺️'), W('city', 'עיר', '🏙️'), W('village', 'כפר', '🏘️'), W('farm', 'חווה', '🚜'), W('house', 'בית', '🏡'), W('apartment', 'דירה', '🏢'), W('gate', 'שער', '🚪'), W('trip', 'טיול', '🎒'),
+    W('dance', 'לרקוד', '💃'), W('nap', 'לנמנם', '😴'), W('fish', ['דג', 'לדוג'], '🐟'), W('boat', 'סירה', '⛵'), W('shop', ['חנות', 'לקנות'], '🛍️'), W('river', 'נהר', '🏞️'), W('near', 'קרוב', '📍'), W('far away', 'רחוק', '🔭'),
+    W('neighbor', ['שכן', 'שכנה'], '🏡'), W('flower', 'פרח', '🌷'), W('road', 'כביש', '🛣️'), W('plane', 'מטוס', '✈️'), W('mountain', 'הר', '⛰️'), W('below', 'מתחת', '⬇️'), W('between', 'בין', '↔️'), W('grass', 'דשא', '🌱'),
+  ],
 };
+/* the spelling topics of the test (Magic E, long vowels) as a bonus pack; the wand game drills them */
+PACKS.unshift({ id: 'p-magic', t: 'Magic E ותנועות ארוכות', em: '✨', words: [W('cape', 'גלימה', '🦸'), W('kite', 'עפיפון', '🪁'), W('bike', 'אופניים', '🚲'), W('bone', 'עצם', '🦴'), W('cube', 'קובייה', '🧊'), W('tube', 'שפופרת', '🧴'), W('five', 'חמש', '🖐️'), W('lake', 'אגם', '🏞️'), W('rain', 'גשם', '🌧️'), W('play', 'לשחק', '🎲'), W('tree', 'עץ', '🌳'), W('sea', 'ים', '🌊'), W('snow', 'שלג', '❄️'), W('night', 'לילה', '🌙'), W('blue', 'כחול', '🔵')] });
 /* Magic E pairs: the E at the end makes the vowel say its name */
 const MAGIC = [['cap', 'cape', 'כובע', 'גלימה'], ['kit', 'kite', 'ערכה', 'עפיפון'], ['hop', 'hope', 'לקפץ', 'תקווה'], ['tub', 'tube', 'אמבט', 'שפופרת'], ['plan', 'plane', 'תוכנית', 'מטוס'], ['pin', 'pine', 'סיכה', 'אורן'], ['not', 'note', 'לא', 'פתק'], ['cub', 'cube', 'גור', 'קובייה'], ['can', 'cane', 'פחית', 'מקל הליכה'], ['bit', 'bite', 'קצת', 'לנגוס'], ['rob', 'robe', 'לשדוד', 'חלוק'], ['mad', 'made', 'כועס', 'עשה']];
 /* long vowel teams: the same sound, different spellings */
@@ -514,7 +521,7 @@ const LIST_1104 = {
   words: [W('Live', 'לחיות', '💓'), W('Palace', 'ארמון', '🏰'), W('Home', 'בית', '🏠'), W('Flag', 'דגל', '🇬🇧'), W('Tour', 'סיור', '🗺️'), W('Bus', 'אוטובוס', '🚌'), W('Clock', 'שעון', '🕰️'), W('Scone', ['לחמניית סקון', 'סקון'], '🥯'), W('Game', 'משחק', '🎲')],
 };
 SENTENCES.push(['The king lives in a ___.', 'palace'], ['I ride a red ___ in London.', 'bus'], ['Big Ben is a big ___.', 'clock'], ['I eat a ___ with jam.', 'scone'], ['We go on a ___ of the city.', 'tour']);
-const SENT_WORDS = () => [...new Set([...LIST_EXAM.words, ...LIST_1104.words].map(x => x.en.toLowerCase()))];
+const SENT_WORDS = () => [...new Set([...PACKS[0].words, ...LIST_1104.words].map(x => x.en.toLowerCase()))];
 
 /* ---- romi/src/20-state.js ---- */
 /* ---------- saved state ---------- */
@@ -532,7 +539,7 @@ function norm(o) {
   if (o.dadMsgs) o.dadMsgs = arr(o.dadMsgs);
   for (const k in o.p) { const q = o.p[k]; q.wr = arr(q.wr); }
   /* lists that ship with a version are added once, also to a phone that already has data */
-  o.seen = o.seen || {}; if (!o.seen.exam1123) { o.seen.exam1123 = 1; [LIST_1104, LIST_EXAM].forEach(L => { if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
+  o.seen = o.seen || {}; if (!o.seen.exam1123b) { o.seen.exam1123 = o.seen.exam1123b = 1; [LIST_1104, LIST_EXAM].forEach(L => { o.lists = o.lists.filter(l => l.id !== L.id || L === LIST_1104); if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
   return o;
 }
 let S = (() => { try { const r = localStorage.getItem(KEY); if (r) return norm(JSON.parse(r)); } catch (e) { } return fresh(); })();
@@ -600,7 +607,19 @@ const VBUF = {};
 function saveVoice() { try { localStorage.setItem(VKEY, JSON.stringify(VOICE)); } catch (e) { toast('אין מקום לשמור עוד הקלטות בטלפון'); } }
 const hasVoice = w => !!(w && VOICE[kOf(w)]) && S.dadVoice !== 0;
 /* iPhone: let the sound play even when the side switch is on silent */
-try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { }
+const audioMode = t => { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) { } };
+audioMode('playback');
+/* getUserMedia with the reason when it fails. The audio session must allow recording first ("playback" blocks the microphone on iPhone) */
+async function getMic() {
+  audioMode('play-and-record');
+  try { return await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+  catch (e) {
+    audioMode('playback');
+    const n = e && e.name;
+    toast(n === 'NotAllowedError' ? 'הטלפון חוסם את המיקרופון. באייפון: הגדרות ← אפליקציות ← ספארי ← מיקרופון ← "לשאול" או "לאפשר". אחר כך לסגור את סלטה לגמרי ולפתוח שוב.' : n === 'NotFoundError' ? 'לא נמצא מיקרופון' : `המיקרופון לא נפתח (${esc(n || e)})`, 7000);
+    return null;
+  }
+}
 async function playVoice(k) {
   const a = ac(); const src = VOICE[k]; if (!a || !src) return false;
   try {
@@ -620,12 +639,12 @@ const recOK = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserM
 async function recStart(k, onDone) {
   if (REC) return recStop();
   if (!recOK()) return toast('הטלפון הזה לא מאפשר הקלטה כאן');
-  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { return toast('צריך לאשר גישה למיקרופון (הגדרות ← ספארי ← מיקרופון)', 4500); }
+  const stream = await getMic(); if (!stream) return;
   const type = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
   const mr = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {}), parts = [];
   mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
   mr.onstop = () => {
-    stream.getTracks().forEach(t => t.stop()); const b = new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' });
+    stream.getTracks().forEach(t => t.stop()); audioMode('playback'); const b = new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' });
     const fr = new FileReader(); fr.onload = () => { VOICE[k] = fr.result; delete VBUF[k]; saveVoice(); voicePush(k); REC = null; onDone && onDone(); playVoice(k); }; fr.readAsDataURL(b);
   };
   REC = { mr, k, t: setTimeout(recStop, 2600) }; mr.start(); SFX.beep && SFX.beep(); onDone && onDone(true);
@@ -650,7 +669,7 @@ async function voicePull() {
    steps: 0 meet the word · 1 meaning (choose) · 2 spelling (choose) · 3 build from letters · 4 hear English, type · 5 hear Hebrew, type English · 6 write the Hebrew meaning
    bonus lists stop at 6 (no Hebrew writing). */
 const STEP_NAMES = ['חדשה', 'פירוש', 'זיהוי', 'הרכבה', 'הכתבה', 'מעברית', 'פירוש בכתב', 'כוכב'];
-const maxSt = l => l && l.he ? 7 : 6;
+const maxSt = l => l && l.kind === 'exam' ? 4 : l && l.he ? 7 : 6;
 function prog(w) { const k = kOf(w); return S.p[k] || (S.p[k] = { st: 0, r: 0, ok: 0, bad: 0, wr: [] }); }
 const stageOf = w => (S.p[kOf(w)] || {}).st || 0;
 const mastered = (w, l) => stageOf(w) >= maxSt(l);
@@ -665,15 +684,16 @@ function planSession(list) {
   const un = ws.filter(w => !mastered(w, list)).sort((a, b) => stageOf(b) - stageOf(a));
   const started = un.filter(w => stageOf(w) > 0), news = shuffle(un.filter(w => stageOf(w) === 0));
   const rev = shuffle(ws.filter(w => mastered(w, list) && (isDue(w) || left <= 1)));
-  let q = [...shuffle(started), ...news.slice(0, Math.max(2, 5 - started.length))];
+  const cap = list.kind === 'exam' ? 9 : 5;  /* a test list is long and asks only to recognise: more words at once */
+  let q = [...shuffle(started), ...news.slice(0, Math.max(2, cap - started.length))];
   q = q.concat(q.length < 3 ? rev : rev.slice(0, 3));
   if (!q.length) q = shuffle(ws).slice(0, Math.min(6, ws.length));
-  const n = left <= 1 ? 16 : 14;
+  const n = list.kind === 'exam' ? 18 : left <= 1 ? 16 : 14;
   return { q, n };
 }
 function itemType(w, list) {
   const st = stageOf(w), M = maxSt(list);
-  if (st >= M) return pick(list.he ? ['typeEN', 'typeHE2EN', 'writeHE'] : ['typeEN', 'typeHE2EN']);
+  if (st >= M) return pick(list.kind === 'exam' ? ['meanEN', 'meanHE', 'pick'] : list.he ? ['typeEN', 'typeHE2EN', 'writeHE'] : ['typeEN', 'typeHE2EN']);
   return ['learn', R() < .5 ? 'meanEN' : 'meanHE', 'pick', 'tiles', 'typeEN', 'typeHE2EN', 'writeHE'][st];
 }
 /* record a result. ok = right on the first try */
@@ -1119,7 +1139,7 @@ VIEWS.pdone = () => {
 let T = null;
 function startTest(l) {
   if (!l) return;
-  T = { l, items: shuffle(l.words).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en' };
+  T = { l, items: shuffle(l.words).slice(0, l.kind === 'exam' ? 10 : 99).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en' };
   S.view = 'test'; save(); render(); testSay();
 }
 function testSay() { const it = T && T.items[T.i]; if (!it) return; if (it.mode === 'he') { if (hasHeVoice()) say(it.w.he[0], 'he'); } else sayWord(it.w); }
@@ -1362,7 +1382,7 @@ GAMES.wand = {
     return { rounds, i: 0, score: 0, miss: 0 };
   },
   start: () => GAMES.wand.speak(),
-  speak() { const r = G && G.rounds[G.i]; if (!r) return; if (r.k === 'sent') return; const w = [...LIST_EXAM.words, ...LIST_1104.words].find(x => x.en.toLowerCase() === r.say); w ? sayWord(w) : say(r.say); },
+  speak() { const r = G && G.rounds[G.i]; if (!r) return; if (r.k === 'sent') return; const w = [...PACKS[0].words, ...LIST_1104.words].find(x => x.en.toLowerCase() === r.say); w ? sayWord(w) : say(r.say); },
   view() {
     const r = G.rounds[G.i], n = G.rounds.length;
     const ask = r.k === 'magic' ? 'איזו מילה שמעת?' : r.k === 'team' ? 'איך כותבים את מה ששמעת?' : 'השלימי את המשפט';
@@ -1382,7 +1402,7 @@ GAMES.wand = {
     let msg = '';
     if (r.k === 'magic') { const [a, c, ha, hc] = r.p; msg = `<span dir="ltr"><b>${a}</b> + e = <b>${c}</b></span><div class="small">${a} = ${ha} · ${c} = ${hc}</div>`; say(r.ans); }
     else if (r.k === 'sent') { const full = r.s.replace('___', r.ans); msg = `<span dir="ltr">${esc(full)}</span>`; say(full, 'en', .8); }
-    else { const w = LIST_EXAM.words.find(x => x.en === r.ans); msg = `<b dir="ltr">${esc(r.ans)}</b>${w ? ` = ${esc(w.he[0])}` : ''}`; }
+    else { const w = [...PACKS[0].words, ...LIST_EXAM.words].find(x => x.en === r.ans); msg = `<b dir="ltr">${esc(r.ans)}</b>${w ? ` = ${esc(w.he[0])}` : ''}`; }
     fb(`<div class="fb fb-good">+${pts} · ${msg}</div>`);
     later(() => { G.i++; if (G.i >= G.rounds.length) return GAMES.wand.end(); render(); GAMES.wand.speak(); }, r.k === 'sent' ? 2600 : 1700);
   },
@@ -1676,12 +1696,12 @@ VIEWS.vrec = () => {
 };
 async function vrBegin() {
   if (!recOK()) return toast('הטלפון הזה לא מאפשר הקלטה כאן');
-  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); } catch (e) { return toast('צריך לאשר גישה למיקרופון (הגדרות ← ספארי ← מיקרופון)', 4500); }
+  const stream = await getMic(); if (!stream) return;
   const type = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
   const mr = new MediaRecorder(stream, type ? { mimeType: type } : {}), parts = [];
   mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
   mr.onstart = () => { VR.t0 = performance.now(); };
-  mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); if (VR && VR.ph === 'proc') vrSplit(new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' })); };
+  mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); audioMode('playback'); if (VR && VR.ph === 'proc') vrSplit(new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' })); };
   Object.assign(VR, { mr, stream, ph: 'rec', i: 0, marks: [], t0: performance.now() }); mr.start(); render();
 }
 function vrNext() {

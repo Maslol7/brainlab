@@ -2,7 +2,7 @@
    steps: 0 meet the word · 1 meaning (choose) · 2 spelling (choose) · 3 build from letters · 4 hear English, type · 5 hear Hebrew, type English · 6 write the Hebrew meaning
    bonus lists stop at 6 (no Hebrew writing). */
 const STEP_NAMES = ['חדשה', 'פירוש', 'זיהוי', 'הרכבה', 'הכתבה', 'מעברית', 'פירוש בכתב', 'כוכב'];
-const maxSt = l => l && l.he ? 7 : 6;
+const maxSt = l => l && l.kind === 'exam' ? 4 : l && l.he ? 7 : 6;
 function prog(w) { const k = kOf(w); return S.p[k] || (S.p[k] = { st: 0, r: 0, ok: 0, bad: 0, wr: [] }); }
 const stageOf = w => (S.p[kOf(w)] || {}).st || 0;
 const mastered = (w, l) => stageOf(w) >= maxSt(l);
@@ -17,15 +17,16 @@ function planSession(list) {
   const un = ws.filter(w => !mastered(w, list)).sort((a, b) => stageOf(b) - stageOf(a));
   const started = un.filter(w => stageOf(w) > 0), news = shuffle(un.filter(w => stageOf(w) === 0));
   const rev = shuffle(ws.filter(w => mastered(w, list) && (isDue(w) || left <= 1)));
-  let q = [...shuffle(started), ...news.slice(0, Math.max(2, 5 - started.length))];
+  const cap = list.kind === 'exam' ? 9 : 5;  /* a test list is long and asks only to recognise: more words at once */
+  let q = [...shuffle(started), ...news.slice(0, Math.max(2, cap - started.length))];
   q = q.concat(q.length < 3 ? rev : rev.slice(0, 3));
   if (!q.length) q = shuffle(ws).slice(0, Math.min(6, ws.length));
-  const n = left <= 1 ? 16 : 14;
+  const n = list.kind === 'exam' ? 18 : left <= 1 ? 16 : 14;
   return { q, n };
 }
 function itemType(w, list) {
   const st = stageOf(w), M = maxSt(list);
-  if (st >= M) return pick(list.he ? ['typeEN', 'typeHE2EN', 'writeHE'] : ['typeEN', 'typeHE2EN']);
+  if (st >= M) return pick(list.kind === 'exam' ? ['meanEN', 'meanHE', 'pick'] : list.he ? ['typeEN', 'typeHE2EN', 'writeHE'] : ['typeEN', 'typeHE2EN']);
   return ['learn', R() < .5 ? 'meanEN' : 'meanHE', 'pick', 'tiles', 'typeEN', 'typeHE2EN', 'writeHE'][st];
 }
 /* record a result. ok = right on the first try */

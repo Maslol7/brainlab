@@ -13,7 +13,7 @@ function norm(o) {
   if (o.dadMsgs) o.dadMsgs = arr(o.dadMsgs);
   for (const k in o.p) { const q = o.p[k]; q.wr = arr(q.wr); }
   /* lists that ship with a version are added once, also to a phone that already has data */
-  o.seen = o.seen || {}; if (!o.seen.exam1123) { o.seen.exam1123 = 1; [LIST_1104, LIST_EXAM].forEach(L => { if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
+  o.seen = o.seen || {}; if (!o.seen.exam1123b) { o.seen.exam1123 = o.seen.exam1123b = 1; [LIST_1104, LIST_EXAM].forEach(L => { o.lists = o.lists.filter(l => l.id !== L.id || L === LIST_1104); if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
   return o;
 }
 let S = (() => { try { const r = localStorage.getItem(KEY); if (r) return norm(JSON.parse(r)); } catch (e) { } return fresh(); })();

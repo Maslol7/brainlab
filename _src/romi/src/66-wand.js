@@ -10,7 +10,7 @@ GAMES.wand = {
     return { rounds, i: 0, score: 0, miss: 0 };
   },
   start: () => GAMES.wand.speak(),
-  speak() { const r = G && G.rounds[G.i]; if (!r) return; if (r.k === 'sent') return; const w = [...LIST_EXAM.words, ...LIST_1104.words].find(x => x.en.toLowerCase() === r.say); w ? sayWord(w) : say(r.say); },
+  speak() { const r = G && G.rounds[G.i]; if (!r) return; if (r.k === 'sent') return; const w = [...PACKS[0].words, ...LIST_1104.words].find(x => x.en.toLowerCase() === r.say); w ? sayWord(w) : say(r.say); },
   view() {
     const r = G.rounds[G.i], n = G.rounds.length;
     const ask = r.k === 'magic' ? 'איזו מילה שמעת?' : r.k === 'team' ? 'איך כותבים את מה ששמעת?' : 'השלימי את המשפט';
@@ -30,7 +30,7 @@ GAMES.wand = {
     let msg = '';
     if (r.k === 'magic') { const [a, c, ha, hc] = r.p; msg = `<span dir="ltr"><b>${a}</b> + e = <b>${c}</b></span><div class="small">${a} = ${ha} · ${c} = ${hc}</div>`; say(r.ans); }
     else if (r.k === 'sent') { const full = r.s.replace('___', r.ans); msg = `<span dir="ltr">${esc(full)}</span>`; say(full, 'en', .8); }
-    else { const w = LIST_EXAM.words.find(x => x.en === r.ans); msg = `<b dir="ltr">${esc(r.ans)}</b>${w ? ` = ${esc(w.he[0])}` : ''}`; }
+    else { const w = [...PACKS[0].words, ...LIST_EXAM.words].find(x => x.en === r.ans); msg = `<b dir="ltr">${esc(r.ans)}</b>${w ? ` = ${esc(w.he[0])}` : ''}`; }
     fb(`<div class="fb fb-good">+${pts} · ${msg}</div>`);
     later(() => { G.i++; if (G.i >= G.rounds.length) return GAMES.wand.end(); render(); GAMES.wand.speak(); }, r.k === 'sent' ? 2600 : 1700);
   },

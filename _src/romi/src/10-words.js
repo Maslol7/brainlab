@@ -55,13 +55,20 @@ function parseList(text) {
   }
   return out;
 }
-/* ---------- the English test on 23.11.2026 (My Way 2, unit 1): Magic E and long vowel sounds ----------
-   The book's vocabulary pages are behind the school's login, so this list covers the two spelling topics the teacher named. */
+/* ---------- the English test on 23.11.2026: unit 1 of My Way 2 (pages 28-69). These are the vocabulary boxes of pages 28, 36, 44, 56 and 64.
+   The test asks to recognise, match and complete, so this list stops at "build from letters" (4 steps, see maxSt) ---------- */
 const LIST_EXAM = {
   id: 'e-2026-11-23', t: 'מבחן 23.11', date: '2026-11-23', src: 'class', kind: 'exam', he: false,
-  words: [W('cape', 'גלימה', '🦸'), W('kite', 'עפיפון', '🪁'), W('bike', 'אופניים', '🚲'), W('home', 'בית', '🏠'), W('bone', 'עצם', '🦴'), W('cube', 'קובייה', '🧊'), W('tube', 'שפופרת', '🧴'), W('five', 'חמש', '🖐️'),
-    W('rain', 'גשם', '🌧️'), W('play', 'לשחק', '🎲'), W('tree', 'עץ', '🌳'), W('sea', 'ים', '🌊'), W('boat', 'סירה', '⛵'), W('snow', 'שלג', '❄️'), W('night', 'לילה', '🌙'), W('blue', 'כחול', '🔵')],
+  words: [
+    W('bridge', 'גשר', '🌉'), W('palace', 'ארמון', '🏰'), W('tour bus', 'אוטובוס סיורים', '🚌'), W('clock', 'שעון', '🕰️'), W('flag', 'דגל', '🇬🇧'), W('home', 'בית', '🏠'), W('game', 'משחק', '🎲'), W('scone', ['סקון', 'לחמניית סקון'], '🥯'),
+    W('learn', 'ללמוד', '📚'), W('art', 'אמנות', '🎨'), W('math', ['חשבון', 'מתמטיקה'], '➗'), W('English', 'אנגלית', '🔤'), W('test', 'מבחן', '📝'), W('today', 'היום', '📅'), W('lesson', 'שיעור', '🧑‍🏫'), W('grade', ['כיתה', 'ציון'], '5️⃣'), W('go away', ['לך מכאן', 'לכי מכאן'], '👋'),
+    W('world', 'עולם', '🌍'), W('country', ['ארץ', 'מדינה'], '🗺️'), W('city', 'עיר', '🏙️'), W('village', 'כפר', '🏘️'), W('farm', 'חווה', '🚜'), W('house', 'בית', '🏡'), W('apartment', 'דירה', '🏢'), W('gate', 'שער', '🚪'), W('trip', 'טיול', '🎒'),
+    W('dance', 'לרקוד', '💃'), W('nap', 'לנמנם', '😴'), W('fish', ['דג', 'לדוג'], '🐟'), W('boat', 'סירה', '⛵'), W('shop', ['חנות', 'לקנות'], '🛍️'), W('river', 'נהר', '🏞️'), W('near', 'קרוב', '📍'), W('far away', 'רחוק', '🔭'),
+    W('neighbor', ['שכן', 'שכנה'], '🏡'), W('flower', 'פרח', '🌷'), W('road', 'כביש', '🛣️'), W('plane', 'מטוס', '✈️'), W('mountain', 'הר', '⛰️'), W('below', 'מתחת', '⬇️'), W('between', 'בין', '↔️'), W('grass', 'דשא', '🌱'),
+  ],
 };
+/* the spelling topics of the test (Magic E, long vowels) as a bonus pack; the wand game drills them */
+PACKS.unshift({ id: 'p-magic', t: 'Magic E ותנועות ארוכות', em: '✨', words: [W('cape', 'גלימה', '🦸'), W('kite', 'עפיפון', '🪁'), W('bike', 'אופניים', '🚲'), W('bone', 'עצם', '🦴'), W('cube', 'קובייה', '🧊'), W('tube', 'שפופרת', '🧴'), W('five', 'חמש', '🖐️'), W('lake', 'אגם', '🏞️'), W('rain', 'גשם', '🌧️'), W('play', 'לשחק', '🎲'), W('tree', 'עץ', '🌳'), W('sea', 'ים', '🌊'), W('snow', 'שלג', '❄️'), W('night', 'לילה', '🌙'), W('blue', 'כחול', '🔵')] });
 /* Magic E pairs: the E at the end makes the vowel say its name */
 const MAGIC = [['cap', 'cape', 'כובע', 'גלימה'], ['kit', 'kite', 'ערכה', 'עפיפון'], ['hop', 'hope', 'לקפץ', 'תקווה'], ['tub', 'tube', 'אמבט', 'שפופרת'], ['plan', 'plane', 'תוכנית', 'מטוס'], ['pin', 'pine', 'סיכה', 'אורן'], ['not', 'note', 'לא', 'פתק'], ['cub', 'cube', 'גור', 'קובייה'], ['can', 'cane', 'פחית', 'מקל הליכה'], ['bit', 'bite', 'קצת', 'לנגוס'], ['rob', 'robe', 'לשדוד', 'חלוק'], ['mad', 'made', 'כועס', 'עשה']];
 /* long vowel teams: the same sound, different spellings */
@@ -74,4 +81,4 @@ const LIST_1104 = {
   words: [W('Live', 'לחיות', '💓'), W('Palace', 'ארמון', '🏰'), W('Home', 'בית', '🏠'), W('Flag', 'דגל', '🇬🇧'), W('Tour', 'סיור', '🗺️'), W('Bus', 'אוטובוס', '🚌'), W('Clock', 'שעון', '🕰️'), W('Scone', ['לחמניית סקון', 'סקון'], '🥯'), W('Game', 'משחק', '🎲')],
 };
 SENTENCES.push(['The king lives in a ___.', 'palace'], ['I ride a red ___ in London.', 'bus'], ['Big Ben is a big ___.', 'clock'], ['I eat a ___ with jam.', 'scone'], ['We go on a ___ of the city.', 'tour']);
-const SENT_WORDS = () => [...new Set([...LIST_EXAM.words, ...LIST_1104.words].map(x => x.en.toLowerCase()))];
+const SENT_WORDS = () => [...new Set([...PACKS[0].words, ...LIST_1104.words].map(x => x.en.toLowerCase()))];

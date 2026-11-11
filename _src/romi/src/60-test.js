@@ -2,7 +2,7 @@
 let T = null;
 function startTest(l) {
   if (!l) return;
-  T = { l, items: shuffle(l.words).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en' };
+  T = { l, items: shuffle(l.words).slice(0, l.kind === 'exam' ? 10 : 99).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en' };
   S.view = 'test'; save(); render(); testSay();
 }
 function testSay() { const it = T && T.items[T.i]; if (!it) return; if (it.mode === 'he') { if (hasHeVoice()) say(it.w.he[0], 'he'); } else sayWord(it.w); }

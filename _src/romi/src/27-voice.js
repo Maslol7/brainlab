@@ -7,7 +7,19 @@ const VBUF = {};
 function saveVoice() { try { localStorage.setItem(VKEY, JSON.stringify(VOICE)); } catch (e) { toast('אין מקום לשמור עוד הקלטות בטלפון'); } }
 const hasVoice = w => !!(w && VOICE[kOf(w)]) && S.dadVoice !== 0;
 /* iPhone: let the sound play even when the side switch is on silent */
-try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { }
+const audioMode = t => { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) { } };
+audioMode('playback');
+/* getUserMedia with the reason when it fails. The audio session must allow recording first ("playback" blocks the microphone on iPhone) */
+async function getMic() {
+  audioMode('play-and-record');
+  try { return await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+  catch (e) {
+    audioMode('playback');
+    const n = e && e.name;
+    toast(n === 'NotAllowedError' ? 'הטלפון חוסם את המיקרופון. באייפון: הגדרות ← אפליקציות ← ספארי ← מיקרופון ← "לשאול" או "לאפשר". אחר כך לסגור את סלטה לגמרי ולפתוח שוב.' : n === 'NotFoundError' ? 'לא נמצא מיקרופון' : `המיקרופון לא נפתח (${esc(n || e)})`, 7000);
+    return null;
+  }
+}
 async function playVoice(k) {
   const a = ac(); const src = VOICE[k]; if (!a || !src) return false;
   try {
@@ -27,12 +39,12 @@ const recOK = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserM
 async function recStart(k, onDone) {
   if (REC) return recStop();
   if (!recOK()) return toast('הטלפון הזה לא מאפשר הקלטה כאן');
-  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { return toast('צריך לאשר גישה למיקרופון (הגדרות ← ספארי ← מיקרופון)', 4500); }
+  const stream = await getMic(); if (!stream) return;
   const type = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
   const mr = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {}), parts = [];
   mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
   mr.onstop = () => {
-    stream.getTracks().forEach(t => t.stop()); const b = new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' });
+    stream.getTracks().forEach(t => t.stop()); audioMode('playback'); const b = new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' });
     const fr = new FileReader(); fr.onload = () => { VOICE[k] = fr.result; delete VBUF[k]; saveVoice(); voicePush(k); REC = null; onDone && onDone(); playVoice(k); }; fr.readAsDataURL(b);
   };
   REC = { mr, k, t: setTimeout(recStop, 2600) }; mr.start(); SFX.beep && SFX.beep(); onDone && onDone(true);

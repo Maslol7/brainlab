@@ -23,6 +23,8 @@ A second app, built by the same `tools/build.mjs` into `pwa/romi/` (https://masl
 - Cloud: same Firebase as the main app, its own family code. Romi's phone writes `brainlab/<code>.json`; dad's phone writes only `brainlab/<code>-p.json` (lists, note, messages, candies). Dad's voice recordings: `brainlab/<code>-v/<word>.json`, one child per word.
 - Look: competition floor. Tokens at the top of `romi/styles.css` (light and dark). Fonts: Secular One (headings, scores), Heebo (Hebrew), Andika (English words, school letters).
 - Dad's voice in one take (`82-vrec.js`): the words show one by one, dad taps after each; the recording is split at the taps, trimmed to the voice, normalized and kept as 12 kHz WAV per word. `splitByMarks` is the pure part.
+- Test 23.11 list (`LIST_EXAM`): the vocabulary boxes of My Way 2 pages 28, 36, 44, 56, 64 (42 words). A list with `kind: 'exam'` has 4 steps only (recognise, not spell), more new words per session, and a 10-word mock.
+- Microphone on iPhone: the audio session must be `play-and-record` while recording (`getMic` in `27-voice.js`); `playback` blocks the microphone.
 - Test prep (`66-wand.js`): the Magic E wand game (listen and choose, long-vowel spelling, complete the sentence). Lists that ship with a version (`LIST_1104`, `LIST_EXAM`) are added once to phones that already have data (`S.seen.exam1123`).
 - Extras (`75-extras.js`): birthday 3 April 2017 (gift, banner, countdown), general review, the speaking game (only where the browser has speech recognition), self-update (reloads once on the home screen when `version.json` changes).
 - Tests: `romi/tests/run.sh` (flow and cloud), `node romi/tests/shots.js <url> <dir>` for screenshots.
