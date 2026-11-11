@@ -6,7 +6,14 @@ const TM = (m) => { const H = 8 + Math.floor(m / 60), M = m % 60; return L(`${H}
    and the answer in <b>, and an optional short warning (.mtip). Only inline elements: the explanation sits inside a <p>. */
 const mB = v => `<b>${v}</b>`;
 const mCalc = lines => `<span class="calc">${lines.filter(Boolean).map(s => `<span>${s}</span>`).join('')}</span>`;
-const mEx = (method, lines, pic = '', tip = '') => `<span class="mhow">${method}</span>${pic}${mCalc(lines)}${tip ? `<span class="mtip">${tip}</span>` : ''}`;
+const mEx = (method, lines, pic = '', tip = '', spot = '') => `<span class="mhow">${method}</span>${pic}${mCalc(lines)}${tip ? `<span class="mtip">${tip}</span>` : ''}${spot ? `<span class="mspot"><b>איך מזהים:</b> ${spot}</span>` : ''}`;
+const mGcd = (a, b) => b ? mGcd(b, a % b) : a;
+const mLcm = (...ns) => ns.reduce((x, y) => x * y / mGcd(x, y));
+/* "3 פעמים" in words, so a small number in a hint is not mistaken for the answer */
+const mTimes = n => ({ 1: 'בדיוק', 2: 'פעמיים', 3: 'שלוש פעמים', 4: 'ארבע פעמים', 5: 'חמש פעמים', 6: 'שש פעמים', 8: 'שמונה פעמים' })[n] || `${n} פעמים`;
+/* wrong options and why they are wrong, for the guided lesson: keyed by the option's digits ("5.50", "8:36") */
+const mKey = s => strip(String(s)).replace(/[^\d.:]/g, '');
+const mWhy = (pairs, ans) => { const o = {}; for (const [v, t] of pairs) { const k = mKey(v); if (k !== mKey(ans) && !o[k]) o[k] = t; } return o; };
 /* numeric question with clean distractors: whole, positive, never the answer; small neighbours fill the gaps */
 const mNum = (d, prompt, vis, ans, cands, ex, unit = '') => {
   const ok = c => Number.isFinite(c) && c > 0 && c !== ans && (!Number.isInteger(ans) || Number.isInteger(c));
@@ -32,14 +39,39 @@ function mNL(pts, arcs = []) {
   for (const p of pts) { const x = X(p.v); s += `<line class="ln" x1="${x}" y1="${y - 5}" x2="${x}" y2="${y + 5}"/>`; if (p.c) s += `<circle cx="${x}" cy="${y}" r="4.5" class="${p.c}"/>`; s += mTx(x, y + 21, p.t, p.c || '', 13); if (p.w) s += mTx(x, y + 36, p.w, p.c || 'mu', 10.5); }
   return mSvg(84, s);
 }
-/* timeline of two bus lines: dots every a and every b minutes, meeting at l */
-function mBusTL(a, b, l) {
-  const x0 = 22, x1 = 280, X = m => x0 + m * (x1 - x0) / l, y = 46;
-  let s = `<line class="ln" x1="${x0 - 8}" y1="${y}" x2="${x1 + 12}" y2="${y}"/><line class="lg dash" x1="${X(l)}" y1="${y - 20}" x2="${X(l)}" y2="${y + 20}"/>`;
-  for (let m = 0; m <= l; m += a) s += `<circle cx="${X(m)}" cy="${y - 14}" r="4.5" class="a"/>` + (m ? mTx(X(m), y - 24, m, 'a', 10.5) : '');
-  for (let m = 0; m <= l; m += b) s += `<circle cx="${X(m)}" cy="${y + 14}" r="4.5" class="v"/>` + (m ? mTx(X(m), y + 33, m, 'v', 10.5) : '');
-  s += mTx(x0, y + 52, '8:00', 'mu', 11) + mTx(X(l), y + 52, TM(l).replace(/<[^>]+>/g, ''), 'g', 12);
-  return mSvg(102, s) + mLeg([['a', `קו 5: כל ${a} דקות`], ['v', `קו 9: כל ${b} דקות`]]);
+/* timeline of bus lines: one row per line [name, every], a dot at each departure, all meeting at l */
+function mBusTL(ls, l) {
+  const x0 = 22, x1 = 268, X = m => x0 + m * (x1 - x0) / l, C = ['a', 'v', 'w'], y0 = 28, dy = 28, yb = y0 + dy * (ls.length - 1) + 12;
+  let s = `<line class="lg dash" x1="${X(l)}" y1="${y0 - 22}" x2="${X(l)}" y2="${yb}"/>`;
+  ls.forEach(([, a], r) => { const y = y0 + dy * r; s += `<line class="ln" x1="${x0 - 8}" y1="${y}" x2="${x1 + 12}" y2="${y}"/>`; const sk = Math.ceil(l / a / 8); for (let m = 0; m <= l; m += a) s += `<circle cx="${X(m)}" cy="${y}" r="4.5" class="${C[r]}"/>` + (m === l ? `<text x="${X(m) + 6}" y="${y - 7}" font-size="10" text-anchor="start" class="${C[r]}">${m}</text>` : m && (m / a) % sk === 0 && X(l) - X(m) > 14 ? mTx(X(m), y - 9, m, C[r], 10) : ''); });
+  s += mTx(x0, yb + 14, '8:00', 'mu', 11) + mTx(X(l), yb + 14, strip(TM(l)), 'g', 12);
+  return mSvg(yb + 20, s) + mLeg(ls.map(([nm, a], r) => [C[r], `${nm}: כל ${a} דקות`]));
+}
+/* packs split into equal piles: one box per item, with the price of one item in it */
+function mPacks(packs, best, one) {
+  return `<span class="mpacks">${packs.map(([n, p, u]) => `<span class="mpk${u === best ? ' best' : ''}"><span class="mpkh">חבילה של ${n} · ${L(money(p))} ₪</span><span class="mbc">${Array.from({ length: n }, () => `<i class="${u === best ? 'g' : ''}">${money(u)}</i>`).join('')}${u === best ? '<em>זול יותר</em>' : ''}</span></span>`).join('')}<span class="mcap">כל משבצת היא ${one}. מחיר החבילה מתחלק שווה בין המשבצות.</span></span>`;
+}
+/* ages: for each moment [title, child, dad] a child bar and a dad bar; the gold part is the difference, and it keeps its length */
+function mAgesTL(nm, rows) {
+  const mx = Math.max(...rows.map(r => r[2])), x0 = 62, X = v => Math.round(x0 + v * (266 - x0) / mx), bh = 16;
+  const side = (t, y) => `<text x="${x0 - 6}" y="${y + 12}" font-size="11.5" text-anchor="end" class="mu">${t}</text>`, num = (v, x, y, c = '') => `<text x="${x + 4}" y="${y + 12}" font-size="11.5" text-anchor="start" class="${c}">${v}</text>`;
+  let s = '', y = 0;
+  for (const [t, c, dd] of rows) {
+    const y1 = y + 18, y2 = y1 + bh + 5;
+    s += `<text x="${x0}" y="${y + 12}" font-size="12" text-anchor="start" class="tt">${t}</text>`;
+    s += `<rect class="bc" x="${x0}" y="${y1}" width="${X(c) - x0}" height="${bh}" rx="3"/>` + side(nm, y1) + num(c, X(c), y1, 'a');
+    s += `<rect class="bd" x="${x0}" y="${y2}" width="${X(c) - x0}" height="${bh}" rx="3"/><rect class="bgap" x="${X(c)}" y="${y2}" width="${X(dd) - X(c)}" height="${bh}" rx="3"/>` + side('אבא', y2) + num(dd, X(dd), y2, 'v');
+    s += mTx((X(c) + X(dd)) / 2, y2 + 12, `הפרש ${dd - c}`, 'gk', 10.5) + `<line class="lg dash" x1="${X(c)}" y1="${y1}" x2="${X(c)}" y2="${y2 + bh}"/>`;
+    y = y2 + bh + 10;
+  }
+  return mSvg(y, s) + `<span class="mcap">שניהם מתבגרים באותו מספר שנים, ולכן החלק הצהוב (ההפרש) נשאר באותו אורך.</span>`;
+}
+/* everyone against everyone: n dots on a circle, a line for each game; the games of one player are coloured */
+function mPoly(n, who = 'שחקן אחד') {
+  const P = i => [150 + 54 * Math.sin(2 * Math.PI * i / n), 62 - 54 * Math.cos(2 * Math.PI * i / n)].map(Math.round); let s = '';
+  for (let i = n - 1; i >= 0; i--) for (let j = i + 1; j < n; j++) { const [a, b] = P(i), [c, e] = P(j); s += `<line class="${i ? 'ln thin' : 'la'}" x1="${a}" y1="${b}" x2="${c}" y2="${e}"/>`; }
+  for (let i = 0; i < n; i++) { const [a, b] = P(i); s += `<circle cx="${a}" cy="${b}" r="5" class="${i ? 'v' : 'a'}"/>`; }
+  return mSvg(124, s) + mLeg([['a', `המשחקים של ${who}: ${n - 1}`], ['m', 'כל קו הוא משחק אחד']]);
 }
 /* two trains on one road: the first from the left, the second from the right, a tick for every hour */
 function mTrainTL(v1, v2, t, D) {
@@ -51,9 +83,25 @@ function mTrainTL(v1, v2, t, D) {
   return mSvg(80, s) + mLeg([['a', `ראשונה, ${v1} קמ"ש`], ['v', `שנייה, ${v2} קמ"ש`], ['g', 'נפגשות']]) + '<span class="mcap">כל קו קטן הוא שעה של נסיעה.</span>';
 }
 /* a rectangle with its sides written on it */
-function mRect(a, b, all) {
+/* la, lb: the labels (a number, or "?"); split: cut the long side into split + (a − split) and write each part's area inside */
+function mRect(a, b, all, la = a, lb = b, split = 0) {
   const k = 150 / Math.max(a, b), w = Math.max(40, a * k), h = Math.max(26, b * k), x = 150 - w / 2, y = 22;
-  return mSvg(h + 46, `<rect class="la" x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/>` + mTx(150, y - 6, a, 'a') + mTx(x + w + 14, y + h / 2 + 4, b, 'g') + (all ? mTx(150, y + h + 16, a, 'a') + mTx(x - 14, y + h / 2 + 4, b, 'g') : ''));
+  let s = `<rect class="la" x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/>` + mTx(x + w + 14, y + h / 2 + 4, lb, 'g') + (all ? mTx(150, y + h + 16, la, 'a') + mTx(x - 14, y + h / 2 + 4, lb, 'g') : '');
+  if (split) { const xs = x + w * split / a; s += `<line class="lg dash" x1="${xs}" y1="${y}" x2="${xs}" y2="${y + h}"/>` + mTx((x + xs) / 2, y - 6, split, 'a') + mTx((xs + x + w) / 2, y - 6, a - split, 'a') + mTx((x + xs) / 2, y + h / 2 + 4, split * b, 'mu', 11) + mTx((xs + x + w) / 2, y + h / 2 + 4, (a - split) * b, 'mu', 11); }
+  else s += mTx(150, y - 6, la, 'a');
+  return mSvg(h + 46, s);
+}
+/* a rectangle and a square with the same perimeter, side by side */
+function mRectSq(b, a, sq) {
+  const k = 100 / Math.max(b, sq, a), w1 = b * k, h1 = a * k, w2 = sq * k, H = Math.max(h1, w2), y = 22, x1 = 20, x2 = 190;
+  return mSvg(H + 52, `<rect class="la" x="${x1}" y="${y}" width="${w1}" height="${h1}" rx="2"/><rect class="lg" fill="none" x="${x2}" y="${y}" width="${w2}" height="${w2}" rx="2"/>` + mTx(x1 + w1 / 2, y - 6, b, 'a') + mTx(x1 + w1 + 12, y + h1 / 2 + 4, a, 'a') + mTx(x2 + w2 / 2, y - 6, sq, 'g') + mTx(x2 + w2 + 12, y + w2 / 2 + 4, sq, 'g') + mTx(x1 + w1 / 2, y + H + 22, `היקף ${2 * (a + b)}`, 'a', 11) + mTx(x2 + w2 / 2, y + H + 22, `היקף ${4 * sq}`, 'g', 11));
+}
+/* a rectangle A by B with an s by s square cut from a corner; the two edges that moved in are gold */
+function mLShape(A, B, s) {
+  const k = Math.min(190 / A, 96 / B), W = A * k, H = B * k, S = s * k, x = 150 - W / 2, y = 20, xc = x + W - S;
+  return mSvg(H + 48, `<rect class="lg dash" fill="none" x="${xc}" y="${y}" width="${S}" height="${S}"/><path class="la" d="M${x} ${y}H${xc}V${y + S}H${x + W}V${y + H}H${x}Z"/><path class="lg w3" fill="none" d="M${xc} ${y}V${y + S}H${x + W}"/>`
+    + mTx(150, y + H + 16, A, 'a') + mTx(x - 14, y + H / 2 + 4, B, 'a') + mTx(xc + S / 2, y - 6, s, 'g') + mTx(x + W + 12, y + S / 2 + 4, s, 'g'))
+    + mLeg([['g', 'הצלעות שזזו פנימה: אותו אורך כמו הצלעות שנגזרו']]);
 }
 /* balls in a bag */
 const mDots = groups => { let i = 0, s = ''; for (const [n, c] of groups) for (let j = 0; j < n; j++) s += `<circle cx="${10 + 16 * i++}" cy="12" r="6.5" class="${c}"/>`; return `<svg class="mdots" width="${16 * i + 4}" height="24" viewBox="0 0 ${16 * i + 4} 24" aria-hidden="true">${s}</svg>`; };
@@ -65,24 +113,59 @@ function mAvgEx(n, A, B, need, what) {
 }
 const PCW = { 10: 'עשירית', 20: 'חמישית', 25: 'רבע', 50: 'חצי' };
 const MT = {
-  consec(d) {
-    if (d === 1) { const x = ri(10, 60), S = 3 * x + 3;
-      const ex = mEx('במספרים עוקבים, המספר האמצעי הוא הממוצע: הסכום חלקי כמות המספרים.',
-        [`האמצעי: ${L(`${S} ÷ 3 = ${x + 1}`)}`, `הגדול בא צעד אחד אחריו: ${L(`${x + 1} + 1 = ${mB(x + 2)}`)}`, `בדיקה: ${L(`${x} + ${x + 1} + ${x + 2} = ${S}`)}`],
-        mNL([{ v: x, t: x }, { v: x + 1, t: x + 1, w: 'ממוצע', c: 'a' }, { v: x + 2, t: x + 2, w: 'הגדול', c: 'g' }], [[x + 1, x + 2, '+1']]));
-      return withHint(mNum(d, `סכום שלושה מספרים שלמים עוקבים הוא ${S}. מהו הגדול מביניהם?`, '', x + 2, [x + 1, x, x + 3], ex), `בשלושה מספרים עוקבים, האמצעי הוא בדיוק הממוצע. מה הממוצע של שלושה מספרים שסכומם ${S}?`, `האמצעי: ${L(`${S} ÷ 3 = ${x + 1}`)}. הגדול נמצא צעד אחד אחריו.`); }
-    const x = ri(5, 30) * 2, S = 5 * x + 20;
-    const ex = mEx('במספרים עוקבים, המספר האמצעי הוא הממוצע: הסכום חלקי כמות המספרים.',
-      [`האמצעי: ${L(`${S} ÷ 5 = ${x + 4}`)}`, `הקטן נמצא שני צעדים של 2 לפניו: ${L(`${x + 4} − 4 = ${mB(x)}`)}`, `המספרים: ${L(`${x} , ${x + 2} , ${x + 4} , ${x + 6} , ${x + 8}`)}`],
-      mNL([{ v: x, t: x, w: 'הקטן', c: 'g' }, { v: x + 2, t: x + 2 }, { v: x + 4, t: x + 4, w: 'ממוצע', c: 'a' }, { v: x + 6, t: x + 6 }, { v: x + 8, t: x + 8 }], [[x + 4, x + 2, '−2'], [x + 2, x, '−2']]));
-    return withHint(mNum(d, `סכום חמישה מספרים זוגיים עוקבים הוא ${S}. מהו הקטן מביניהם?`, '', x, [x + 4, x + 2, x - 2], ex), `בחמישה זוגיים עוקבים, המספר האמצעי הוא הממוצע. חלקו את ${S} ב-5.`, `האמצעי: ${L(`${S} ÷ 5 = ${x + 4}`)}. הקטן נמצא שני מספרים זוגיים לפניו.`);
+  /* kind: '3' three in a row, '5e' five even, '5' five, '4' four (no middle number), '3o' three odd */
+  consec(d, kind) {
+    const K = kind || pick(d === 1 ? ['3'] : d === 2 ? ['5e', '5', '3o'] : ['4', '4', '5e', '3o']), n = +K[0], st = /[eo]/.test(K) ? 2 : 1;
+    const x = K === '5e' ? ri(5, 30) * 2 : K === '3o' ? ri(5, 40) * 2 + 1 : ri(10, 60), big = d === 1 || K === '4' ? R() < .5 : K === '5';
+    const nums = Array.from({ length: n }, (_, i) => x + st * i), S = nums.reduce((s, v) => s + v, 0), ans = big ? nums[n - 1] : x, word = big ? 'הגדול' : 'הקטן';
+    const what = st === 2 ? (x % 2 ? 'מספרים אי-זוגיים עוקבים' : 'מספרים זוגיים עוקבים') : 'מספרים שלמים עוקבים', NW = { 3: 'שלושה', 4: 'ארבעה', 5: 'חמישה' }[n];
+    const prompt = `סכום ${NW} ${what} הוא ${S}. מהו ${word} מביניהם?`, chk = `בדיקה: ${L(`${nums.join(' + ')} = ${S}`)}`;
+    const spot = '"סכום של כמה מספרים עוקבים". תמיד מתחילים מהממוצע: הסכום חלקי כמות המספרים.';
+    let ex, h1, h2, meta;
+    if (n === 4) { const av = S / 4;
+      ex = mEx('בארבעה מספרים עוקבים אין מספר אמצעי. הממוצע נופל בדיוק באמצע, בין שני המספרים האמצעיים.',
+        [`הממוצע: ${L(`${S} ÷ 4 = ${fmt(av)}`)}`, `שני המספרים האמצעיים הם השלמים משני הצדדים שלו: ${x + 1} ו-${x + 2}`, big ? `הגדול בא צעד אחד אחרי ${x + 2}: ${L(`${x + 2} + 1 = ${mB(ans)}`)}` : `הקטן בא צעד אחד לפני ${x + 1}: ${L(`${x + 1} − 1 = ${mB(ans)}`)}`, chk],
+        mNL(nums.map((v, i) => ({ v, t: v, c: v === ans ? 'g' : '', w: v === ans ? word : '' })).concat([{ v: av, t: '', w: 'ממוצע', c: 'a' }])),
+        `דרך נוספת: הקטן ועוד הגדול הם חצי מהסכום, ${L(`${S} ÷ 2 = ${S / 2}`)}. המלכודת: לחשוב ש-${L(fmt(av))} הוא אחד המספרים.`, spot);
+      h1 = `בארבעה מספרים עוקבים אין מספר אמצעי אחד. חלקו את ${S} ב-4. הממוצע ייפול בין שני המספרים האמצעיים.`;
+      h2 = `${L(`${S} ÷ 4 = ${fmt(av)}`)}. אז שני המספרים האמצעיים הם המספרים השלמים משני הצדדים של ${L(fmt(av))}.`;
+      meta = { n, st, S, av, x, big };
+    } else { const mid = nums[(n - 1) / 2], steps = (n - 1) / 2, far = steps * st;
+      ex = mEx('במספרים עוקבים, המספר האמצעי הוא הממוצע: הסכום חלקי כמות המספרים.',
+        [`האמצעי: ${L(`${S} ÷ ${n} = ${mid}`)}`, `${word} נמצא ${steps === 1 ? 'צעד אחד' : `${steps} צעדים`}${st === 2 ? ' של 2' : ''} ${big ? 'אחרי' : 'לפני'} האמצעי: ${L(`${mid} ${big ? '+' : '−'} ${far} = ${mB(ans)}`)}`, chk],
+        mNL(nums.map(v => ({ v, t: v, c: v === mid ? 'a' : v === ans ? 'g' : '', w: v === mid ? 'ממוצע' : v === ans ? word : '' })), [[mid, ans, `${big ? '+' : '−'}${far}`]]), '', spot);
+      h1 = `ב${NW} ${what}, המספר האמצעי הוא בדיוק הממוצע. כמה זה ${L(`${S} ÷ ${n}`)}?`;
+      h2 = `האמצעי: ${L(`${S} ÷ ${n} = ${mid}`)}. ${word} נמצא ${steps === 1 ? 'צעד אחד' : `${steps} צעדים`}${st === 2 ? ' של 2' : ''} ${big ? 'אחריו' : 'לפניו'}.`;
+      meta = { n, st, S, mid, x, big };
+    }
+    const q = withHint(mNum(d, prompt, '', ans, [n === 4 ? (big ? x + 2 : x + 1) : nums[(n - 1) / 2], big ? x : nums[n - 1], ans + st, ans - st], ex), h1, h2);
+    q.lk = 'consec'; q.meta = Object.assign(meta, { why: mWhy([[nums[(n - 1) >> 1], n === 4 ? 'זה אחד משני המספרים האמצעיים' : 'זה המספר האמצעי (הממוצע)'], [nums[n >> 1], 'זה אחד משני המספרים האמצעיים'], [big ? x : nums[n - 1], big ? 'זה הקטן, והשאלה על הגדול' : 'זה הגדול, והשאלה על הקטן'], [ans + st, 'צעד אחד יותר מדי'], [ans - st, 'צעד אחד יותר מדי']], ans) });
+    return q;
   },
-  ratio(d) {
-    const [a, b] = pick([[2, 3], [3, 4], [3, 5], [4, 5], [5, 7], [1, 2]]), k = ri(3, 6), T = (a + b) * k, boys = a === 1 ? 'בן אחד' : `${a} בנים`;
-    const ex = mEx(`ביחס מחלקים לקבוצות שוות. בכל קבוצה יש ${boys} ו-${b} בנות.`,
-      [`ילדים בקבוצה אחת: ${L(`${a} + ${b} = ${a + b}`)}`, `מספר הקבוצות: ${L(`${T} ÷ ${a + b} = ${k}`)}`, `בנות: ${L(`${b} × ${k} = ${mB(b * k)}`)}`, `בדיקה: ${L(`${a * k} + ${b * k} = ${T}`)}`],
-      mBar([['בנים', mRep(a, k)], ['בנות', mRep(b, k, 'g')]], '', `<span class="mcap">כל משבצת היא ${k} ילדים (אחד מכל קבוצה).</span>`));
-    return withHint(mNum(d, `בכיתה ${T} תלמידים. על כל ${boys} יש בכיתה ${b} בנות. כמה בנות בכיתה?`, '', b * k, [a * k, k, b * (k + 1), b * k - b], ex), `חשבו על קבוצה של ${boys} ו-${b} בנות, כלומר ${a + b} ילדים. כמה קבוצות כאלה יש ב-${T}?`, `${L(`${T} ÷ ${a + b} = ${k}`)} קבוצות. בכל קבוצה יש ${b} בנות.`);
+  /* kind: 'total' (class size given), 'part' (number of boys given), 'diff' (how many more girls) */
+  ratio(d, kind) {
+    for (;;) {
+      const K = kind || pick(d === 1 ? ['total'] : d === 2 ? ['total', 'part'] : ['part', 'diff']);
+      const [a, b] = pick([[2, 3], [3, 4], [3, 5], [4, 5], [5, 7], [1, 2], [2, 5], [3, 7]]), k = d === 1 ? ri(3, 6) : ri(4, 9), T = (a + b) * k;
+      if ((T > 40 && d === 1) || T < 15) continue;
+      const boys = a === 1 ? 'בן אחד' : `${a} בנים`, at = T > 40 ? 'בשכבה' : 'בכיתה', A = a * k, B = b * k, D = B - A;
+      const grp = `בכל קבוצה: ${boys} ו-${b} בנות, כלומר ${L(`${a} + ${b} = ${a + b}`)} ילדים`;
+      const kLine = K === 'total' ? `מספר הקבוצות: ${L(`${T} ÷ ${a + b} = ${k}`)}` : K === 'part' ? (a === 1 ? `כל בן הוא קבוצה אחת, אז יש ${k} קבוצות` : `מספר הקבוצות: ${L(`${A} ÷ ${a} = ${k}`)} (בכל קבוצה ${a} בנים)`) : (b - a === 1 ? `בכל קבוצה יש בת אחת יותר מבנים. ${D} בנות יותר, אז יש ${k} קבוצות` : `בכל קבוצה יש ${b - a} בנות יותר מבנים. מספר הקבוצות: ${L(`${D} ÷ ${b - a} = ${k}`)}`);
+      const ans = K === 'total' ? B : T, last = K === 'total' ? `בנות: ${L(`${b} × ${k} = ${mB(B)}`)}` : `בסך הכל: ${L(`${a + b} × ${k} = ${mB(T)}`)}`;
+      const bar = mBar([['בנים', mRep(a, k)], ['בנות', K === 'diff' ? mRep(a, k, 'g').concat(mRep(b - a, k, 'k')) : mRep(b, k, 'g')]], '', (K === 'diff' ? mLeg([['k', 'הבנות שיש יותר']]) : '') + `<span class="mcap">כל משבצת היא ${k} ילדים, ובכל עמודה יש קבוצה אחת: ${boys} ו-${b} בנות.</span>`);
+      const ex = mEx('"על כל ... יש ..." אומר שהכיתה בנויה מקבוצות שוות. מוצאים כמה קבוצות יש, וכופלים.',
+        [grp, kLine, last, `בדיקה: ${L(`${A} + ${B} = ${T}`)}${K === 'diff' ? `, ו-${L(`${B} − ${A} = ${D}`)}` : ''}`], bar,
+        K === 'total' ? `המלכודת: לחלק את ${T} ב-${b}. מחלקים בגודל של קבוצה שלמה, ${a + b}.` : K === 'part' ? `המלכודת: לענות רק את מספר הבנות (${B}). שואלים על כל ה${at === 'בכיתה' ? 'כיתה' : 'שכבה'}.` : `המלכודת: לחשוב ש-${D} הוא מספר הבנות. זה רק ההפרש.`,
+        '"על כל 3 ... יש 5 ..." או "היחס הוא 3 ל-5". חושבים על קבוצות של 8 שחוזרות שוב ושוב.');
+      const prompt = K === 'total' ? `${at} ${T} תלמידים. על כל ${boys} יש ${at} ${b} בנות. כמה בנות ${at}?` : K === 'part' ? `${at} יש ${A} בנים. על כל ${boys} יש ${at} ${b} בנות. כמה תלמידים יש ${at} בסך הכל?` : `על כל ${boys} יש ${at} ${b} בנות. יש ${at} ${D} בנות יותר מבנים. כמה תלמידים יש ${at} בסך הכל?`;
+      const cands = K === 'total' ? [A, k, b * (k + 1), Math.round(T / b)] : K === 'part' ? [B, A + b, T + k, A * (a + b)] : [B, D * (a + b), T + D, A + D];
+      const h = K === 'total' ? [`חשבו על קבוצה של ${boys} ו-${b} בנות, כלומר ${a + b} ילדים. כמה קבוצות כאלה יש ב-${T}?`, `${L(`${T} ÷ ${a + b} = ${k}`)} קבוצות. בכל קבוצה יש ${b} בנות.`]
+        : K === 'part' ? [`חשבו על קבוצות: בכל קבוצה ${boys} ו-${b} בנות. כמה קבוצות כאלה צריך כדי שיהיו ${A} בנים?`, `${kLine}. בכל קבוצה ${a + b} ילדים. כמה ילדים בכל הקבוצות?`]
+          : [`בכל קבוצה של ${boys} ו-${b} בנות יש ${b - a === 1 ? 'בת אחת' : `${b - a} בנות`} יותר מבנים. כמה קבוצות צריך כדי שיהיו ${D} בנות יותר?`, `${kLine}. בכל קבוצה ${a + b} ילדים. כמה ילדים בכל הקבוצות?`];
+      const q = withHint(mNum(d, prompt, '', ans, cands, ex), h[0], h[1]);
+      q.lk = 'ratio'; q.meta = { K, a, b, k, T, A, B, D, boys, at, why: mWhy([[A, 'זה מספר הבנים'], [B, 'זה רק מספר הבנות'], [k, 'זה מספר הקבוצות, לא הילדים'], [D, 'זה רק ההפרש']], ans) };
+      return q;
+    }
   },
   legs(d) {
     const r = ri(3, 15), c = ri(3, 15), H = r + c, Lg = 4 * r + 2 * c;
@@ -93,18 +176,77 @@ const MT = {
   },
   average(d) { for (;;) { const n = ri(3, 5), A = ri(72, 88), B = A + ri(2, 4), need = B * (n + 1) - n * A; if (need > 100) continue; const p = pick(PEOPLE);
     return withHint(mNum(d, `הממוצע של ${p[0]} ב-${n} מבחנים הוא ${A}. איזה ציון ${g(p, 'הוא צריך', 'היא צריכה')} לקבל במבחן הבא כדי שהממוצע יעלה ל-${B}?`, '', need, [B, B + (B - A), 100], mAvgEx(n, A, B, need, 'מבחנים')), `חשבו בסכומים, לא בממוצעים: מה סכום הציונים של ${p[0]} ב-${n} המבחנים, ומה צריך להיות הסכום של ${n + 1} מבחנים?`, `הסכום עכשיו: ${L(`${n} × ${A} = ${n * A}`)}. כדי שממוצע ${n + 1} מבחנים יהיה ${B}, הסכום צריך להיות ${L(`${n + 1} × ${B}`)}. כמה חסר?`); } },
-  handshake(d) {
-    const n = ri(6, 12), ans = n * (n - 1) / 2;
-    const ex = mEx('כל שחקן משחק נגד כל האחרים. כך כל משחק נספר פעמיים, ולכן מחלקים ב-2.',
-      [`כל שחקן משחק נגד ${n - 1} שחקנים`, `${n} שחקנים: ${L(`${n} × ${n - 1} = ${n * (n - 1)}`)} (כל משחק נספר פעמיים)`, `משחקים: ${L(`${n * (n - 1)} ÷ 2 = ${mB(ans)}`)}`]);
-    return withHint(mNum(d, `בטורניר שחמט משתתפים ${n} שחקנים. כל שחקן משחק נגד כל שחקן אחר פעם אחת בדיוק. כמה משחקים יהיו בסך הכל?`, '', ans, [n * (n - 1), n * n / 2 | 0, n * (n + 1) / 2], ex), `נגד כמה שחקנים משחק כל אחד מ-${n} השחקנים? ושימו לב: בכל משחק משתתפים שני שחקנים.`, `כל שחקן משחק ${n - 1} משחקים: ${L(`${n} × ${n - 1} = ${n * (n - 1)}`)}. אבל כך כל משחק נספר פעמיים. מה עושים?`);
+  /* kind: 'once' (everyone plays everyone once), 'twice' (home and away), 'back' (from the number of handshakes to the number of people) */
+  handshake(d, kind) {
+    const K = kind || pick(d === 1 ? ['once'] : d === 2 ? ['once', 'twice'] : ['twice', 'back', 'back']);
+    const n = d === 1 ? ri(5, 8) : ri(7, 12), H = n * (n - 1) / 2, stairs = n <= 8 ? Array.from({ length: n - 1 }, (_, i) => n - 1 - i).join(' + ') : `${n - 1} + ${n - 2} + ${n - 3} + … + 1`;
+    const spot = '"כל אחד נגד כל אחד" או "כל שניים לחצו ידיים". קודם סופרים זוגות (כל אחד נגד כל השאר, חלקי 2), ואז בודקים כמה פעמים נפגש כל זוג.';
+    let q;
+    if (K === 'once') {
+      const ex = mEx('כל שחקן משחק נגד כל האחרים. אם סופרים לכל שחקן את המשחקים שלו, כל משחק נספר פעמיים (פעם אצל כל אחד משני השחקנים). לכן מחלקים ב-2.',
+        [`כל שחקן משחק נגד ${n - 1} שחקנים`, `${n} שחקנים: ${L(`${n} × ${n - 1} = ${n * (n - 1)}`)} (כל משחק נספר פעמיים)`, `משחקים: ${L(`${n * (n - 1)} ÷ 2 = ${mB(H)}`)}`, `דרך שנייה: הראשון משחק ${n - 1} משחקים, לשני נשארו עוד ${n - 2} חדשים, וכן הלאה: ${L(`${stairs} = ${H}`)}`],
+        mPoly(n), `המלכודת: לשכוח לחלק ב-2 (${n * (n - 1)}).`, spot);
+      q = withHint(mNum(d, `בטורניר שחמט משתתפים ${n} שחקנים. כל שחקן משחק נגד כל שחקן אחר פעם אחת בדיוק. כמה משחקים יהיו בסך הכל?`, '', H, [n * (n - 1), n * n / 2 | 0, n * (n + 1) / 2], ex), `נגד כמה שחקנים משחק כל אחד מ-${n} השחקנים? ושימו לב: בכל משחק משתתפים שני שחקנים.`, `כל שחקן משחק ${n - 1} משחקים: ${L(`${n} × ${n - 1} = ${n * (n - 1)}`)}. אבל כך כל משחק נספר פעמיים. מה עושים?`);
+      q.meta = { K, n, H, why: mWhy([[n * (n - 1), 'שכחו לחלק ב-2: כל משחק נספר פעמיים'], [n * (n + 1) / 2, `כאילו כל שחקן משחק נגד ${n} שחקנים, אבל הוא לא משחק נגד עצמו`], [n * n / 2 | 0, 'חצי מ-n × n, ולא מ-n × (n − 1)']], H) };
+    } else if (K === 'twice') {
+      const ans = n * (n - 1);
+      const ex = mEx('כל זוג קבוצות נפגש פעמיים, אז כאן לא מחלקים ב-2.',
+        [`זוגות של קבוצות: ${L(`${n} × ${n - 1} ÷ 2 = ${H}`)}`, `כל זוג משחק פעמיים: ${L(`${H} × 2 = ${mB(ans)}`)}`, `קיצור: כל קבוצה מארחת בבית ${n - 1} קבוצות: ${L(`${n} × ${n - 1} = ${ans}`)}`], mPoly(n, 'קבוצה אחת'),
+        `המלכודת: לחלק ב-2 מתוך הרגל (${H}). כאן כל זוג באמת משחק פעמיים.`, spot);
+      q = withHint(mNum(d, `בליגה ${n} קבוצות. כל קבוצה משחקת נגד כל קבוצה אחרת פעמיים: פעם בבית ופעם בחוץ. כמה משחקים יהיו בליגה?`, '', ans, [H, n * n, (n - 1) * 2, ans + n], ex), `קודם: כמה זוגות של קבוצות יש? וכמה פעמים נפגש כל זוג?`, `זוגות: ${L(`${n} × ${n - 1} ÷ 2 = ${H}`)}. ועכשיו זכרו שכל זוג משחק פעמיים.`);
+      q.meta = { K, n, H, why: mWhy([[H, 'זה מספר הזוגות, אבל כל זוג משחק פעמיים'], [n * n, 'כאילו כל קבוצה משחקת גם נגד עצמה']], ans) };
+    } else {
+      const ex = mEx('מספר הלחיצות = אורחים × (אורחים פחות 1) ÷ 2. כאן הולכים הפוך: מהלחיצות אל מספר האורחים.',
+        [`${L(`${H} × 2 = ${2 * H}`)}: זו המכפלה של מספר האורחים במספר שלפניו`, `מחפשים שני מספרים צמודים שמכפלתם ${2 * H}: ${L(`${n} × ${n - 1} = ${2 * H}`)}`, `אורחים: ${mB(n)}`, `בדיקה: ${L(`${n} × ${n - 1} ÷ 2 = ${H}`)} ✓`],
+        mTab(['אורחים', 'לחיצות ידיים'], [[n - 1, (n - 1) * (n - 2) / 2], [n, H], [n + 1, n * (n + 1) / 2]], 1), 'במבחן אפשר גם להציב כל תשובה בכלל, ולראות איזו נותנת בדיוק את מספר הלחיצות.', spot);
+      q = withHint(mNum(d, `במסיבה כל שני אורחים לחצו ידיים פעם אחת בדיוק. היו ${H} לחיצות ידיים. כמה אורחים היו במסיבה?`, '', n, [n + 1, n - 1, n + 2, Math.round(H / 2)], ex), `אם יש מספר מסוים של אורחים, כל אחד לוחץ יד לכל השאר, וכל לחיצה נספרת פעמיים. נסו אחת התשובות: כמה לחיצות היא נותנת?`, `${L(`${H} × 2 = ${2 * H}`)}. חפשו שני מספרים צמודים שהמכפלה שלהם ${2 * H}.`);
+      q.meta = { K, n, H, why: mWhy([[n + 1, `${n + 1} אורחים נותנים ${n * (n + 1) / 2} לחיצות`], [n - 1, `${n - 1} אורחים נותנים ${(n - 1) * (n - 2) / 2} לחיצות`], [n + 2, `${n + 2} אורחים נותנים ${(n + 1) * (n + 2) / 2} לחיצות`]], n) };
+    }
+    q.lk = 'pairs'; return q;
   },
-  ages(d) {
-    const p = pick(PEOPLE); const [m1, m2] = pick([[4, 3], [7, 5], [5, 4]]); const k = m1 === 4 ? ri(3, 7) : m1 === 7 ? ri(2, 5) : ri(2, 4); const x = k * (m2 - 1) / (m1 - m2);
-    const ex = mEx('קוראים לגיל של היום x, ממלאים טבלה של היום ושל עוד כמה שנים, ובונים משוואה.',
-      [`היום: ${p[0]} ${L('x')}, אבא ${L(`${m1}x`)}`, `בעוד ${k} שנים: ${p[0]} ${L(`x + ${k}`)}, אבא ${L(`${m1}x + ${k}`)}`, `אז אבא פי ${m2}: ${L(`${m1}x + ${k} = ${m2}(x + ${k}) = ${m2}x + ${m2 * k}`)}`, `${L(`${m1}x − ${m2}x = ${m2 * k} − ${k}`)}${m1 - m2 === 1 ? '' : `, כלומר ${L(`${m1 - m2}x = ${(m2 - 1) * k}`)}`}`, m1 - m2 === 1 ? `${p[0]} היום: ${L(`x = ${mB(x)}`)}` : `${p[0]} היום: ${L(`x = ${(m2 - 1) * k} ÷ ${m1 - m2} = ${mB(x)}`)}`, `בדיקה: ${L(`${m1 * x + k} = ${m2} × ${x + k}`)}`],
-      mTab(['', 'היום', `בעוד ${k}`], [[p[0], x, x + k], ['אבא', m1 * x, m1 * x + k], ['פי', m1, m2]], 0));
-    return withHint(mNum(d, `היום אבא של ${p[0]} מבוגר ${g(p, 'ממנו', 'ממנה')} פי ${m1}. בעוד ${k} שנים, אבא יהיה מבוגר ${g(p, 'ממנו', 'ממנה')} פי ${m2}. ${g(p, 'בן', 'בת')} כמה ${p[0]} היום?`, '', x, [k, x + k, 2 * x, m1 * x], ex), `קראו לגיל של ${p[0]} היום x. אז אבא בן ${L(`${m1}x`)}. מה יהיו הגילים של שניהם בעוד ${k} שנים?`, `בעוד ${k} שנים: ${p[0]} ${L(`x + ${k}`)} ואבא ${L(`${m1}x + ${k}`)}. אז אבא פי ${m2}: ${L(`${m1}x + ${k} = ${m2}(x + ${k})`)}. פתרו או נסו את התשובות.`);
+  /* kind: 'when' (ages today, when will dad be m times), 'fut' (times now and in k years), 'past' (times now and k years ago), 'dad' (like fut, asks dad's age) */
+  ages(d, kind) {
+    for (let t0 = 0; ; t0++) {
+      const K = kind || pick(d === 1 ? ['when'] : d === 2 ? ['fut', 'fut', 'when'] : ['fut', 'past', 'dad']);
+      const p = pick(PEOPLE), nm = p[0], him = g(p, 'ממנו', 'ממנה'), bn = g(p, 'בן', 'בת'), his = g(p, 'שלו', 'שלה');
+      const spot = '"מבוגר פי..." היום, ו"פי" אחר בעוד כמה שנים (או לפני). השאלה היא תמיד על ההפרש שלא משתנה.';
+      if (K === 'when') {
+        const m = pick([2, 3, 4]), t = ri(2, 10), y = ri(6, 20), c = y - t, D = (m - 1) * y, dad = c + D;
+        if (c < 3 || dad < 26 || dad > 50) continue;
+        const ex = mEx(`ההפרש בין הגילים לא משתנה לעולם: כל שנה גם ${nm} וגם אבא מתבגרים בשנה אחת.`,
+          [`ההפרש: ${L(`${dad} − ${c} = ${D}`)} שנים, והוא יישאר ${D} תמיד`, m === 2 ? `כשאבא פי 2, ההפרש שווה בדיוק לגיל של ${nm}` : `כשאבא פי ${m}, ההפרש הוא ${mTimes(m - 1)} הגיל של ${nm}`, m === 2 ? `אז ${nm} ${g(p, 'יהיה', 'תהיה')} ${g(p, 'בן', 'בת')} ${D}` : `אז ${nm} ${g(p, 'יהיה', 'תהיה')} ${g(p, 'בן', 'בת')} ${L(`${D} ÷ ${m - 1} = ${y}`)}`, `עוד כמה שנים? ${L(`${y} − ${c} = ${mB(t)}`)}`, `בדיקה: בעוד ${t} שנים ${nm} ${y} ואבא ${dad + t}, ו-${L(`${m} × ${y} = ${dad + t}`)} ✓`],
+          mAgesTL(nm, [['היום', c, dad], [`בעוד ${t} שנים`, y, dad + t]]), `המלכודת: לענות את הגיל של ${nm} אז (${y}) במקום מספר השנים.`, 'נותנים גילים של היום ושואלים מתי אבא יהיה "פי...". מחשבים את ההפרש, שלא משתנה, ומחלקים אותו.');
+        const q = withHint(mNum(d, `היום ${nm} ${bn} ${c} ואבא ${his} בן ${dad}. בעוד כמה שנים אבא יהיה מבוגר ${him} פי&nbsp;${m} בדיוק?`, '', t, [y, D, t + 1, t - 1, t + 2], ex, ' שנים'),
+          `מה ההפרש בין הגילים היום? ההפרש הזה לא ישתנה אף פעם.`, `ההפרש הוא ${D}. כשאבא פי ${m}, ההפרש הוא ${mTimes(m - 1)} הגיל של ${nm}. ${g(p, 'בן', 'בת')} כמה ${nm} אז, ובעוד כמה שנים זה?`);
+        q.lk = 'ages'; q.meta = { K, nm, c, dad, D, m, y, t, why: mWhy([[y, `זה הגיל של ${nm} אז, לא מספר השנים`], [D, 'זה ההפרש בין הגילים']], t) };
+        return q;
+      }
+      const past = K === 'past', [m1, m2] = pick(past ? [[3, 4], [3, 5], [4, 5], [2, 3], [5, 7]] : [[4, 3], [7, 5], [5, 4], [6, 5]]);
+      /* today A × (age now) = B × (age then). Divided by their gcd: the age now is pNow parts, the age then pOth parts, one part apart, so a part is k years */
+      const A = m1 - 1, B = m2 - 1, gg = mGcd(A, B), pNow = B / gg, pOth = A / gg, k = ri(2, 8), X = pNow * k, dad = m1 * X, Y = past ? X - k : X + k, dadY = past ? dad - k : dad + k;
+      if (Math.abs(pNow - pOth) !== 1 || X < 3 || Y < 2 || dad < 26 || dad > 50) continue;
+      const when = past ? `לפני ${k} שנים` : `בעוד ${k} שנים`, ans = K === 'dad' ? dad : X;
+      const bar = mBar(past ? [[when, mRep(Y / k, k)], ['היום', mRep(Y / k, k).concat([[k, 'g']])]] : [['היום', mRep(X / k, k)], [when, mRep(X / k, k).concat([[k, 'g']])]], 'mparts', `<span class="mcap">כל משבצת היא ${k} שנים. המשבצת הצהובה היא ${k} השנים שבין שתי השורות.</span>`);
+      const lines = [
+        `היום אבא פי ${m1}, אז ההפרש ${A === 1 ? `שווה לגיל של ${nm} היום` : `הוא ${mTimes(A)} הגיל של ${nm} היום`}`,
+        `${when} אבא ${past ? 'היה' : 'יהיה'} פי ${m2}, אז ההפרש ${B === 1 ? `שווה לגיל של ${nm} אז` : `הוא ${mTimes(B)} הגיל של ${nm} אז`}`,
+        `זה אותו הפרש: ${A === 1 ? 'הגיל' : mTimes(A) + ' הגיל'} היום שווה ל${mTimes(B)} הגיל ${when}. זה נכון כשהגיל היום הוא ${pNow} חלקים, והגיל ${when} ${pOth === 1 ? 'חלק אחד' : `${pOth} חלקים`} (${L(`${A} × ${pNow} = ${B} × ${pOth}`)})${bar}`,
+        `ההבדל בין שני הגילים הוא חלק אחד, והוא ${k} השנים. אז כל חלק הוא ${k} שנים`,
+        K === 'dad' ? `${nm} היום: ${L(`${pNow} × ${k} = ${X}`)}` : `${nm} היום: ${L(`${pNow} × ${k} = ${mB(X)}`)}`,
+        K === 'dad' ? `אבא היום: ${L(`${m1} × ${X} = ${mB(dad)}`)}` : '',
+        `בדיקה: היום ${X} ו-${dad} (פי ${m1}). ${when}: ${Y} ו-${dadY} (פי ${m2}) ✓`];
+      const rows = past ? [[when, Y, dadY], ['היום', X, dad]] : [['היום', X, dad], [when, Y, dadY]];
+      const ex = mEx(`ההפרש בין הגילים לא משתנה לעולם: כל שנה גם ${nm} וגם אבא מתבגרים בשנה אחת. משווים את ההפרש של היום להפרש ${when}.`, lines, mAgesTL(nm, rows),
+        `במבחן אפשר גם להציב כל תשובה: ${K === 'dad' ? 'הגיל של אבא, הגיל של ' + nm : 'הגיל של ' + nm + ', הגיל של אבא'}, ו${past ? 'פחות' : 'עוד'} ${k} שנים לשניהם. רק תשובה אחת נותנת פי ${m2}.`, spot);
+      const prompt = past ? `היום אבא של ${nm} מבוגר ${him} פי&nbsp;${m1}. לפני ${k} שנים, אבא היה מבוגר ${him} פי&nbsp;${m2}. ${bn} כמה ${nm} היום?`
+        : `היום אבא של ${nm} מבוגר ${him} פי&nbsp;${m1}. בעוד ${k} שנים, אבא יהיה מבוגר ${him} פי&nbsp;${m2}. ${K === 'dad' ? 'בן כמה אבא היום?' : `${bn} כמה ${nm} היום?`}`;
+      const cands = K === 'dad' ? [X, dadY, m2 * X, dad + 2 * k] : past ? [Y, X + k, dad, k * pOth * 2] : [Y, k, dad, 2 * X];
+      const h1 = `ההפרש בין הגילים לא משתנה עם השנים. היום אבא פי ${m1}, אז ההפרש הוא ${mTimes(A)} הגיל של ${nm} היום. ומה ההפרש ${when}?`;
+      const h2 = `${A === 1 ? 'הגיל' : mTimes(A) + ' הגיל'} היום שווה ל${mTimes(B)} הגיל ${when}. אפשר גם לבדוק כל תשובה: מה הגילים של שניהם היום, ומה ${past ? 'היו' : 'יהיו'} ${when}? אבא ${past ? 'היה' : 'יהיה'} אז פי ${m2}?`;
+      const q = withHint(mNum(d, prompt, '', ans, cands, ex), h1, h2);
+      q.lk = 'ages'; q.meta = { K, nm, m1, m2, A, B, k, X, Y, dad, dadY, pNow, pOth, past, when, why: mWhy([[Y, `זה הגיל של ${nm} ${when}, לא היום`], [dad, 'זה הגיל של אבא'], [X, `זה הגיל של ${nm}`], [dadY, `זה הגיל של אבא ${when}`], [k, 'זה מספר השנים מהשאלה']], ans) };
+      return q;
+    }
   },
   trains(d) {
     const t = ri(2, 5), v1 = ri(4, 12) * 10, v2 = ri(4, 12) * 10, D = t * (v1 + v2);
@@ -143,13 +285,24 @@ const MT = {
       mBar([['', mRep(ub, one, 'm').concat(mRep(ug, one, 'k'), mRep(ul, one, 'g'))]], '', mLeg([['m', 'ספר'], ['k', 'משחק'], ['g', 'נשאר']])));
     return withHint(mNum(d, `${p[0]} ${g(p, 'הוציא', 'הוציאה')} ${FR[f1]} מהכסף ${g(p, 'שלו', 'שלה')} על ספר, ואחר כך ${FR[f2]} ממה שנשאר על משחק. נשארו ${g(p, 'לו', 'לה')} ${X} ₪. כמה כסף היה ${g(p, 'לו', 'לה')} בהתחלה?`, '', O, [2 * X, X * 3, O / 2, O + X], ex, ' ₪'), `עבדו מהסוף להתחלה: ${X} ₪ נשארו אחרי ש${p[0]} ${g(p, 'הוציא', 'הוציאה')} ${FR[f2]} על המשחק. איזה חלק זה ממה שהיה לפני המשחק?`, `${X} ₪ הם ${rest2} ממה שהיה אחרי הספר, אז אחרי הספר היו ${R1} ₪. ואיזה חלק זה מהכסף שבהתחלה?`);
   },
-  buses(d) {
-    const [a, b, l] = pick([[12, 18, 36], [15, 20, 60], [10, 25, 50], [12, 16, 48], [20, 30, 60], [6, 15, 30], [18, 24, 72]]); const opts = [l, a * b, a + b, Math.max(a, b) * 2, l + Math.min(a, b), l + Math.max(a, b), 2 * l].filter((v, i, s) => s.indexOf(v) === i && v < 600).slice(0, 4);
-    const m = mc(opts.map(TM)), ms = s => Array.from({ length: l / s }, (_, i) => (i + 1) * s).join(', ');
-    const ex = mEx('הקווים ייצאו יחד שוב אחרי הכפולה המשותפת הקטנה ביותר של שני הזמנים.',
-      [`קו 5 יוצא אחרי: ${L(ms(a))} דקות`, `קו 9 יוצא אחרי: ${L(ms(b))} דקות`, `המספר הראשון שמופיע בשתי השורות: ${l} דקות${l >= 60 ? (l === 60 ? ', כלומר שעה' : `, כלומר שעה ו-${l - 60} דקות`) : ''}`, `${L('8:00')} ועוד ${l} דקות: ${mB(TM(l))}`],
-      mBusTL(a, b, l));
-    return withHint({ cat: 'math', d, prompt: `קו 5 יוצא מהתחנה כל ${a} דקות, וקו 9 יוצא כל ${b} דקות. בשעה ${L('8:00')} יצאו שניהם יחד. באיזו שעה ייצאו שוב יחד לראשונה?`, vis: '', options: m.options, answer: m.answer, ex }, `שני הקווים ייצאו יחד אחרי מספר דקות שמתחלק גם ב-${a} וגם ב-${b}. מה המספר הקטן ביותר כזה?`, `עברו על כפולות של ${b}, אחת אחרי השנייה. ${b} עצמו לא מתחלק ב-${a}. מה הכפולה הבאה? בסוף הוסיפו את הדקות ל-${L('8:00')}.`);
+  /* two bus lines (three at d 3 half the time) leave together at 8:00; when together again? kind: 2 or 3 lines */
+  buses(d, kind) {
+    const three = kind ? kind === 3 : d === 3 && R() < .5, NM = ['קו 5', 'קו 9', 'קו 12'];
+    const P = three ? pick([[4, 6, 10], [6, 8, 12], [6, 10, 15], [10, 12, 15], [6, 9, 12], [8, 12, 20]]) : pick(d === 1 ? [[4, 6], [6, 8], [10, 15], [6, 9], [4, 10], [5, 6], [8, 12]] : [[12, 18], [15, 20], [10, 25], [12, 16], [20, 30], [6, 15], [18, 24]]);
+    const l = mLcm(...P), [a, b, c] = P, big = P[P.length - 1], ls = P.map((v, i) => [NM[i], v]), prod = P.reduce((x, y) => x * y, 1);
+    const opts = [l].concat(three ? [mLcm(a, b), mLcm(b, c), mLcm(a, c), 2 * l, l + c, l + a, a * c] : [a * b, a + b, b * 2, l + a, l + b, 2 * l]).filter((v, i, s) => s.indexOf(v) === i && v < 600 && v > 0).slice(0, 4);
+    const m = mc(opts.map(TM)), ms = s => Array.from({ length: l / s }, (_, i) => (i + 1) * s).join(', '), hm = l >= 60 ? (l % 60 ? `, כלומר ${l < 120 ? 'שעה' : `${l / 60 | 0} שעות`} ו-${l % 60} דקות` : `, כלומר ${l === 60 ? 'שעה' : `${l / 60} שעות`}`) : '';
+    const lines = three
+      ? [`כותבים את הכפולות של ${big}, המספר הגדול: ${L(ms(big))}`, `בודקים כל אחת: האם היא מתחלקת גם ב-${a} וגם ב-${b}? הראשונה שעוברת: ${l}`, `${L(`${l} ÷ ${a} = ${l / a}`)}, ${L(`${l} ÷ ${b} = ${l / b}`)}, ${L(`${l} ÷ ${c} = ${l / c}`)}`, hm ? `${l} דקות${hm}` : '', `${L('8:00')} ועוד ${l} דקות: ${mB(TM(l))}`]
+      : [`${NM[0]} יוצא אחרי: ${L(ms(a))} דקות`, `${NM[1]} יוצא אחרי: ${L(ms(b))} דקות`, `המספר הראשון שמופיע בשתי השורות: ${l} דקות${hm}`, `${L('8:00')} ועוד ${l} דקות: ${mB(TM(l))}`];
+    const tip = three ? `המלכודת: לעצור במספר שמתחלק רק בשניים מהם (למשל ${mLcm(a, b) !== l ? mLcm(a, b) : mLcm(b, c)}).` : a * b !== l ? `המלכודת: ${L(`${a} × ${b} = ${a * b}`)} גם מתחלק בשניהם, אבל הוא לא הראשון.` : `כאן ל-${a} ול-${b} אין מחלק משותף, ולכן ${L(`${a} × ${b} = ${l}`)} הוא הראשון. זה לא תמיד כך.`;
+    const ex = mEx(`הקווים ייצאו שוב יחד אחרי הכפולה המשותפת הקטנה ביותר: המספר הקטן ביותר שמתחלק ב${three ? 'כל הזמנים' : 'שני הזמנים'}.`, lines, mBusTL(ls, l), tip, '"שוב יחד", "באותו רגע", "בפעם הבאה ביחד". מחפשים כפולה משותפת קטנה.');
+    const prompt = three ? `${NM[0]} יוצא מהתחנה כל ${a} דקות, ${NM[1]} כל ${b} דקות ו${NM[2]} כל ${c} דקות. בשעה ${L('8:00')} יצאו שלושתם יחד. באיזו שעה ייצאו שוב שלושתם יחד לראשונה?` : `${NM[0]} יוצא מהתחנה כל ${a} דקות, ו${NM[1]} יוצא כל ${b} דקות. בשעה ${L('8:00')} יצאו שניהם יחד. באיזו שעה ייצאו שוב יחד לראשונה?`;
+    const q = withHint({ cat: 'math', d, lk: 'lcm', prompt, vis: '', options: m.options, answer: m.answer, ex },
+      three ? `שלושת הקווים ייצאו יחד אחרי מספר דקות שמתחלק ב-${a}, ב-${b} וגם ב-${c}. התחילו מהכפולות של ${c}.` : `שני הקווים ייצאו יחד אחרי מספר דקות שמתחלק גם ב-${a} וגם ב-${b}. מה המספר הקטן ביותר כזה?`,
+      three ? `כפולות של ${c}: ${c}, ${2 * c}, ${3 * c}... בדקו כל אחת: האם היא מתחלקת גם ב-${a} וגם ב-${b}? בסוף הוסיפו את הדקות ל-${L('8:00')}.` : `עברו על כפולות של ${b}, אחת אחרי השנייה. ${b} עצמו לא מתחלק ב-${a}. מה הכפולה הבאה? בסוף הוסיפו את הדקות ל-${L('8:00')}.`);
+    q.meta = { P, l, three, why: mWhy([[TM(a * b), `${a} × ${b} מתחלק בשניהם, אבל יש מספר קטן יותר`], [TM(prod), 'מכפלה של כולם: מתחלקת, אבל לא הראשונה'], [TM(2 * l), 'גם זה זמן משותף, אבל השני ולא הראשון'], [TM(a + b), 'חיבור של הזמנים לא אומר כלום כאן'], [TM(l + a), 'הוסיפו עוד זמן אחרי המפגש'], [TM(l + b), 'הוסיפו עוד זמן אחרי המפגש'], [TM(l + (c || 0)), 'הוסיפו עוד זמן אחרי המפגש'], [TM(b * 2), `${b * 2} לא מתחלק ב-${a}`], ...(three ? [[TM(mLcm(a, b)), `מתחלק ב-${a} וב-${b}, אבל לא ב-${c}`], [TM(mLcm(b, c)), `מתחלק ב-${b} וב-${c}, אבל לא ב-${a}`], [TM(mLcm(a, c)), `מתחלק ב-${a} וב-${c}, אבל לא ב-${b}`]] : [])], TM(l)) };
+    return q;
   },
   pages(d) {
     const N = ri(60, 250); const D = N < 100 ? 9 + 2 * (N - 9) : 189 + 3 * (N - 99);
@@ -166,7 +319,8 @@ const MT = {
       w2 > w ? 'יותר פועלים, אז פחות ימים (יחס הפוך).' : 'פחות פועלים, אז יותר ימים (יחס הפוך).');
     return withHint(mNum(d, `${w} פועלים בונים קיר ב-${t} ימים. בכמה ימים יבנו את אותו קיר ${w2} פועלים שעובדים באותו קצב?`, '', ans, [t * w2 / w, t + (w - w2), t, w * t], ex, ' ימים'), `${w} פועלים עובדים ${t} ימי עבודה כל אחד. כמה ימים היה לוקח לפועל אחד לבד לבנות את הקיר?`, `פועל אחד לבד: ${L(`${w} × ${t} = ${w * t}`)} ימי עבודה. עכשיו מחלקים אותם שווה בין ${w2} פועלים.`); } },
 };
-const MPOOL = { 1: ['consec', 'ratio', 'legs', 'average', 'handshake'], 2: ['handshake', 'ages', 'trains', 'work', 'percent', 'fraction', 'buses', 'consec', 'legs'], 3: ['chase', 'pages', 'workers', 'ages', 'fraction', 'percent', 'work', 'buses'] };
+/* every lesson key has questions at every level, so a lesson can always find practice for it (genByKey) */
+const MPOOL = { 1: ['consec', 'ratio', 'legs', 'average', 'handshake', 'ages', 'buses'], 2: ['handshake', 'ages', 'trains', 'work', 'percent', 'fraction', 'buses', 'consec', 'legs', 'ratio'], 3: ['chase', 'pages', 'workers', 'ages', 'fraction', 'percent', 'work', 'buses', 'ratio', 'handshake', 'consec'] };
 function genMath(d) { return MT[pick(MPOOL[d])](d); }
 /* themed math */
 Object.assign(MT, {
@@ -177,17 +331,39 @@ Object.assign(MT, {
     return withHint(mNum(d, `במשחק כדורסל ${p[0]} ${g(p, 'קלע', 'קלעה')} ${N} סלים: חלקם רגילים (2 נקודות) וחלקם שלשות (3 נקודות). בסך הכל ${g(p, 'צבר', 'צברה')} ${P} נקודות. כמה שלשות ${g(p, 'קלע', 'קלעה')}?`, '', s3, [s2, Math.round(P / 3), s3 + 1, s3 - 1], ex), `נניח שכל ${N} הסלים היו רגילים, של 2 נקודות. כמה נקודות זה, וכמה חסר עד ${P}?`, `${N} סלים רגילים: ${L(`${N} × 2 = ${2 * N}`)} נקודות. כל שלשה במקום סל רגיל מוסיפה נקודה אחת. כמה חסר עד ${P}?`); },
   avgSport(d) { for (;;) { const n = ri(3, 5), A = ri(10, 22), B = A + ri(1, 3), need = B * (n + 1) - n * A; if (need > 45) continue; const p = pick(PEOPLE);
     return withHint(mNum(d, `${p[0]} ${g(p, 'קלע', 'קלעה')} בממוצע ${A} נקודות ב-${n} משחקי כדורסל. כמה נקודות ${g(p, 'הוא צריך', 'היא צריכה')} לקלוע במשחק הבא כדי שהממוצע יעלה ל-${B}?`, '', need, [B, B + (B - A), A + (B - A) * 2], mAvgEx(n, A, B, need, 'משחקים'), ' נקודות'), `ממוצע ${A} ב-${n} משחקים זה סכום של ${L(`${n} × ${A}`)} נקודות. איזה סכום נותן ממוצע ${B} ב-${n + 1} משחקים?`, `סכום נדרש: ${L(`${n + 1} × ${B} = ${B * (n + 1)}`)}. הסכום עכשיו: ${L(`${n} × ${A}`)}. כמה חסר?`); } },
-  rect(d) { const L0 = ri(6, 30), W0 = ri(4, L0 - 1); const ask = d === 1 ? 'per' : pick(['area', 'sq']);
-    if (ask === 'per') { const ex = mEx('היקף הוא כל הדרך מסביב: שתי צלעות אורך ושתי צלעות רוחב.', [`${L(`${L0} + ${W0} + ${L0} + ${W0}`)}`, `${L(`= 2 × ${L0} + 2 × ${W0} = ${2 * L0} + ${2 * W0} = ${mB(2 * (L0 + W0))}`)} מטר`], mRect(L0, W0, true));
-      return withHint(mNum(d, `מגרש מלבני באורך ${L0} מטר וברוחב ${W0} מטר. מה ההיקף שלו?`, '', 2 * (L0 + W0), [L0 * W0, L0 + W0, 2 * L0 + W0], ex, ' מ׳'), `היקף הוא כל הדרך מסביב למגרש: ארבע צלעות. למגרש ${L0} על ${W0} יש שתי צלעות מכל אורך.`, `שתי צלעות האורך: ${L(`${L0} + ${L0} = ${2 * L0}`)}. הוסיפו את שתי צלעות הרוחב, ${W0} כל אחת.`); }
-    if (ask === 'area') { const tn = L0 - L0 % 10, on = L0 % 10;
-      const ex = mEx('שטח מלבן = אורך × רוחב.', L0 >= 10 && on ? [`מפרקים את ${L0} ל-${tn} ועוד ${on}:`, `${L(`${tn} × ${W0} = ${tn * W0}`)}`, `${L(`${on} × ${W0} = ${on * W0}`)}`, `${L(`${tn * W0} + ${on * W0} = ${mB(L0 * W0)}`)} מ"ר`] : [`${L(`${L0} × ${W0} = ${mB(L0 * W0)}`)} מ"ר`], mRect(L0, W0, false), 'היקף (הדרך מסביב) ושטח (כמה ריבועים בפנים) הם שני דברים שונים.');
-      return withHint(mNum(d, `מגרש מלבני באורך ${L0} מטר וברוחב ${W0} מטר. מה השטח שלו?`, '', L0 * W0, [2 * (L0 + W0), L0 * W0 + L0, (L0 + W0) * 2 + 10], ex, ' מ"ר'), `דמיינו את המגרש מחולק לריבועים של מטר על מטר: ${W0} שורות, ובכל שורה ${L0} ריבועים. כמה ריבועים בסך הכל?`, L0 < 10 ? `${W0} שורות של ${L0}: ${L0}, ${2 * L0}, ${3 * L0}... המשיכו לספור בקפיצות של ${L0} עד ${W0} שורות.` : on === 0 ? `${L(`${L0 / 10} × ${W0} = ${L0 / 10 * W0}`)}, ועכשיו כפלו ב-10.` : `פרקו את ${L0} ל-${tn} ו-${on}: ${L(`${tn} × ${W0} = ${tn * W0}`)}, ועוד ${L(`${on} × ${W0} = ${on * W0}`)}. חברו.`); }
+  /* kind: 'per', 'area', 'sq' (square with the same perimeter), 'back' (from perimeter and length to area), 'lcut' (corner cut out) */
+  rect(d, kind) { const ask = kind || pick(d === 1 ? ['per', 'per', 'area'] : d === 2 ? ['area', 'sq', 'back'] : ['sq', 'back', 'lcut']);
+    const L0 = d === 1 ? ri(5, 14) : ri(6, 30), W0 = ri(d === 1 ? 3 : 4, L0 - 1);
+    const spotPA = 'היקף = הדרך מסביב (מחברים צלעות). שטח = כמה ריבועים של 1 על 1 נכנסים בפנים (אורך × רוחב).';
+    if (ask === 'per') { const ex = mEx('היקף הוא כל הדרך מסביב: שתי צלעות אורך ושתי צלעות רוחב.', [`${L(`${L0} + ${W0} + ${L0} + ${W0}`)}`, `${L(`= 2 × ${L0} + 2 × ${W0} = ${2 * L0} + ${2 * W0} = ${mB(2 * (L0 + W0))}`)} מטר`], mRect(L0, W0, true), `המלכודת: לכפול ${L(`${L0} × ${W0}`)}. זה השטח, לא ההיקף.`, spotPA);
+      const q = withHint(mNum(d, `מגרש מלבני באורך ${L0} מטר וברוחב ${W0} מטר. מה ההיקף שלו?`, '', 2 * (L0 + W0), [L0 * W0, L0 + W0, 2 * L0 + W0], ex, ' מ׳'), `היקף הוא כל הדרך מסביב למגרש: ארבע צלעות. למגרש ${L0} על ${W0} יש שתי צלעות מכל אורך.`, `שתי צלעות האורך: ${L(`${L0} + ${L0} = ${2 * L0}`)}. הוסיפו את שתי צלעות הרוחב, ${W0} כל אחת.`);
+      q.lk = 'geometry'; q.meta = { ask, why: mWhy([[L0 * W0, 'זה השטח'], [L0 + W0, 'רק חצי מהדרך מסביב'], [2 * L0 + W0, 'חסרה צלע אחת']], 2 * (L0 + W0)) }; return q; }
+    if (ask === 'area') { const tn = L0 - L0 % 10, on = L0 % 10, sp = L0 >= 10 && on;
+      const ex = mEx('שטח מלבן = אורך × רוחב.', sp ? [`מפרקים את ${L0} ל-${tn} ועוד ${on}:`, `${L(`${tn} × ${W0} = ${tn * W0}`)}`, `${L(`${on} × ${W0} = ${on * W0}`)}`, `${L(`${tn * W0} + ${on * W0} = ${mB(L0 * W0)}`)} מ"ר`] : [`${L(`${L0} × ${W0} = ${mB(L0 * W0)}`)} מ"ר`], mRect(L0, W0, false, L0, W0, sp ? tn : 0), 'היקף (הדרך מסביב) ושטח (כמה ריבועים בפנים) הם שני דברים שונים.', spotPA);
+      const q = withHint(mNum(d, `מגרש מלבני באורך ${L0} מטר וברוחב ${W0} מטר. מה השטח שלו?`, '', L0 * W0, [2 * (L0 + W0), L0 * W0 + L0, (L0 + W0) * 2 + 10], ex, ' מ"ר'), `דמיינו את המגרש מחולק לריבועים של מטר על מטר: ${W0} שורות, ובכל שורה ${L0} ריבועים. כמה ריבועים בסך הכל?`, L0 < 10 ? `${W0} שורות של ${L0}: ${L0}, ${2 * L0}... המשיכו לספור בקפיצות של ${L0} עד ${W0} שורות.` : on === 0 ? `${L(`${L0 / 10} × ${W0} = ${L0 / 10 * W0}`)}, ועכשיו כפלו ב-10.` : `פרקו את ${L0} ל-${tn} ו-${on}: ${L(`${tn} × ${W0} = ${tn * W0}`)}, ועוד ${L(`${on} × ${W0} = ${on * W0}`)}. חברו.`);
+      q.lk = 'geometry'; q.meta = { ask, why: mWhy([[2 * (L0 + W0), 'זה ההיקף']], L0 * W0) }; return q; }
+    if (ask === 'back') { let l, w; do { l = ri(5, 15); w = ri(3, l - 1); } while (l * w === 2 * (l + w)); const P = 2 * (l + w), h = l + w, ans = l * w;
+      const ex = mEx('חצי מההיקף הוא אורך אחד ועוד רוחב אחד. ממנו מוצאים את הרוחב, ואז את השטח.',
+        [`חצי היקף: ${L(`${P} ÷ 2 = ${h}`)}, וזה אורך + רוחב`, `הרוחב: ${L(`${h} − ${l} = ${w}`)} ס"מ`, `השטח: ${L(`${l} × ${w} = ${mB(ans)}`)} סמ"ר`, `בדיקה: ${L(`${l} + ${w} + ${l} + ${w} = ${P}`)} ✓`],
+        mRect(l, w, true, l, '?'), `המלכודת: לחשב רוחב = ${L(`${P} − ${l} = ${P - l}`)}. בהיקף יש שני אורכים ושני רוחבים.`, spotPA);
+      const q = withHint(mNum(d, `ההיקף של מלבן הוא ${P} ס"מ, והאורך שלו ${l} ס"מ. מה השטח של המלבן?`, '', ans, [2 * ans, l * (P - l), P * l / 2 | 0, l * h], ex, ' סמ"ר'), `ציירו את המלבן. בהיקף יש שני אורכים ושני רוחבים. כמה ס"מ נשארים לשני הרוחבים יחד?`, `שני האורכים: ${L(`${l} + ${l} = ${2 * l}`)}. מה שנשאר מ-${P} הוא שני רוחבים. כמה זה רוחב אחד?`);
+      q.lk = 'geometry'; q.meta = { ask, l, w, P, h, why: mWhy([[2 * ans, 'הרוחב חושב כפול: שכחו לחלק ב-2'], [l * (P - l), `הורידו רק אורך אחד מההיקף`], [l * h, 'כפלו באורך + רוחב, במקום ברוחב']], ans) }; return q; }
+    if (ask === 'lcut') { const A = ri(8, 16), B = ri(5, A - 1), s = ri(2, B - 2), per = R() < .5, P = 2 * (A + B), ar = A * B - s * s, ans = per ? P : ar;
+      const ex = per ? mEx('כשחותכים ריבוע מפינה, שתי הצלעות שלו שהיו בחוץ נעלמות, ושתי צלעות באותו אורך מופיעות בפנים. ההיקף לא משתנה.',
+        [`הצלעות שנגזרו: ${s} ו-${s}. הצלעות החדשות בפנים: גם ${s} ו-${s}`, `אז ההיקף הוא כמו של המלבן השלם: ${L(`2 × (${A} + ${B}) = ${mB(P)}`)} ס"מ`, `בדיקה, צלע אחרי צלע: ${L(`${A - s} + ${s} + ${s} + ${B - s} + ${A} + ${B} = ${P}`)}`], mLShape(A, B, s), `המלכודת: להוריד ${L(`2 × ${s}`)} או ${L(`4 × ${s}`)} מההיקף. השטח קטן, אבל ההיקף לא.`, 'צורה שנוצרה מגזירת פינה ושואלים על היקף. בודקים אילו צלעות רק "זזו".')
+        : mEx('שטח של צורה עם פינה חסרה: השטח של המלבן השלם, פחות השטח של מה שנגזר.',
+          [`המלבן השלם: ${L(`${A} × ${B} = ${A * B}`)} סמ"ר`, `הריבוע שנגזר: ${L(`${s} × ${s} = ${s * s}`)} סמ"ר`, `נשאר: ${L(`${A * B} − ${s * s} = ${mB(ar)}`)} סמ"ר`], mLShape(A, B, s), `שימו לב: השטח קטן, אבל ההיקף נשאר ${P}.`, 'צורה עם חלק חסר. מחשבים את השלם ומורידים את החסר.');
+      const prompt = `ממלבן באורך ${A} ס"מ וברוחב ${B} ס"מ גזרו ריבוע של ${s} ס"מ על ${s} ס"מ מאחת הפינות. מה ${per ? 'ההיקף' : 'השטח'} של הצורה שנשארה?`;
+      const q = withHint(mNum(d, prompt, '', ans, per ? [P - 2 * s, P - 4 * s, P + 2 * s, ar] : [A * B, A * B - 2 * s, A * B - 4 * s, P], ex, per ? ' ס"מ' : ' סמ"ר'),
+        per ? `ציירו את הצורה. מה קרה לשתי הצלעות של הפינה שנגזרה? ומה הופיע במקומן?` : `חשבו קודם את השטח של המלבן השלם, ${A} על ${B}. כמה ממנו נגזר?`,
+        per ? `במקום שתי צלעות של ${s} שנעלמו מבחוץ, מופיעות שתי צלעות של ${s} בפנים. אז ההיקף שווה להיקף של איזה מלבן?` : `המלבן השלם: ${L(`${A} × ${B} = ${A * B}`)}. הריבוע שנגזר: ${L(`${s} × ${s}`)}. מה נשאר?`);
+      q.lk = 'geometry'; q.meta = { ask, why: per ? mWhy([[P - 2 * s, 'הורידו צלעות, אבל צלעות חדשות הופיעו בפנים'], [P - 4 * s, 'הורידו את כל ההיקף של הריבוע'], [ar, 'זה השטח']], P) : mWhy([[A * B, 'שכחו להוריד את מה שנגזר'], [P, 'זה ההיקף']], ar) }; return q; }
     const s = ri(3, 12), a = ri(1, s - 1), b = 2 * s - a;
     const ex = mEx('מוצאים את ההיקף, מחלקים אותו ב-4 כדי לקבל צלע של ריבוע, ואז צלע × צלע.',
-      [`היקף המלבן: ${L(`2 × (${b} + ${a}) = ${2 * (a + b)}`)}`, `צלע הריבוע: ${L(`${2 * (a + b)} ÷ 4 = ${s}`)}`, `שטח הריבוע: ${L(`${s} × ${s} = ${mB(s * s)}`)} סמ"ר`], '',
-      `שטח הריבוע גדול משטח המלבן (${a * b}): מכל המלבנים עם אותו היקף, לריבוע יש השטח הגדול ביותר.`);
-    return withHint(mNum(d, `לריבוע יש אותו היקף כמו למלבן באורך ${b} ס"מ וברוחב ${a} ס"מ. מה השטח של הריבוע?`, '', s * s, [a * b, 4 * s, s * s + s, 2 * (a + b)], ex, ' סמ"ר'), `קודם מצאו את ההיקף של המלבן ${b} על ${a}. לריבוע אותו היקף, וכל ארבע הצלעות שלו שוות.`, `${L(`${b} + ${a} = ${a + b}`)} זה חצי מההיקף. צלע הריבוע היא רבע מכל ההיקף, כלומר חצי מ-${a + b}. ואז שטח = צלע כפול צלע.`); },
+      [`היקף המלבן: ${L(`2 × (${b} + ${a}) = ${2 * (a + b)}`)}`, `לריבוע 4 צלעות שוות: ${L(`${2 * (a + b)} ÷ 4 = ${s}`)}`, `שטח הריבוע: ${L(`${s} × ${s} = ${mB(s * s)}`)} סמ"ר`], mRectSq(b, a, s),
+      `שטח הריבוע גדול משטח המלבן (${a * b}): מכל המלבנים עם אותו היקף, לריבוע יש השטח הגדול ביותר.`, spotPA);
+    const q = withHint(mNum(d, `לריבוע יש אותו היקף כמו למלבן באורך ${b} ס"מ וברוחב ${a} ס"מ. מה השטח של הריבוע?`, '', s * s, [a * b, 4 * s, s * s + s, 2 * (a + b)], ex, ' סמ"ר'), `קודם מצאו את ההיקף של המלבן ${b} על ${a}. לריבוע אותו היקף, וכל ארבע הצלעות שלו שוות.`, `${L(`${b} + ${a} = ${a + b}`)} זה חצי מההיקף. צלע הריבוע היא רבע מכל ההיקף, כלומר חצי מ-${a + b}. ואז שטח = צלע כפול צלע.`);
+    q.lk = 'geometry'; q.meta = { ask, why: mWhy([[a * b, 'זה השטח של המלבן, לא של הריבוע'], [4 * s, 'זה ההיקף של הריבוע'], [2 * (a + b), 'זה ההיקף']], s * s) }; return q; },
   remainder(d) { const [a, b] = pick([[3, 4], [4, 5], [3, 5], [5, 6], [4, 7]]), r0 = ri(1, Math.min(a, b) - 1); const l = a * b; const ans = l + r0;
     const left = r0 === 1 ? 'נשאר ממתק אחד' : `נשארים ${r0} ממתקים`;
     const ex = mEx('מורידים את מה שנשאר בחוץ. מה שנשאר אחרי זה מתחלק בשני המספרים.',
@@ -262,19 +438,50 @@ Object.assign(MT, {
         : [`העודף: ${L(`${pay} − ${money(tot)} = ${mB(money(ans))}`)} ₪`]));
     return withHint({ cat: 'math', d, prompt: `בסופרמרקט קנו ${it.map(g => `${g[0]} (${money(g[1])} ₪)`).join(', ')}. שילמו בשטר של ${pay} ₪. כמה עודף צריך לקבל?`, vis: '', options: m.options, answer: m.answer, ex }, `קודם חברו את המחירים: ${L(it.map(g => money(g[1])).join(' + '))}. אחר כך בדקו כמה חסר מהסכום עד ${pay}.`, up > tot && up < pay ? `הסכום: ${L(money(tot))}. משלימים לשקל שלם: ${L(`${money(tot)} + ${money(gap)} = ${up}`)}. ועכשיו כמה מ-${up} עד ${pay}?` : `הסכום: ${L(money(tot))}. כמה צריך להוסיף לזה כדי להגיע ל-${pay}? התחילו מהאגורות.`);
   },
-  unit(d) {
-    for (;;) { const a = ri(4, 8), pa = a * pick([3.5, 4, 4.5, 5, 6]), b = ri(2, a - 1), pb = b * pick([4, 4.5, 5, 5.5, 6, 7]); const ua = pa / a, ub = pb / b; if (ua === ub || !Number.isInteger(pa * 2) || !Number.isInteger(pb * 2)) continue;
-      const best = ua < ub ? ua : ub;
-      const opts = [best, ua < ub ? ub : ua, r2((pa + pb) / (a + b)), r2(best + .5)].filter((v, i, s) => s.indexOf(v) === i); while (opts.length < 4) opts.push(r2(best + opts.length));
-      const m = mc(opts.map(v => L(money(v)) + ' ₪'));
-      const [wn, wp, wu] = ua < ub ? [b, pb, ub] : [a, pa, ua];
-      const ex = mEx('מחלקים כל מחיר במספר השקיות, ומשווים את המחיר של שקית אחת.',
-        [`חבילה של ${a}: ${L(`${money(pa)} ÷ ${a} = ${money(ua)}`)} ₪ לשקית`, `חבילה של ${b}: ${L(`${money(pb)} ÷ ${b} = ${money(ub)}`)} ₪ לשקית`, `הזולה יותר: ${mB(money(best) + ' ₪')} לשקית, בחבילה של ${ua < ub ? a : b}`], '',
-        ua < ub ? 'כאן החבילה הגדולה משתלמת יותר. אבל זה לא תמיד כך, תמיד בודקים.' : 'כאן דווקא החבילה הקטנה משתלמת יותר. גדול לא תמיד זול יותר.');
-      return withHint({ cat: 'math', d, lk: 'unit', prompt: `חבילה של ${a} שקיות שוקו עולה ${money(pa)} ₪. חבילה של ${b} שקיות שוקו עולה ${money(pb)} ₪. כמה עולה שקית אחת בחבילה המשתלמת יותר?`, vis: '', options: m.options, answer: m.answer, ex }, `חלקו כל מחיר במספר השקיות שבחבילה: ${L(`${money(pa)} ÷ ${a}`)} ו-${L(`${money(pb)} ÷ ${b}`)}. מה יוצא זול יותר?`, `בחבילה של ${wn}: ${L(`${money(wp)} ÷ ${wn} = ${money(wu)}`)} לשקית. חשבו גם את החבילה השנייה והשוו.`); }
+  /* price per item. kind: 'one' (price of one item in the better pack), 'save' (how much you save on the same number of items) */
+  unit(d, kind) {
+    const IT = [['שקיות שוקו', 'שקית שוקו', 'f', 'שקיות השוקו'], ['יוגורטים', 'יוגורט', 'm', 'היוגורטים'], ['מחברות', 'מחברת', 'f', 'המחברות'], ['עפרונות', 'עיפרון', 'm', 'העפרונות'], ['כדורי טניס', 'כדור טניס', 'm', 'כדורי הטניס'], ['בקבוקי מים', 'בקבוק מים', 'm', 'בקבוקי המים']];
+    for (;;) {
+      const [pl, sg, gd, plD] = pick(IT), one = `${sg} ${gd === 'f' ? 'אחת' : 'אחד'}`, K = kind || (d === 3 && R() < .5 ? 'save' : 'one');
+      const U = d === 1 ? [2, 3, 4, 5, 6, 7, 8, 9] : [2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7], a = K === 'save' ? pick([2, 3, 4, 6]) : ri(3, 8), b = K === 'save' ? pick([3, 4, 6, 8]) : ri(2, 8), ua = pick(U), ub = pick(U);
+      if (a === b || ua === ub || Math.abs(ua - ub) > 2.5) continue;
+      if (d === 2 && K === 'one' && Number.isInteger(ua) && Number.isInteger(ub)) continue; /* level 2 always has a half shekel to divide */
+      const pa = a * ua, pb = b * ub; if (pa > 60 || pb > 60) continue;
+      const best = Math.min(ua, ub), worse = Math.max(ua, ub), [bn, bp] = ua < ub ? [a, pa] : [b, pb], [wn, wp] = ua < ub ? [b, pb] : [a, pa];
+      /* "27.50 ÷ 5" without a calculator: whole shekels first, then what is left in agorot */
+      const div = (P, n) => { const u = P / n, w = Math.floor(u), rest = P - w * n, ag = Math.round(rest * 100); return `${L(`${money(P)} ÷ ${n} = ${money(u)}`)} ₪` + (Number.isInteger(u) ? '' : `<i class="msub">איך: ${L(`${w * n} ÷ ${n} = ${w}`)}. נשארו ${money(rest)} ₪, שהם ${ag} אגורות. ${L(`${ag} ÷ ${n} = ${ag / n}`)} אגורות.</i>`); };
+      const pic = mPacks([[a, pa, ua], [b, pb, ub]], best, one), cheapTot = pa < pb ? a : b, trapTot = cheapTot !== bn;
+      if (K === 'save') {
+        const N = mLcm(a, b) < 12 ? 2 * mLcm(a, b) : mLcm(a, b); if (N > 24) continue;
+        const Ta = N / a * pa, Tb = N / b * pb, ans = Math.abs(Ta - Tb); if (!Number.isInteger(ans) || [Ta, Tb, N / a, N / b].includes(ans)) continue;
+        const p = pick(PEOPLE), nm = p[0];
+        const ex = mEx(`משווים את אותה כמות: כמה עולים ${N} ${pl} בכל סוג של חבילה.`,
+          [`חבילות של ${a}: ${L(`${N} ÷ ${a} = ${N / a}`)} חבילות, ${L(`${N / a} × ${money(pa)} = ${money(Ta)}`)} ₪`, `חבילות של ${b}: ${L(`${N} ÷ ${b} = ${N / b}`)} חבילות, ${L(`${N / b} × ${money(pb)} = ${money(Tb)}`)} ₪`, `חוסכים: ${L(`${money(Math.max(Ta, Tb))} − ${money(Math.min(Ta, Tb))} = ${mB(money(ans))}`)} ₪`],
+          pic, `דרך נוספת: ${L(`${money(ua)}`)} ₪ מול ${L(`${money(ub)}`)} ₪ ל${sg}. ההפרש ${L(money(worse - best))} ₪, כפול ${N}: ${L(`${money(worse - best)} × ${N} = ${money(ans)}`)}.`,
+          'שתי חבילות בגדלים שונים, ושואלים מה משתלם או כמה חוסכים. משווים מחיר ליחידה, או מחיר של אותה כמות.');
+        const opts = [ans, Math.abs(pa - pb), worse - best, Math.min(Ta, Tb), ans * 2, ans + N / 2].filter((v, i, s) => v > 0 && Number.isInteger(v * 2) && s.indexOf(v) === i).slice(0, 4);
+        while (opts.length < 4) opts.push(ans + opts.length);
+        const m = mc(opts.map(v => L(money(v)) + ' ₪'));
+        const q = withHint({ cat: 'math', d, lk: 'unit', prompt: `${nm} ${g(p, 'צריך', 'צריכה')} בדיוק ${N} ${pl}. יש חבילות של ${a} ב-${money(pa)} ₪, ויש חבילות של ${b} ב-${money(pb)} ₪. ${nm} ${g(p, 'קונה', 'קונה')} רק סוג אחד של חבילות. כמה ${g(p, 'יחסוך', 'תחסוך')} אם ${g(p, 'יבחר', 'תבחר')} בסוג המשתלם?`, vis: '', options: m.options, answer: m.answer, ex },
+          `השוו את אותה כמות. כמה חבילות של ${a} צריך כדי לקבל ${N}, וכמה הן עולות? ואותו דבר עם חבילות של ${b}.`, `מחבילות של ${wn} צריך ${L(`${N} ÷ ${wn} = ${N / wn}`)} חבילות, כל אחת ב-${money(wp)} ₪. כמה זה בסך הכל? חשבו כך גם את הסוג השני, והחסירו.`);
+        q.meta = { K, a, b, pa, pb, ua, ub, N, Ta, Tb, one, pl, why: mWhy([[Math.abs(pa - pb), 'זה ההפרש בין מחירי החבילות, אבל הכמויות שונות'], [worse - best, `זה החיסכון על ${one} בלבד`], [Math.min(Ta, Tb), 'זה המחיר, לא החיסכון'], [ans * 2, 'כפול מהחיסכון'], [ans + N / 2, 'לא יוצא בחישוב']].map(([v, t]) => [money(v), t]), money(ans)) };
+        return q;
+      }
+      const cands = [worse, Math.min(pa, pb), worse - best, best + .5, best - .5, best + 1].filter((v, i, s) => v > 0 && v !== best && Number.isInteger(v * 2) && s.indexOf(v) === i).slice(0, 3);
+      const m = mc([best].concat(cands).map(v => L(money(v)) + ' ₪'));
+      const ex = mEx(`לא משווים את מחירי החבילות. משווים מחיר של ${one}: מחיר החבילה ÷ מספר ${plD} בה.`,
+        [`חבילה של ${a}: ${div(pa, a).replace('₪', `₪ ל${sg}`)}`, `חבילה של ${b}: ${div(pb, b).replace('₪', `₪ ל${sg}`)}`, `${L(money(best))} קטן מ-${L(money(worse))}, אז המשתלמת היא החבילה של ${bn}: ${mB(money(best) + ' ₪')} ל${sg}`],
+        pic, trapTot ? `המלכודת: החבילה של ${cheapTot} זולה יותר בסך הכל, אבל יש בה פחות ${pl}. ${one} בה ${gd === 'f' ? 'יקרה' : 'יקר'} יותר.` : bn < wn ? 'כאן דווקא החבילה הקטנה משתלמת יותר. גדול לא תמיד זול יותר.' : 'כאן החבילה הגדולה משתלמת יותר. אבל זה לא תמיד כך, תמיד בודקים.',
+        '"איזו חבילה משתלמת", "כמה עולה אחד". מחלקים כל מחיר בכמות. לא יוצא שלם? עוברים לאגורות.');
+      const q = withHint({ cat: 'math', d, lk: 'unit', prompt: `חבילה של ${a} ${pl} עולה ${money(pa)} ₪. חבילה של ${b} ${pl} עולה ${money(pb)} ₪. כמה עולה ${one} בחבילה המשתלמת יותר?`, vis: '', options: m.options, answer: m.answer, ex },
+        `לא משווים את מחירי החבילות, כי יש בהן כמויות שונות. חלקו כל מחיר במספר ${plD} שבחבילה, ומצאו כמה עולה ${one} בכל אחת.`,
+        `בחבילה של ${wn}: ${L(`${money(wp)} ÷ ${wn} = ${money(wp / wn)}`)} ₪ ל${sg}. חשבו כך גם את החבילה השנייה. לא יוצא שלם? עברו לאגורות.`);
+      q.meta = { K, a, b, pa, pb, ua, ub, best, bn, wn, one, pl, sg, why: mWhy([[worse, `זה המחיר ל${sg} בחבילה היקרה יותר`], [Math.min(pa, pb), 'זה המחיר של חבילה שלמה, לא של אחד'], [worse - best, 'זה ההפרש בין המחירים, לא המחיר'], [best + .5, `${one} בחבילה הזולה עולה פחות`], [best - .5, `${one} לא עולה כל כך מעט`], [best + 1, `${one} בחבילה הזולה עולה פחות`]].map(([v, t]) => [money(v), t]), money(best)) };
+      return q;
+    }
   },
 });
-MPOOL[1].push('change');
+MPOOL[1].push('change', 'unit');
 MPOOL[2].push('change', 'unit');
 MPOOL[3].push('unit', 'change');
 /* ---- number properties ---- */

@@ -1,0 +1,107 @@
+/* ---------- solutions that teach: number series, number tables, shape series, invented operation and language ---------- */
+/* shared lines */
+.sx-rule{display:block;margin:2px 0 6px;padding:7px 10px;border-radius:10px;background:var(--acc-soft);border-inline-start:3px solid var(--acc);color:var(--ink);line-height:1.5}
+.sx-rule b{color:var(--acc)}
+.sx-note{display:block;margin:6px 0;line-height:1.5}
+.sx-note b{color:var(--ink)}
+.sx-trap{display:block;margin:8px 0 4px;line-height:1.5;color:var(--muted)}
+.sx-trap b{color:var(--bad,#FF5C7A)}
+.sx-next{display:block;margin:8px 0 2px;padding:6px 10px;border-radius:10px;border:1px dashed var(--edge2);line-height:1.5}
+.sx-next b{color:var(--gold)}
+
+/* the ladder: numbers on a grid, steps between them, the change of the steps under them */
+.sx-lad{display:grid;grid-template-columns:repeat(var(--c),minmax(0,1fr));column-gap:0;row-gap:3px;align-items:center;width:100%;max-width:calc(var(--n) * 50px);margin:10px auto 6px;direction:rtl}
+.sx-c{display:block;margin:0 2px;padding:5px 0;text-align:center;font-weight:700;font-size:.98rem;font-variant-numeric:tabular-nums;border-radius:9px;background:rgba(255,255,255,.07);border:1.5px solid var(--edge2);line-height:1.25;white-space:nowrap}
+.sx-c.sx-q{border-color:var(--gold);background:rgba(255,200,69,.18);color:var(--gold);box-shadow:0 0 8px rgba(255,200,69,.35)}
+.sx-c.sx-a{border-color:var(--acc);color:var(--acc)}
+.sx-c.sx-b{border-color:var(--violet,#A98BFF);color:var(--violet,#A98BFF)}
+.sx-c.sx-q.sx-a,.sx-c.sx-q.sx-b{background:rgba(255,200,69,.18);box-shadow:0 0 0 2px var(--gold)}
+.sx-l{display:block;text-align:center;font-size:.78rem;font-weight:700;line-height:1.2;white-space:nowrap;color:var(--acc)}
+.sx-l i{font-style:normal}
+.sx-l.sx-a{color:var(--acc)}.sx-l.sx-b{color:var(--violet,#A98BFF)}
+.sx-l.sx-d2{color:var(--muted);font-weight:600}
+.sx-l.sx-hot{color:var(--gold)}
+.sx-l.sx-mk{color:var(--muted);font-weight:600}
+.sx-l.sx-sm{font-size:.62rem;letter-spacing:-.02em}
+/* brackets that join every second number (two series woven together) */
+.sx-br{display:block;height:1.35em;text-align:center;font-size:.78rem;font-weight:700;line-height:1.3;border:2px solid currentColor;margin:0 3px}
+.sx-br i{font-style:normal}
+.sx-br.up{border-bottom:0;border-radius:8px 8px 0 0}
+.sx-br.dn{border-top:0;border-radius:0 0 8px 8px;line-height:1.5}
+.sx-br.sx-a{color:var(--acc)}.sx-br.sx-b{color:var(--violet,#A98BFF)}
+/* primes: every number in the range, the primes marked */
+.sx-pl{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0 2px;direction:rtl}
+.sx-p{display:inline-block;min-width:1.9em;padding:1px 2px;text-align:center;font-size:.78rem;border-radius:6px;color:var(--muted);text-decoration:line-through;opacity:.7;font-variant-numeric:tabular-nums}
+.sx-p.pr{color:var(--acc);text-decoration:none;opacity:1;font-weight:700;border:1px solid var(--acc)}
+.sx-p.sx-q{color:var(--gold);border-color:var(--gold);background:rgba(255,200,69,.18)}
+
+/* number table: each row with its rule written out */
+.tx{display:grid;grid-template-columns:repeat(5,auto);justify-content:start;gap:4px 8px;align-items:center;margin:8px 0;direction:rtl}
+.tx-r{display:contents}
+.tx-n{display:block;min-width:1.9em;padding:3px 4px;text-align:center;font-weight:700;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--edge);font-variant-numeric:tabular-nums}
+.tx-f{display:block;text-align:center;white-space:nowrap}
+.tx-eq{display:block;color:var(--muted)}
+.tx-res{color:var(--ink)}
+.tx-last .tx-res{border-color:var(--gold)}
+.tx-last .tx-res b{color:var(--gold)}
+.tx-tries{display:flex;flex-direction:column;gap:2px;margin:4px 0 6px;align-items:flex-start}
+.tx-try{display:block;color:var(--muted)}
+.tx-try.ok{color:var(--good);font-weight:700}
+
+/* question visuals: bigger shape-series cells, an 8-number series that fits, invented-language rows in columns */
+.qvis .sseries .fbox{flex:0 1 60px}
+.qvis .series.sx-long{gap:1px}
+.qvis .series.sx-long .arr{font-size:.5rem}
+.qvis .series.sx-long .cell{padding-inline:0}
+.qvis .lang{display:grid;grid-template-columns:max-content auto 1fr;gap:8px 10px;align-items:center}
+.qvis .lang .lr{display:contents}
+.qvis .lang .lr b{min-width:0}
+
+/* shape series: one strip per part (hand, dot, background) */
+.dx{display:block;margin:8px 0}
+.dx-h{display:block;font-weight:700;margin:0 0 2px}
+.dx-s{display:flex;align-items:center;justify-content:center;gap:2px;direction:rtl}
+.dx-c{flex:0 1 46px;min-width:0;display:block;border-radius:8px;background:var(--paper);color:#22253A;line-height:0}
+.dx-c svg{width:100%;height:auto}
+.dx-c.ans{box-shadow:0 0 0 2.5px var(--gold)}
+.dx-a{flex:none;display:flex;flex-direction:column;align-items:center;min-width:20px;font-size:.66rem;font-weight:700;line-height:1.1;color:var(--gold)}
+.dx-a i{font-style:normal;color:var(--dim);font-size:.6rem}
+.dx-t{display:block;margin:3px 0 0;line-height:1.45}
+.dx .gh{fill:none;stroke:#E8618C;stroke-width:2.2;stroke-dasharray:3 3}
+.dx .ghd{fill:none;stroke:#E8618C;stroke-width:2;stroke-dasharray:2.5 2.5}
+.dx .mk{fill:none;stroke:#E8618C;stroke-width:2.4}
+.dx .mkh{fill:#E8618C}
+
+/* invented operation: the substitution table */
+.ox{display:grid;grid-template-columns:auto auto auto 1fr auto;gap:4px 6px;align-items:center;margin:8px 0;direction:rtl;font-variant-numeric:tabular-nums}
+.ox-r{display:contents}
+.ox-h{display:block;font-size:.72rem;color:var(--muted);text-align:center;line-height:1.2}
+.ox-c{display:block;text-align:center;padding:4px 3px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--edge);white-space:nowrap;line-height:1.5}
+.ox-c.ox-x{font-weight:600}
+.ox-c.ox-calc{text-align:center}
+.ox-c.ox-calc>span{display:block}
+.ox-c.ox-res{font-weight:700}
+.ox-last .ox-res{border-color:var(--gold);color:var(--gold)}
+.ox-ok .ox-c{border-color:color-mix(in srgb,var(--good) 60%,transparent)}
+.ox-ok .ox-res{color:var(--good)}
+.ox-no .ox-c{opacity:.55}
+.ox-link{display:block;text-align:center;font-size:.8rem;color:var(--muted);margin:-2px 0 4px}
+
+/* invented language: the rows with every word colored by its meaning, and the dictionary */
+.lx{display:grid;grid-template-columns:auto max-content auto max-content;justify-content:start;gap:6px 6px;align-items:center;margin:8px 0;direction:rtl}
+.lx-r{display:contents}
+.lx-n{display:block;font-size:.72rem;color:var(--muted)}
+.lx-e{display:block;color:var(--muted);text-align:center}
+.lx-w{display:inline-block;padding:0 4px;margin:1px 2px;border-radius:7px;font-weight:700;font-size:.88rem;border:1.5px solid currentColor;line-height:1.45;white-space:nowrap}
+.lx-z,.lx-he{display:block;white-space:nowrap}
+.lw0{color:var(--acc)}.lw1{color:var(--gold)}.lw2{color:var(--violet,#A98BFF)}.lw3{color:var(--good)}.lw4{color:#FF8FB1}.lw5{color:#FF9F43}
+.lx-dict{display:grid;grid-template-columns:auto auto auto 1fr;justify-content:start;gap:2px 6px;align-items:center;margin:8px 0;direction:rtl}
+.lx-dh{grid-column:1 / -1;display:block;font-weight:700}
+.lx-d{display:contents}
+.lx-why{grid-column:2 / -1;display:block;font-size:.8rem;color:var(--muted);line-height:1.35;margin:0 0 6px}
+.lx-ans{display:block;margin:8px 0 2px;font-weight:700}
+.lx-tr{display:flex;gap:10px;justify-content:center;margin:4px 0 6px;direction:rtl}
+.lx-tw{display:flex;flex-direction:column;align-items:center}
+.lx-tw i{font-style:normal;color:var(--muted);font-size:.75rem;line-height:1}
+.ox .ox-link{grid-column:1 / -1}
+.lx-d>.lx-w,.lx-tw>.lx-w{justify-self:start;align-self:center}

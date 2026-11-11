@@ -4,22 +4,7 @@
 .an-again{position:absolute;top:6px;inset-inline-start:6px;font-size:.75rem;padding:3px 9px;border-radius:99px;background:var(--panel2);border:1px solid var(--edge);color:var(--muted)}
 @media (prefers-reduced-motion: reduce){.anim *{animation-duration:.01s!important;animation-delay:0s!important}}
 /* cube net folding */
-.fold{position:relative;display:inline-block;perspective:700px;margin:18px auto 10px;direction:ltr}
-.fold-cube{position:absolute;inset:0;transform-style:preserve-3d;transform:translate(0,0) rotateX(-14deg) rotateY(16deg);animation:foldSpin 2.2s ease-in-out var(--sp) both}
-@keyframes foldSpin{from{transform:translate(0,0) rotateX(-14deg) rotateY(16deg)}to{transform:translate(var(--tx),var(--ty)) rotateX(-14deg) rotateY(196deg)}}
-.fold-root{position:absolute;width:var(--u);height:var(--u);transform-style:preserve-3d}
-.nf{position:absolute;inset:0;width:var(--u);height:var(--u);display:grid;place-items:center;transform-style:preserve-3d;backface-visibility:hidden;background:#2F5D93;border:2px solid #CFE3FF;border-radius:3px;font-size:1.15rem;color:#fff;box-sizing:border-box}
-.nf>b{font-weight:400;pointer-events:none;backface-visibility:hidden}
-.nf.fa{background:var(--acc);color:var(--on-acc)}
-.nf.fb{background:#FFC845;color:#2E2100}
-.nf.d-r{inset:auto;left:100%;top:0;transform-origin:left center;animation:fR .7s ease-in-out var(--dl) both}
-.nf.d-l{inset:auto;right:100%;top:0;transform-origin:right center;animation:fL .7s ease-in-out var(--dl) both}
-.nf.d-d{inset:auto;top:100%;left:0;transform-origin:center top;animation:fD .7s ease-in-out var(--dl) both}
-.nf.d-u{inset:auto;bottom:100%;left:0;transform-origin:center bottom;animation:fU .7s ease-in-out var(--dl) both}
-@keyframes fR{to{transform:rotateY(90deg)}}
-@keyframes fL{to{transform:rotateY(-90deg)}}
-@keyframes fD{to{transform:rotateX(-90deg)}}
-@keyframes fU{to{transform:rotateX(90deg)}}
+.netfold{display:block;margin:0 auto}
 /* rotation vs mirror */
 .rot-row{display:flex;justify-content:center;gap:18px;flex-wrap:wrap}
 .rot-item{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:140px}
@@ -109,3 +94,6 @@ mark.s2c{background:var(--acc-soft);color:var(--acc);border-radius:5px;padding:0
 .fc-fact{margin:0;font-size:.74rem;color:var(--muted);line-height:1.4}
 .fc-btn{width:100%;min-height:38px;font-size:.85rem;margin-top:auto}
 .fc-lock{font-size:.74rem;color:var(--muted);padding:6px;border-radius:10px;border:1px dashed var(--edge);width:100%;margin-top:auto}
+/* a tile that is a link (the prep site) looks like the other tiles */
+a.tile{text-decoration:none;color:inherit}
+a.tile p{color:var(--muted)}

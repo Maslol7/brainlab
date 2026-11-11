@@ -70,13 +70,71 @@ const LGM = [
     rp: { T: 3.4, cap: [[0, 'סונס מוסר לרחבה'], [1.4, 'ינסן יוצא'], [2.3, 'לוב מעל השוער']],
       tr: { kenny: [[0, 46, 13], [1.2, 45, 9.5]], jensen: [[0, 34, 1], [1.4, 38, 3], [2.2, 41.5, 5.5]] },
       ball: [[0, 'souness'], [.4, 'souness'], [1.2, 'kenny'], [2.2, 'kenny'], [3.2, 35.5, -.6]], loft: [3.2] } },
+  { id: 'gerrard06', t: 'הבעיטה מ-30 מטר', yr: 2006, match: 'גמר הגביע האנגלי · ליברפול מול ווסטהאם', kit: LFC_KIT, kit2: { shirt: '#7A263A', shorts: '#F4F4F4', socks: '#7A263A' }, nums: { gerrard: 8 }, ab: { gerrard: ['power'] }, crowd: ['#D00027', '#F4F4F4', '#7A263A', '#5FB3E4'], T: 7,
+    story: 'דקה 91. ווסטהאם מובילה 3-2, והמשחק כמעט נגמר. כדור שנהדף מהרחבה מתגלגל אל סטיבן ג\'רארד, רחוק מאוד מהשער.',
+    task: 'אין זמן להתקרב: המגינים כבר רצים אליך. החלק מהר לפינה התחתונה של השער. החלקה מהירה = בעיטה חזקה.',
+    after: 'ג\'רארד בעט מכ-30 מטר לפינה התחתונה. 3-3, ובפנדלים ליברפול זכתה בגביע.',
+    lesson: 'כשאין זמן, מחליטים מהר ומבצעים בביטחון.',
+    us: [['gerrard', 'ג\'רארד', 30, 31]],
+    opp: [['w1', 'מגן', 36, 20, 'press', 4.6], ['w2', 'מגן', 25, 23, 'press', 4.2], ['w3', 'מגן', 33, 12, 'block', 2.5], ['hislop', 'היסלופ', 34, 1, 'keeper']],
+    ball: 'gerrard',
+    rp: { T: 2.8, cap: [[0, 'הכדור מגיע לג\'רארד'], [.7, 'בעיטה מיד, נמוך לפינה']], tr: { w1: [[0, 36, 20], [1.2, 33, 26]], w2: [[0, 25, 23], [1.2, 28, 27]], hislop: [[0, 34, 1], [1.7, 31.9, .8]] },
+      ball: [[0, 'gerrard'], [.7, 'gerrard'], [2, 30.9, -.6]] } },
+  { id: 'torres09', t: 'טורס מול וידיץ\'', yr: 2009, match: 'הפרמייר ליג · מנצ\'סטר יונייטד 1-4 ליברפול', kit: { shirt: '#F4F4F4', shorts: '#F4F4F4', socks: '#F4F4F4', numCol: '#C8102E' }, kit2: { shirt: '#DA020E', shorts: '#F4F4F4', socks: '#15151A' }, nums: { torres: 9 }, ab: { torres: ['speed'] }, crowd: ['#DA020E', '#F4F4F4', '#15151A', '#DA020E'], T: 11,
+    story: 'אולד טראפורד, 2009. יונייטד מובילה 1-0. כדור ארוך נשלח מההגנה של ליברפול, והבלם נמניה וידיץ\' טועה בקריאה שלו.',
+    task: 'החלק מהבלם לטורס כדי לשלוח כדור ארוך. טורס מהיר יותר: החזק וגרור כדי לרוץ עם הכדור לשער, ואז החלק לפינה.',
+    after: 'טורס ניצל את הטעות, ברח מוידיץ\' והבקיע מול השוער ואן דר סאר. ליברפול ניצחה 4-1.',
+    lesson: 'גם שחקן גדול טועה. מי שממשיך לרוץ עד הסוף מוכן להזדמנות.',
+    us: [['def', 'בלם', 30, 46], ['torres', 'טורס', 38, 32, [[36, 22]], 7, .4]],
+    opp: [['vidic', 'וידיץ\'', 35, 27, 'wake:torres:2.4', 5.6], ['m2', 'מגן', 24, 26, 'block', 2.5], ['vds', 'ואן דר סאר', 34, 1, 'keeper']],
+    ball: 'def', tackleTip: 'רוץ ישר לשער מהר, לפני שוידיץ\' סוגר.',
+    rp: { T: 4, cap: [[0, 'כדור ארוך מההגנה'], [1.7, 'וידיץ\' מפספס, טורס בורח'], [3.3, 'גול']], tr: { torres: [[0, 38, 32], [1.7, 36, 22], [2.7, 34.5, 14], [3.3, 33.5, 9]], vidic: [[0, 34, 28], [1.7, 35, 23], [2.7, 36.5, 17], [3.3, 36, 12]], vds: [[0, 34, 1], [3.3, 34.5, 2.6]] },
+      ball: [[0, 'def'], [.4, 'def'], [1.7, 'torres'], [3.3, 'torres'], [3.8, 31.8, -.6]], loft: [1.7] } },
+  { id: 'dudek05', t: 'הפנדל של שבצ\'נקו', yr: 2005, match: 'גמר ליגת האלופות · דו-קרב פנדלים מול מילאן', gkMode: true, spot: [34, 11], kit: { shirt: '#F2C230', shorts: '#15151A', socks: '#F2C230', gloves: '#F4F4F4' }, kit2: { shirt: '#F4F4F4', shorts: '#F4F4F4', socks: '#F4F4F4', numCol: '#111' }, nums: { sheva: 7 }, crowd: ['#D00027', '#F4F4F4', '#D00027', '#1B1B1F'], T: 6,
+    story: 'דו-קרב פנדלים באיסטנבול. אם יז\'י דודק יעצור את הבעיטה של אנדריי שבצ\'נקו, ליברפול זוכה בגביע.',
+    task: 'אתה דודק, השוער. אל תזוז לפני הבעיטה: שבצ\'נקו רואה אותך ויבעט לצד השני. ברגע שהכדור יוצא, החלק לצד שאליו הוא טס.',
+    after: 'דודק הציל את הבעיטה של שבצ\'נקו, וליברפול זכתה בגביע האירופי בפעם החמישית.',
+    lesson: 'סבלנות: מי שמחכה לרגע הנכון ולא מנחש מוקדם, מגיב נכון.',
+    us: [['dudek', 'דודק', 34, .5]], opp: [['sheva', 'שבצ\'נקו', 32.6, 13.6, 'taker']],
+    ball: 'sheva',
+    rp: { T: 3.4, cap: [[0, 'דודק מחכה'], [2.1, 'הבעיטה... והצלה!']], tr: { sheva: [[0, 32.6, 13.6], [1.2, 32.6, 13.6], [2.1, 33.7, 11.5]], dudek: [[0, 34, .5], [2.15, 34, .5], [2.55, 32.3, .6]] },
+      ball: [[0, 34, 11], [2.1, 34, 11], [2.55, 32.5, .3], [3.2, 29.5, 4]] } },
+  { id: 'panenka', t: 'הפנדל של פננקה', yr: 1976, match: 'גמר יורו 1976 · צ\'כוסלובקיה מול מערב גרמניה', kit: { shirt: '#D00027', shorts: '#F4F4F4', socks: '#1D4FA0' }, kit2: { shirt: '#F4F4F4', shorts: '#15151A', socks: '#F4F4F4' }, gkKit: { shirt: '#15151A', shorts: '#15151A', socks: '#15151A' }, crowd: ['#D00027', '#F4F4F4', '#1D4FA0', '#F2C230'], T: 8, special: 'chip', spot: [34, 11],
+    story: 'הפנדל האחרון בדו-קרב. אם אנטונין פננקה מבקיע, צ\'כוסלובקיה אלופת אירופה. בשער עומד ספ מאייר, אחד השוערים הטובים בעולם.',
+    task: 'השוער יקפוץ לצד שהוא מנחש, ובדרך כלל ינחש נכון. לחץ "לוב" והחלק לאמצע השער: הכדור יטוס לאט, בדיוק למקום שהשוער עזב.',
+    after: 'מאייר קפץ לצד, ופננקה הרים את הכדור לאט לאמצע השער. מאז בעיטה כזאת נקראת "פננקה".',
+    lesson: 'לפעמים הפתרון הכי טוב הוא הפשוט, שאף אחד לא מצפה לו.',
+    us: [['panenka', 'פננקה', 34, 11.6]], opp: [['maier', 'מאייר', 34, .5, 'pen', 7.5]],
+    ball: 'panenka', saveTip: 'השוער ניחש את הצד. בפנדל הזה הצד הוא בדיוק מה שהוא מצפה לו.',
+    rp: { T: 3.2, cap: [[0, 'כולם בטוחים שהוא יבעט חזק לפינה'], [1.2, 'מאייר קופץ... והכדור עולה לאט לאמצע']], tr: { panenka: [[0, 34.5, 13.5], [1.1, 34, 11.6]], maier: [[0, 34, .5], [1.2, 34, .5], [1.7, 31.2, .6]] },
+      ball: [[0, 34, 11], [1.1, 34, 11], [2.5, 34, -.6]], loft: [2.5] } },
+  { id: 'robertocarlos', t: 'הבעיטה החופשית המעוקלת', yr: 1997, match: 'טורניר צרפת · ברזיל מול צרפת', kit: { shirt: '#FFD21F', shorts: '#1D4FA0', socks: '#F4F4F4', numCol: '#1D4FA0' }, kit2: { shirt: '#1D3F8F', shorts: '#F4F4F4', socks: '#D00027' }, nums: { rc: 6 }, ab: { rc: ['power', 'curl'] }, crowd: ['#FFD21F', '#1D3F8F', '#F4F4F4', '#2E9E4F'], T: 10, spot: [40, 29.4],
+    story: 'בעיטה חופשית מכ-35 מטר. בין רוברטו קרלוס לשער עומדת חומה של שחקנים צרפתים, והשוער מכסה את הצד השני.',
+    task: 'בעיטה ישרה תפגע בחומה. החלק בקו מעוקל, מהר: קודם החוצה ימינה, סביב החומה, ואז פנימה אל השער. הכדור יתעקל לפי הקו.',
+    after: 'הכדור יצא רחוק ימינה מהחומה, ואז התעקל חזרה לרשת. השוער פביאן בארתז כמעט לא זז.',
+    lesson: 'כשהדרך הישרה חסומה, מחפשים דרך מעוקלת.',
+    us: [['rc', 'ר. קרלוס', 40, 30]],
+    opp: [['f1', 'מגן', 35.8, 21.4, 'wall'], ['f2', 'מגן', 36.7, 21.2, 'wall'], ['f3', 'מגן', 37.6, 21, 'wall'], ['f4', 'מגן', 38.5, 20.8, 'wall'], ['barthez', 'בארתז', 32.6, .7, 'hold', 4]],
+    ball: 'rc', saveTip: 'השוער היה בצד הנכון. קו מעוקל יותר ישלח את הכדור סביבו.',
+    rp: { T: 3.2, cap: [[0, 'חומה מול השער'], [.9, 'הכדור יוצא ימינה...'], [1.9, '...ומתעקל פנימה']], tr: { rc: [[0, 41.5, 32], [.8, 40, 30]], barthez: [[0, 32.6, .7], [2.4, 33.4, .7]] },
+      ball: [[0, 40, 29.4], [.8, 40, 29.4], [1.5, 45, 17], [2, 42.5, 8], [2.4, 37, -.6]] } },
+  { id: 'bergkamp', t: 'הנגיעה של ברגקאמפ', yr: 1998, match: 'רבע גמר המונדיאל · הולנד מול ארגנטינה', kit: { shirt: '#FF7A1A', shorts: '#F4F4F4', socks: '#FF7A1A' }, kit2: { shirt: '#75AADB', stripe: '#F4F4F4', shorts: '#15151A', socks: '#F4F4F4' }, ab: { bergkamp: ['turn'] }, crowd: ['#FF7A1A', '#75AADB', '#F4F4F4', '#FF7A1A'], T: 11,
+    story: 'דקה 90, 1-1. פרנק דה בור שולח כדור ארוך מאוד מההגנה, ודניס ברגקאמפ רץ אליו ברחבה של ארגנטינה. המגן רוברטו איאלה צמוד אליו.',
+    task: 'החלק מדה בור לברגקאמפ כדי לשלוח כדור ארוך. כשהכדור אצלו ואיאלה מתקרב, לחץ "תפנית", ואז החלק לפינה שהשוער לא מכסה.',
+    after: 'ברגקאמפ עצר את הכדור בנגיעה אחת, עקף את איאלה בשנייה, ובשלישית הבקיע. 2-1 להולנד.',
+    lesson: 'נגיעה ראשונה טובה חוסכת זמן, וזמן הוא הדבר הכי יקר ליד השער.',
+    us: [['deboer', 'דה בור', 22, 48], ['bergkamp', 'ברגקאמפ', 46, 16, [[45, 10]], 6, .3]],
+    opp: [['ayala', 'איאלה', 42.5, 8.5, 'cruyff', 7], ['roa', 'רואה', 34, 1, 'keeper']],
+    ball: 'deboer', tackleTip: 'חכה שאיאלה יתקרב, ואז תפנית.',
+    rp: { T: 4.8, cap: [[0, 'כדור ארוך של דה בור'], [2.2, 'נגיעה ראשונה, ותפנית מול איאלה'], [3.6, 'ושער']], tr: { bergkamp: [[0, 46, 16], [2.2, 45, 10], [2.9, 43.5, 8.6], [3.6, 41.5, 7]], ayala: [[0, 42.5, 8.5], [2.2, 44, 9], [2.9, 45.5, 9.8], [3.6, 44.5, 9.2]], roa: [[0, 34, 1], [3.8, 36.3, 1.5]] },
+      ball: [[0, 'deboer'], [.4, 'deboer'], [2.2, 'bergkamp'], [3.6, 'bergkamp'], [4.1, 32.4, -.5]], loft: [2.2] } },
 ];
 /* ----- player cards: earned with coins, by winning moments, or by climbing the challenge ----- */
 const LG_CARDS = [
   { id: 'me', n: () => ME.name, team: 'me', rar: 1, ab: [], how: { free: 1 }, num: 9, fact: 'השחקן שלך. בלי יכולת מיוחדת, אבל עם הרבה מוטיבציה.' },
   { id: 'rush', n: 'ראש', full: 'איאן ראש', team: 'lfc', rar: 1, ab: ['poacher'], how: { coins: 150 }, num: 9, fact: 'מלך השערים של ליברפול בכל הזמנים, עם 346 שערים.' },
   { id: 'fowler', n: 'פאולר', full: 'רובי פאולר', team: 'lfc', rar: 1, ab: ['curl'], how: { coins: 150 }, num: 9, fact: 'גדל באקדמיה של ליברפול. ב-1994 הבקיע שלושער מול ארסנל בפחות מחמש דקות.' },
-  { id: 'torres', n: 'טורס', full: 'פרננדו טורס', team: 'lfc', rar: 1, ab: ['speed'], how: { coins: 150 }, num: 9, fact: 'חלוץ ספרדי מהיר במיוחד. שיחק בליברפול מ-2007 עד 2011.' },
+  { id: 'torres', n: 'טורס', full: 'פרננדו טורס', team: 'lfc', rar: 2, ab: ['speed'], how: { moment: 'torres09' }, num: 9, fact: 'חלוץ ספרדי מהיר במיוחד. שיחק בליברפול מ-2007 עד 2011.' },
   { id: 'firmino', n: 'פירמינו', full: 'רוברטו פירמינו', team: 'lfc', rar: 1, ab: ['vision'], how: { coins: 150 }, num: 9, fact: 'חלוץ ברזילאי שידוע במסירות בלי להסתכל.' },
   { id: 'mane', n: 'מאנה', full: 'סאדיו מאנה', team: 'lfc', rar: 2, ab: ['dribble'], how: { coins: 220 }, num: 10, fact: 'קיצוני מסנגל. יחד עם סלאח ופירמינו היה שלישיית התקפה מפורסמת.' },
   { id: 'suarez', n: 'סוארס', full: 'לואיס סוארס', team: 'lfc', rar: 2, ab: ['dribble'], how: { coins: 220 }, num: 7, fact: 'חלוץ מאורוגוואי. בעונת 2013/14 הבקיע 31 שערים בפרמייר ליג.' },
@@ -86,6 +144,11 @@ const LG_CARDS = [
   { id: 'dalglish', n: 'דלגליש', full: 'קני דלגליש', team: 'lfc', rar: 2, ab: ['chip'], how: { moment: 'dalglish' }, num: 7, fact: 'הבקיע בגמר הגביע האירופי 1978, ואחר כך גם אימן את ליברפול.' },
   { id: 'gerrard', n: 'ג\'רארד', full: 'סטיבן ג\'רארד', team: 'lfc', rar: 3, ab: ['power', 'leader'], how: { moment: 'istanbul' }, num: 8, fact: 'הקפטן של ליברפול. הוביל את הקאמבק באיסטנבול 2005.' },
   { id: 'salah', n: 'סלאח', full: 'מוחמד סלאח', team: 'lfc', rar: 3, ab: ['speed', 'curl'], how: { level: 5 }, num: 11, fact: 'בעונת 2017/18 קבע שיא של 32 שערים בעונת פרמייר ליג של 38 משחקים.' },
+  { id: 'alonso', n: 'אלונסו', full: 'צ\'אבי אלונסו', team: 'lfc', rar: 2, ab: ['vision', 'power'], how: { coins: 260 }, num: 14, fact: 'הבקיע את השער השלישי באיסטנבול 2005, מהכדור החוזר של הפנדל שלו.' },
+  { id: 'dudek', n: 'דודק', full: 'יז\'י דודק', team: 'lfc', rar: 2, ab: ['extra'], how: { moment: 'dudek05' }, num: 1, fact: 'השוער של ליברפול בגמר איסטנבול 2005. הציל את הפנדל המכריע של שבצ\'נקו.' },
+  { id: 'panenka', n: 'פננקה', full: 'אנטונין פננקה', team: 'world', rar: 2, ab: ['chip'], how: { moment: 'panenka' }, num: 7, fact: 'בגמר יורו 1976 הכריע בפנדל שהרים לאט לאמצע השער. מאז קוראים לבעיטה כזאת "פננקה".' },
+  { id: 'rcarlos', n: 'ר. קרלוס', full: 'רוברטו קרלוס', team: 'world', rar: 3, ab: ['power', 'curl'], how: { moment: 'robertocarlos' }, num: 6, fact: 'מגן ברזילאי. ב-1997 הבקיע מבעיטה חופשית שהתעקלה בצורה שנראתה בלתי אפשרית.' },
+  { id: 'bergkamp', n: 'ברגקאמפ', full: 'דניס ברגקאמפ', team: 'world', rar: 3, ab: ['turn', 'vision'], how: { moment: 'bergkamp' }, num: 8, fact: 'במונדיאל 1998 עצר כדור ארוך בנגיעה אחת והבקיע בדקה ה-90 מול ארגנטינה.' },
   { id: 'zidane', n: 'זידאן', full: 'זינדין זידאן', team: 'world', rar: 2, ab: ['turn'], how: { coins: 260 }, num: 10, fact: 'הבקיע שני שערים בנגיחה בגמר מונדיאל 1998.' },
   { id: 'cruyff', n: 'קרויף', full: 'יוהאן קרויף', team: 'world', rar: 3, ab: ['turn', 'vision'], how: { moment: 'cruyff' }, num: 14, fact: 'המציא את "תפנית קרויף" ב-1974, ואחר כך היה מאמן מהפכני בברצלונה.' },
   { id: 'maradona', n: 'מראדונה', full: 'דייגו מראדונה', team: 'world', rar: 3, ab: ['dribble', 'speed'], how: { moment: 'maradona' }, num: 10, fact: 'הוביל את ארגנטינה לזכייה במונדיאל 1986.' },
@@ -160,7 +223,7 @@ function renderLegends() {
   const m = LGS.m;
   app.innerHTML = `<div class="stack lg"><div class="qbar"><button class="icon-btn" data-lgq aria-label="חזרה">${IC.x}</button><div class="grow"><b>${m.t}</b><div class="small muted" id="lgsub">${lgSub()}</div></div><span class="lg-tm" id="lgtm"></span></div>
   <div class="lg-stage"><canvas id="lgc"></canvas><div class="lg-cap" id="lgcap"></div><div class="lg-big" id="lgbig" hidden></div><div class="lg-btns" id="lgbtns"></div><div class="lg-pane" id="lgpane"></div></div>
-  <div class="small muted lg-help">החלק לשער = בעיטה (קו מעוקל = בעיטה מסובבת, מהיר = חזק) · החלק לחבר = מסירה · החזק וגרור = כדרור</div></div>`;
+  <div class="small muted lg-help">${m.gkMode ? 'אתה השוער: אחרי הבעיטה, החלק או גע בצד של השער שאליו הכדור טס.' : 'החלק לשער = בעיטה (קו מעוקל = בעיטה מסובבת, מהיר = חזק) · החלק לחבר = מסירה · החזק וגרור = כדרור'}</div></div>`;
   app.querySelector('[data-lgq]').onclick = () => { LGS = null; renderLegends(); };
   LGS.R = fbRenderer(document.getElementById('lgc'), m); lgReset(); lgInput(); lgLoop();
   lgPane(m.ch ? 'chintro' : 'intro');
@@ -174,7 +237,7 @@ function lgLevel(L) {
   const A = lgA(), sq = A.squad.map(lgCard), r = (a, b) => a + Math.random() * (b - a);
   const spots = [[r(28, 40), r(30, 35)], [r(12, 20), r(20, 26)], [r(48, 56), r(18, 24)]];
   const us = sq.map((c, i) => [c.id, lgName(c), spots[i][0], spots[i][1], null, 6.6]);
-  const nd = Math.min(6, 1 + Math.floor((L + 1) / 2)), opp = [], sp = Math.min(6.2, 4 + L * .14);
+  const nd = Math.min(6, 1 + Math.floor(L / 2)), opp = [], sp = Math.min(6.2, 4 + L * .14);
   for (let i = 0; i < nd; i++) {
     const role = i === 0 ? `press:${Math.min(14, 7 + L * .5)}` : i % 3 === 1 && us[1] ? `mark:${us[1][0]}` : i % 3 === 2 && us[2] ? `mark:${us[2][0]}` : 'block';
     opp.push([`d${i}`, 'מגן', r(20, 48), r(8, 24 - i), role, sp - (role === 'block' ? 1 : 0)]);
@@ -227,7 +290,7 @@ function lgEvents() {
     else if (type === 'turn') { SFX.combo(); lgCap(`תפנית! ${d} בכיוון הלא נכון`, 1500); }
     else if (type === 'save') SFX.hit();
     else if (type === 'post') SFX.hit();
-    else if (type === 'goal') lgGoal();
+    else if (type === 'goal') lgGoal(d);
     else if (type === 'fail') { SFX.no(); lgButtons(); setTimeout(() => { if (LGS && LGS.W === W) lgPane('fail', d); }, 1100); }
   }
 }
@@ -236,9 +299,9 @@ function lgRoar() {
   try { const n = a.sampleRate * 2.2, buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.min(1, i / 4000) * Math.pow(1 - i / n, 1.4);
     const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(); s.buffer = buf; f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = .6; g.gain.value = .32; s.connect(f); f.connect(g); g.connect(a.destination); s.start(); } catch (e) { }
 }
-function lgGoal() {
+function lgGoal(kind) {
   const W = LGS.W; SFX.win(); lgRoar(); burst(90); lgButtons();
-  const big = document.getElementById('lgbig'); if (big) { big.textContent = 'גוֹל!'; big.hidden = false; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop'); }
+  const big = document.getElementById('lgbig'); if (big) { big.textContent = kind === 'save' ? 'הצלה!' : 'גוֹל!'; big.hidden = false; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop'); }
   /* the slow-motion replay of the last seconds */
   const fr = W.rec.slice(-130).filter((_, i) => i % 1 === 0);
   setTimeout(() => { if (!LGS || LGS.W !== W) return; if (big) big.hidden = true; LGS.slow = { fr, i: 0, acc: 0 }; lgCap('הילוך חוזר', 0); }, 1500);
@@ -285,7 +348,7 @@ function lgPane(kind, d) {
   });
 }
 function lgPlay() {
-  lgReset(); LGS.tries++; LGS.W.mode = 'play'; document.getElementById('lgpane').hidden = true; lgButtons();
+  LGS.m.try = LGS.tries; lgReset(); LGS.tries++; LGS.W.mode = 'play'; document.getElementById('lgpane').hidden = true; lgButtons();
   if (LGS.run && LGS.tries > 1) { LGS.m = lgLevel(LGS.run.L); LGS.W = fbWorld(LGS.m); LGS.W.mode = 'play'; lgButtons(); }
 }
 
@@ -321,7 +384,7 @@ function lgInput() {
     if (g.mode === 'swipe') LGS.trail.push(q);
     if (g.mode === 'drag' || (!g.mode && q.t - p0.t > 260)) { g.mode = 'drag'; const w = fbUnproject(R, q.x, q.y, 'ground'); if (w && LGS.W.carrier) LGS.W.runTo = { x: w.x, y: Math.max(.5, w.y) }; }
   };
-  cv.onpointerup = e => { if (!g) return; const G = g; g = null; G.pts.push(pt(e)); if (LGS.W.mode !== 'play') return; if (G.mode === 'swipe') lgSwipe(G.pts); else if (!G.mode) lgTapAt(G.pts[0]); };
+  cv.onpointerup = e => { if (!g) return; const G = g; g = null; G.pts.push(pt(e)); if (LGS.W.mode !== 'play') return; if (LGS.W.m.gkMode) return lgDive(G.pts[G.pts.length - 1]); if (G.mode === 'swipe') lgSwipe(G.pts); else if (!G.mode) lgTapAt(G.pts[0]); };
 }
 function lgTrail() {
   const ctx = LGS.R.ctx, now = performance.now(); LGS.trail = LGS.trail.filter(q => now - q.t < 380); const T = LGS.trail; if (T.length < 2) return;
@@ -329,14 +392,19 @@ function lgTrail() {
   for (let i = 1; i < T.length; i++) { const a = 1 - (now - T[i].t) / 380; ctx.strokeStyle = `rgba(255,236,150,${a * .85})`; ctx.lineWidth = 3 + a * 7; ctx.beginPath(); ctx.moveTo(T[i - 1].x, T[i - 1].y); ctx.lineTo(T[i].x, T[i].y); ctx.stroke(); }
 }
 function lgTapAt(q) {
-  const W = LGS.W, R = LGS.R, w = fbUnproject(R, q.x, q.y, 'ground'); if (!w) return;
+  const W = LGS.W, R = LGS.R;
+  if (W.m.gkMode) return lgDive(q);
+  const w = fbUnproject(R, q.x, q.y, 'ground'); if (!w) return;
   const c = W.carrier, mate = c && W.ps.filter(p => p.team === 'us' && p !== c).sort((a, b) => Math.hypot(a.x - w.x, a.y - w.y) - Math.hypot(b.x - w.x, b.y - w.y))[0];
   if (mate && Math.hypot(mate.x - w.x, mate.y - w.y) < 3.5 && !W.fly) return fbPassTo(W, mate, {});
   if (c) W.runTo = { x: w.x, y: Math.max(.5, w.y) };
 }
 /* read a swipe: where it ends picks shot or pass; its bend is the curl; its speed is the power */
+/* keeper mode: the keeper dives to the point of the goal the finger points at */
+function lgDive(q) { const W = LGS.W, g = fbUnproject(LGS.R, q.x, q.y, 'goal'); if (g) W.diveTo = { x: Math.max(FB.GX0 - .5, Math.min(FB.GX1 + .5, g.x)), z: g.z }; }
 function lgSwipe(pts) {
-  const W = LGS.W, R = LGS.R, a = pts[0], z = pts[pts.length - 1], L = Math.hypot(z.x - a.x, z.y - a.y); if (L < 20) return;
+  const W = LGS.W, R = LGS.R, a = pts[0], z = pts[pts.length - 1], L = Math.hypot(z.x - a.x, z.y - a.y);
+  if (W.m.gkMode) return lgDive(z); if (L < 20) return;
   const dur = Math.max(30, z.t - a.t), speed = L / dur, power = Math.max(0, Math.min(1, (speed - .45) / 1.6));
   let bend = 0; for (const q of pts) { const s = ((z.x - a.x) * (q.y - a.y) - (z.y - a.y) * (q.x - a.x)) / L; if (Math.abs(s) > Math.abs(bend)) bend = s; }
   const curve = Math.max(-1, Math.min(1, -bend / L * 3.2));

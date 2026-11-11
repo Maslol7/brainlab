@@ -24,13 +24,15 @@ function fbWorld(m) {
   const kit = (team) => team === 'us' ? m.kit : m.kit2;
   W.ps = m.us.map(([id, n, x, y, path, sp, start], i) => ({ id, n, x, y, x0: x, y0: y, vx: 0, vy: 0, team: 'us', kit: kit('us'), num: (m.nums || {})[id] || '', path: path ? path.slice() : null, sp: sp || 6.6, start: start || 0, ab: new Set((m.ab || {})[id] || []), ph: i, st: '' }))
     .concat(m.opp.map(([id, n, x, y, role, sp], i) => {
-      const gk = role === 'keeper' || role === 'rush';
+      const gk = ['keeper', 'rush', 'pen', 'hold'].includes(role);
       return { id, n, x, y, x0: x, y0: y, vx: 0, vy: 0, team: 'them', kit: gk ? m.gkKit || { shirt: '#3FD27A', shorts: '#1B1B1F', socks: '#3FD27A' } : kit('them'), num: gk ? 1 : '', role, gk, sp: sp || (role === 'rush' ? 5.5 : gk ? 4 : 5), stick: 0, fooled: 0, ph: i * 1.7, st: '', tk: 0 };
     }));
   for (const p of W.ps) if (fbHas(p, 'speed')) p.sp *= 1.15;
   if (W.ps.some(p => fbHas(p, 'leader'))) W.T += 3;
-  W.carrier = W.ps.find(p => p.id === m.ball);
-  W.b = { x: W.carrier.x, y: W.carrier.y - .7, z: FB.BR, vx: 0, vy: 0, vz: 0, spin: 0, rot: 0 };
+  if (m.gkMode) { const k = W.ps.find(p => p.team === 'us'); k.gk = true; k.kit = m.kit; k.num = 1; }
+  W.carrier = m.gkMode ? null : W.ps.find(p => p.id === m.ball);
+  const sp = m.spot || [W.carrier.x, W.carrier.y - .7];
+  W.b = { x: sp[0], y: sp[1], z: FB.BR, vx: 0, vy: 0, vz: 0, spin: 0, rot: 0 };
   W.fly = null;
   return W;
 }
@@ -69,10 +71,19 @@ function fbKick(W, who, vx, vy, vz, spin, kind, extra = {}) {
 /* a pass to a teammate: ground pass, or lofted when far or asked; curve bends it */
 function fbPassTo(W, to, o = {}) {
   const c = W.carrier; if (!c || c.team !== 'us' || to === c) return;
-  const lead = to.path && to.path.length ? .8 : 0, tx = to.x + to.vx * lead, ty = to.y + to.vy * lead, d = Math.hypot(tx - c.x, ty - c.y);
+  /* a runner gets the ball where his run ends; anyone else a little ahead of where he is going */
+  let end = to.path && to.path.length ? to.path[to.path.length - 1] : null; if (end && Math.hypot(end[0] - c.x, end[1] - c.y) < 20) end = null;
+  const tx = end ? end[0] : to.x + to.vx * .5, ty = end ? end[1] : to.y + to.vy * .5, d = Math.hypot(tx - c.x, ty - c.y);
   const vis = fbHas(c, 'vision'), loft = o.loft || d > 24;
   let vx, vy, vz;
-  if (loft) { const t = Math.max(.9, d / 17), h = Math.hypot(tx - c.x, ty - c.y) / t; vx = (tx - c.x) / d * h; vy = (ty - c.y) / d * h; vz = FB.G * t / 2 - .2; }
+  if (loft) {
+    const t = Math.max(.9, d / 17); let h = d / t; vz = FB.G * t / 2 - .2;
+    /* air drag shortens a long ball: fly it ahead of time and stretch it until it lands on the target */
+    for (let it = 0; it < 4; it++) { const g = { x: c.x, y: c.y - .5, z: FB.BR + .02, vx: (tx - c.x) / d * h, vy: (ty - c.y) / d * h, vz, spin: 0, rot: 0 }; let up = false;
+      for (let i = 0; i < 400; i++) { fbBallStep(g, 1 / 60, false); if (g.vz > 0) up = true; if (up && g.z <= FB.BR + .03) break; }
+      const got = Math.hypot(g.x - c.x, g.y - (c.y - .5)); if (got > 1) h *= d / got; }
+    vx = (tx - c.x) / d * h; vy = (ty - c.y) / d * h;
+  }
   else { const v = Math.min(26, (9 + d * .55) * (vis ? 1.3 : 1)); vx = (tx - c.x) / d * v; vy = (ty - c.y) / d * v; vz = 0; }
   fbKick(W, c, vx, vy, vz, (o.curve || 0) * 10, 'pass', { to, vis, loft });
 }
@@ -92,8 +103,14 @@ function fbShootAt(W, gx, gz, o = {}) {
   const z0 = W.header ? 1.8 : FB.BR, vz = (aimZ - z0 + FB.G * t * t / 2) / t;
   /* aim to the side so the curl brings it back to the target */
   const ux = (gx - c.x) / D, uy = (0 - sy) / D, h = D / t, off = curl * t * t / 2 * .55;
-  const vx = ux * h + uy * off / t, vy = uy * h - ux * off / t;
-  fbKick(W, c, vx, vy, vz, curl, chip ? 'chip' : 'shot', { aimX: gx, aimZ, poach: fbHas(c, 'poacher') && c.y < 16.5, header: W.header || fbHas(c, 'header'), gkOut: gk && gk.y > 2.8 && fbD(gk, c) < 7 });
+  let vx = ux * h + uy * off / t, vy = uy * h - ux * off / t, vz2 = vz;
+  /* fly it ahead of time a few times and correct the aim, so a curled shot really ends where the finger pointed */
+  for (let it = 0; it < 5; it++) {
+    const e = fbPredict({ x: c.x, y: sy, z: z0, vx, vy, vz: vz2, spin: curl, rot: 0 }, 0, true); if (!e) break;
+    const ex = gx - e.x, ez = aimZ - e.z; if (Math.abs(ex) < .05 && Math.abs(ez) < .05) break;
+    vx += ex / t * .9; vz2 += ez / t * .9;
+  }
+  fbKick(W, c, vx, vy, vz2, curl, chip ? 'chip' : 'shot', { aimX: gx, aimZ, poach: fbHas(c, 'poacher') && c.y < 16.5, header: W.header || fbHas(c, 'header'), gkOut: gk && gk.y > 2.8 && fbD(gk, c) < 7 });
   W.chip = false; W.header = false; W.shake = .35; return true;
 }
 function fbTurn(W) {
@@ -111,7 +128,8 @@ function fbStep(W, dt) {
   /* our players */
   for (const p of W.ps.filter(p => p.team === 'us')) {
     if (p.stT) { p.stT -= dt; if (p.stT <= 0) { p.stT = 0; p.st = ''; } }
-    if (p.dash) { fbMove(p, p.dash.x, p.dash.y, 10, dt, 40); p.dash.t -= dt; if (p.dash.t <= 0) p.dash = null; }
+    if (p.gk) { if (W.diveTo) { fbMove(p, W.diveTo.x, .5, 6.2, dt, 40); if (!p.st && Math.abs(W.diveTo.x - p.x) > .8) { p.st = 'dive'; p.stT = 1; p.diveDir = Math.sign(W.diveTo.x - p.x); } } else fbMove(p, p.x0 + Math.sin(W.t * 3) * .25, p.y0, 2, dt); }
+    else if (p.dash) { fbMove(p, p.dash.x, p.dash.y, 10, dt, 40); p.dash.t -= dt; if (p.dash.t <= 0) p.dash = null; }
     else if (p === c && W.runTo) fbMove(p, W.runTo.x, W.runTo.y, p.sp, dt);
     else if (W.fly && W.fly.kind === 'pass' && W.fly.to === p) { const tgt = fbMeet(W, p); fbMove(p, tgt.x, tgt.y, p.sp, dt); }
     else if (p !== c && p.path && p.path.length && W.t > p.start) { fbMove(p, p.path[0][0], p.path[0][1], p.sp, dt); if (Math.hypot(p.path[0][0] - p.x, p.path[0][1] - p.y) < .4) p.path.shift(); }
@@ -129,6 +147,8 @@ function fbStep(W, dt) {
     else if (role === 'mark' && tgtP) { const d = Math.hypot(tgtP.x - 34, tgtP.y) || 1; fbMove(o, tgtP.x + (34 - tgtP.x) / d * 1.5, tgtP.y - tgtP.y / d * 1.5, c === tgtP ? o.sp * .8 : o.sp, dt); }
     else if (role === 'block') { const s = c || b, d = Math.hypot(s.x - 34, s.y) || 1, k = Math.min(.45, 5 / d); fbMove(o, s.x + (34 - s.x) * k, s.y - s.y * k, o.sp, dt); }
     else if (role === 'wake') { if (W.t > +a2) { const t = c || (W.fly && W.fly.to) || tgtP; fbMove(o, t.x, t.y, o.sp, dt); } else fbMove(o, o.x0 + (o.x0 < 34 ? -4 : 4), o.y0 + 6, 1.2, dt); }
+    else if (role === 'wall') { fbMove(o, o.x0, o.y0, 2, dt); if (W.fly && W.fly.kind === 'shot' && W.fly.t < .4 && !o.st) { o.st = 'jump'; o.stT = .6; } }
+    else if (role === 'taker') { fbTaker(W, o, dt); continue; }
     else if (role === 'cruyff' && c) fbMove(o, c.x, c.y, W.turned ? o.sp * .75 : fbD(o, c) < 2.6 ? 1.2 : o.sp * .45, dt);
     else fbMove(o, o.x, o.y, o.sp, dt);
     /* tackles: a defender next to the carrier tries to win the ball */
@@ -163,6 +183,11 @@ function fbSupport(W, p, dt) {
 function fbKeeper(W, o, dt, role) {
   const b = W.b, f = W.fly, c = W.carrier;
   o.dive = Math.max(0, (o.dive || 0) - dt * .6);
+  if (role === 'pen' && f && (f.kind === 'shot' || f.kind === 'chip')) {
+    f.kd = (f.kd || 0) + dt; if (f.kd < .05) return;
+    if (!o.penDir) { const side = Math.abs(f.aimX - 34) > 1.2 ? Math.sign(f.aimX - 34) : 0; o.penDir = side || (f.aimX >= 34 ? -1 : 1); o.st = 'dive'; o.stT = 1.2; o.diveDir = o.penDir; }
+    return fbMove(o, 34 + o.penDir * 2.9, .6, o.sp, dt, 40);
+  }
   if (f && (f.kind === 'shot' || f.kind === 'chip')) {
     f.kd = (f.kd || 0) + dt;
     const react = .24 + (f.poach ? .14 : 0) + (W.m.gkReact || 0);
@@ -176,6 +201,7 @@ function fbKeeper(W, o, dt, role) {
   }
   if (role === 'rush' && c && c.team === 'us' && c.y < 15 && Math.abs(c.x - 34) < 16) return fbMove(o, c.x + (34 - c.x) * .12, c.y - 1.4, o.sp + .7, dt);
   if (W.m.ai && c && c.team === 'us' && c.y < 11 && !W.ps.some(d => d.team === 'them' && !d.gk && fbD(d, c) < 3)) return fbMove(o, c.x + (34 - c.x) * .15, c.y - 1.5, o.sp + .6, dt);
+  if (role === 'hold' || role === 'pen') return fbMove(o, o.x0 + (role === 'pen' ? Math.sin(W.t * 4) * .3 : 0), o.y0, 2, dt);
   const d = Math.hypot(b.x - 34, b.y) || 1, k = Math.min(1.6, d * .08);
   fbMove(o, 34 + (b.x - 34) / d * k, Math.max(.5, b.y / d * k), o.sp, dt);
 }
@@ -183,6 +209,12 @@ function fbKeeper(W, o, dt, role) {
 function fbFlight(W, dt) {
   const b = W.b, f = W.fly; f.t += dt; const py = b.y;
   fbBallStep(b, dt);
+  if (f.by && f.by.team === 'them') {
+    const k = W.ps.find(p => p.team === 'us' && p.gk), d = k && Math.hypot(k.x - b.x, k.y - b.y);
+    if (k && f.t > .1 && d < (k.st === 'dive' ? 1.2 : .7) && b.z < (k.st === 'dive' ? 2.3 : 2.45)) { b.vx = -b.vx * .3 + (k.diveDir || 1) * 3; b.vy = Math.abs(b.vy) * .4; b.vz = 3; W.fly = null; return fbWin(W, 'save'); }
+    if (py > 0 && b.y <= 0) return b.x > FB.GX0 && b.x < FB.GX1 && b.z < FB.GH ? fbFail(W, W.early ? `זזת לפני הבעיטה, ו${f.by.n} ראה אותך ובעט לצד השני.` : `${f.by.n} הבקיע. ברגע שהכדור יוצא, החלק לצד שאליו הוא טס.`) : fbWin(W, 'save');
+    return;
+  }
   for (const o of W.ps.filter(p => p.team === 'them')) {
     const d = Math.hypot(o.x - b.x, o.y - b.y);
     if (o.gk) {
@@ -217,6 +249,20 @@ function fbFlight(W, dt) {
   if (b.x < -2 || b.x > 70 || b.y > 60) return fbFail(W, 'הכדור יצא מהמגרש.');
   if (f.kind !== 'pass' && Math.hypot(b.vx, b.vy) < .6 && b.z <= FB.BR + .02) return fbFail(W, 'הבעיטה חלשה מדי.');
 }
+function fbWin(W, kind) { if (W.over) return; W.over = true; W.mode = 'goal'; W.fly = null; fbEmit(W, 'goal', kind); }
 function fbGoal(W) { if (W.over) return; W.over = true; W.mode = 'goal'; W.goalAt = { x: W.b.x, z: W.b.z }; W.netHit = 1; W.fly = null; const b = W.b; b.vy *= .25; b.vx *= .3; fbEmit(W, 'goal'); }
 function fbSaved(W, o, msg) { const b = W.b; if (o.gk) { b.vx = -b.vx * .25 + (Math.random() - .5) * 4; b.vy = Math.abs(b.vy) * .35; b.vz = 2.5; } else { b.vx *= .1; b.vy = 2; } W.fly = null; fbEmit(W, 'save', o.gk); fbFail(W, msg); }
 function fbFail(W, msg) { if (W.over) return; W.over = true; W.mode = 'fail'; W.carrier = null; fbEmit(W, 'fail', msg); }
+/* keeper mode: the taker runs up and shoots. If our keeper moves first, he shoots to the other side. */
+function fbTaker(W, o, dt) {
+  const b = W.b, k = W.ps.find(p => p.team === 'us' && p.gk), run = W.m.runAt || 1.2, kick = run + .9;
+  if (W.mode !== 'play' || W.t < run) return fbMove(o, o.x0, o.y0, 2, dt);
+  if (W.t < kick) return fbMove(o, b.x - .3, b.y + .45, 3.2, dt);
+  if (o.kicked) return fbMove(o, o.x, o.y, 2, dt);
+  o.kicked = 1; W.early = Math.abs(k.x - k.x0) > .6;
+  const seq = W.m.penSeq || [-1, 1, 1, -1], side = W.early ? -Math.sign(k.x - k.x0) : seq[(W.m.try || 0) % seq.length];
+  const gx = 34 + side * 2.7, gz = (W.m.try || 0) % 2 ? 1.5 : .45, D = Math.hypot(gx - b.x, b.y), v = 19, t = D / v;
+  const vz = (gz - FB.BR + FB.G * t * t / 2) / t;
+  o.st = 'kick'; o.stT = .3; b.vx = (gx - b.x) / D * v; b.vy = -b.y / D * v; b.vz = vz; b.spin = 0;
+  W.fly = { kind: 'shot', by: o, t: 0, aimX: gx, aimZ: gz }; W.shake = .25; fbEmit(W, 'kick', 'shot');
+}

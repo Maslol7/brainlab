@@ -146,6 +146,7 @@ function fbFigure(R, p, back) {
   ctx.save(); ctx.translate(sx, sy);
   if (p.st === 'dive') { ctx.translate(0, -.9 * k); ctx.rotate((p.diveDir || 1) * 1.15); ctx.translate(0, .55 * k); }
   else if (p.st === 'tackle') { ctx.rotate(.9 * Math.sign(p.vx || 1)); }
+  else if (p.st === 'jump') { ctx.translate(0, -.45 * k); }
   const hip = -.95 * k, sh = -1.5 * k, lw = Math.max(1.5, .15 * k);
   /* legs */
   const leg = (dir, kick) => { const a = kick ? -1.1 : dir * sw; ctx.strokeStyle = kit.socks || '#222'; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(dir * .1 * k, hip); ctx.lineTo(dir * .1 * k + Math.sin(a) * .9 * k * (kick ? .8 : .45), hip + Math.cos(a) * .92 * k); ctx.stroke(); ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(dir * .1 * k + Math.sin(a) * .9 * k * (kick ? .8 : .45), hip + Math.cos(a) * .92 * k, lw * .7, 0, 7); ctx.fill(); };

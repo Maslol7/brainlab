@@ -125,6 +125,18 @@ function foldNet(cells) {
   }
   return cells.map(c => st[vk(c)].n);
 }
+/* why two faces of a net are opposite. Two rules find every opposite pair of a cube net, and never a wrong one:
+   line: three squares in a straight line, the two ends are opposite;
+   z: a straight row of 2 to 4 squares, one square hanging off each end, to different sides (a Z shape): those two are opposite. */
+function netWhy(nc, a, b) {
+  const at = (x, y) => nc.findIndex(c => c[0] === x && c[1] === y), A = nc[a], B = nc[b], dx = B[0] - A[0], dy = B[1] - A[1];
+  if ((dx === 0 && Math.abs(dy) === 2) || (dy === 0 && Math.abs(dx) === 2)) { const m = at(A[0] + dx / 2, A[1] + dy / 2); if (m >= 0) return { k: 'line', seg: [a, m, b], col: dx === 0 }; }
+  for (const [ux, uy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) for (const [px, py] of [[uy, ux], [-uy, -ux]]) {
+    const s0 = [A[0] - px, A[1] - py], seg = [];
+    for (let k = 1; k <= 4; k++) { const i = at(s0[0] + ux * (k - 1), s0[1] + uy * (k - 1)); if (i < 0) break; seg.push(i);
+      if (k >= 2 && nc[i][0] - px === B[0] && nc[i][1] - py === B[1]) return { k: 'z', seg, col: ux === 0 }; } }
+  return null;
+}
 function genNet(d) {
   const SY = ['★', '●', '▲', '■', '◆', '✚'];
   for (let tries = 0; tries < 2000; tries++) {
@@ -133,19 +145,34 @@ function genNet(d) {
     const ns = foldNet(cs); if (new Set(ns.map(vk)).size !== 6) continue;
     const nc = normP(cs); const W = Math.max(...nc.map(c => c[0])) + 1, H = Math.max(...nc.map(c => c[1])) + 1; if (W > 5 || H > 5) continue;
     const ns2 = foldNet(nc); const sy = shuffle(SY);
-    // hard version: pick a pair that is NOT in a straight line with one gap
-    let ai = ri(0, 5); const opp = i => ns2.findIndex(n => vk(n) === vk(neg(ns2[i])));
-    if (d === 3) { for (let k = 0; k < 6; k++) { const j = opp(k); const a = nc[k], b = nc[j]; if (!(a[0] === b[0] || a[1] === b[1])) { ai = k; break; } } }
-    const bi = opp(ai);
+    const opp = i => ns2.findIndex(n => vk(n) === vk(neg(ns2[i])));
+    /* level 1: the opposite face is found by "three in a line"; level 3: only by the Z rule; level 2: either */
+    const want = d === 1 ? 'line' : d >= 3 ? 'z' : null;
+    const ok = shuffle([0, 1, 2, 3, 4, 5]).filter(k => !want || (netWhy(nc, k, opp(k)) || {}).k === want);
+    if (!ok.length) continue;
+    const ai = ok[0], bi = opp(ai), why = netWhy(nc, ai, bi);
+    if (!why) continue;
+    const touch = i => Math.abs(nc[i][0] - nc[ai][0]) + Math.abs(nc[i][1] - nc[ai][1]) === 1;
     const others = [0, 1, 2, 3, 4, 5].filter(i => i !== ai && i !== bi);
-    const m = mc([sy[bi], ...shuffle(others).slice(0, 3).map(i => sy[i])].map(s => `<span class="sym">${s}</span>`));
+    /* wrong answers: mostly faces that do not touch the marked one (they need the rule), and one that touches it when there is room */
+    const far = shuffle(others.filter(i => !touch(i))), near = shuffle(others.filter(touch));
+    const wrong = [...far.slice(0, 2), ...near, ...far.slice(2)].slice(0, 3);
+    const m = mc([sy[bi], ...wrong.map(i => sy[i])].map(s => `<span class="sym">${s}</span>`));
     const u = 46, S = { w: W * u + 6, h: H * u + 6 };
     const svg = `<svg viewBox="0 0 ${S.w} ${S.h}" class="net" style="max-width:${Math.min(320, S.w * 1.15)}px" aria-hidden="true">${nc.map((c, i) => `<rect x="${3 + c[0] * u}" y="${3 + c[1] * u}" width="${u}" height="${u}" class="nc${i === ai ? ' hl' : ''}"/><text x="${3 + c[0] * u + u / 2}" y="${3 + c[1] * u + u / 2 + 8}" text-anchor="middle" class="nt${i === ai ? ' hl' : ''}">${sy[i]}</text>`).join('')}</svg>`;
-    const pa = nc[ai], pb = nc[bi], has = (x, y) => nc.some(c => c[0] === x && c[1] === y);
-    const sk = pa[0] === pb[0] && Math.abs(pa[1] - pb[1]) === 2 && has(pa[0], (pa[1] + pb[1]) / 2) ? 'בעמודה' : pa[1] === pb[1] && Math.abs(pa[0] - pb[0]) === 2 && has((pa[0] + pb[0]) / 2, pa[1]) ? 'בשורה' : '';
-    const nb = nc.map((_, i) => i).filter(i => Math.abs(nc[i][0] - pa[0]) + Math.abs(nc[i][1] - pa[1]) === 1).map(i => sy[i]);
-    const nh2 = sk ? `כלל הדילוג: בקו ישר, המשבצת שאחרי השכנה היא הפאה הנגדית. חפשו ${sk} של ${sy[ai]} סימן שרחוק ממנו שתי משבצות.` : `שימו את ${sy[ai]} על השולחן. ${nb.length > 1 ? `${nb.join(' ו-')} מתקפלים למעלה ונהיים קירות` : `${nb[0]} מתקפל למעלה ונהיה קיר`}. המשיכו לקפל: איזה סימן נוחת למעלה, מעל ${sy[ai]}?`;
-    return withHint({ cat: 'spatial', d, prompt: `מקפלים את הפריסה לקובייה. איזה סימן יהיה בפאה שמול ${sy[ai]}?`, vis: `<div class="netwrap">${svg}</div>`, options: m.options, answer: m.answer, ex: foldNetHTML(nc, sy, ai, bi) + `${sy[ai]} ו-${sy[bi]} נמצאים בפאות נגדיות. כלל: פאות נגדיות אף פעם לא נוגעות זו בזו בפריסה. בשורה ישרה, משבצת ועוד משבצת אחריה ("דילוג על אחת") הן נגדיות. אם לא בשורה ישרה, נסה לדמיין את הקיפול צעד אחרי צעד מהפאה שמסומנת.` }, `הפאה המסומנת היא ${sy[ai]}. סימן שנוגע בה בפריסה לא יכול להיות מולה. אילו סימנים נוגעים ב-${sy[ai]}?`, nh2);
+    const nb = others.filter(touch).map(i => sy[i]), A = sy[ai], B = sy[bi], seg = why.seg.map(i => sy[i]), dir = why.col ? 'עמודה' : 'שורה';
+    const andJ = a => a.length < 2 ? a.join('') : `${a.slice(0, -1).join(', ')} ו-${a[a.length - 1]}`;
+    const nbTxt = nb.length ? `${andJ(nb)} ${nb.length > 1 ? 'נוגעים' : 'נוגע'} ב-${A} בפריסה, ולכן ${nb.length > 1 ? 'הם לא יכולים' : 'הוא לא יכול'} להיות מולו.` : '';
+    const here = why.k === 'line' ? `${seg[0]}, ${seg[1]} ו-${seg[2]} נמצאים ב${dir} ישרה. ${A} ו-${B} בשני הקצוות, עם ${seg[1]} ביניהם. לכן הם נגדיים.`
+      : `${andJ(seg)} נמצאים ב${dir} ישרה. ${A} תלוי בקצה אחד שלה, ו-${B} תלוי בקצה השני, לצד השני. זו צורת Z, ולכן ${A} ו-${B} נגדיים.`;
+    const ex = foldNetHTML(nc, sy, ai, bi)
+      + `<span class="sx-rule"><b>שני כללים מוצאים כל פאה נגדית, בלי לקפל בראש:</b><br>1. שלוש משבצות בקו ישר: שני הקצוות נגדיים.<br>2. צורת Z: שורה ישרה, ומשבצת שתלויה בכל קצה שלה, כל אחת לצד אחר. שתי התלויות נגדיות.</span>`
+      + `<span class="sx-note"><b>כאן${why.k === 'line' ? ' (כלל 1)' : ' (כלל 2)'}:</b> ${here}</span>` + (nbTxt ? `<span class="sx-note">${nbTxt}</span>` : '')
+      + `<span class="sx-next"><b>בפעם הבאה:</b> קודם פוסלים כל סימן שנוגע בפאה המסומנת. אחר כך מחפשים קו ישר של שלוש. אין? מחפשים צורת Z.</span>`;
+    const nh2 = why.k === 'line' ? `חפשו ב${dir} של ${A} סימן שרחוק ממנו בדיוק שתי משבצות, עם משבצת אחת ביניהם. שלוש בקו ישר: הקצוות נגדיים.`
+      : `אין כאן סימן בקו ישר עם ${A}. ${A} תלוי בקצה של ה${dir} הישרה ${andJ(seg)}. איזה סימן תלוי בקצה השני שלה, לצד השני? (צורת Z: הקצוות נגדיים)`;
+    return withHint({ cat: 'spatial', d, prompt: `מקפלים את הפריסה לקובייה. איזה סימן יהיה בפאה שמול ${A}?`, vis: `<div class="netwrap">${svg}</div>`, options: m.options, answer: m.answer, ex },
+      `הפאה המסומנת היא ${A}. סימן שנוגע בה בפריסה לא יכול להיות מולה. אילו סימנים נוגעים ב-${A}? פסלו אותם.`, nh2);
   }
   return genRotation(d);
 }
@@ -241,57 +268,55 @@ function genAnalog(d) {
     return { cat: 'analog', d, prompt: 'השלם את האנלוגיה. איזו מילה מתאימה במקום סימן השאלה?', vis: `<div class="analogy"><span class="w">${it.a}</span><span class="sep">:</span><span class="w">${it.b}</span><span class="like">כמו</span><span class="w">${it.c}</span><span class="sep">:</span><span class="w q">?</span></div>`, options: m.options, answer: m.answer, ex: it.ex }; }
   return genFigAn(d);
 }
-/* ---- shape series (dial) ---- */
-const CORN = [[16, 16], [64, 16], [64, 64], [16, 64]];
+/* ---- shape series (dial) ----
+   A square with a hand (8 positions, marked by small notches), a dot in one corner, and a background.
+   The solution follows one part at a time: a strip with only the hand, a strip with only the dot, a strip with only the background. */
+const CORN = [[15, 15], [65, 15], [65, 65], [15, 65]];
+const CORNN = ['למעלה משמאל', 'למעלה מימין', 'למטה מימין', 'למטה משמאל'];
+const dialTicks = () => [0, 1, 2, 3, 4, 5, 6, 7].map(k => { const a = (k * 45 - 90) * Math.PI / 180; return `<circle cx="${f1(40 + 29 * Math.cos(a))}" cy="${f1(40 + 29 * Math.sin(a))}" r="1.5" fill="currentColor" opacity=".45"/>`; }).join('');
+const dialHand = (ang, cls) => { const a = (ang * 45 - 90) * Math.PI / 180; return `<line x1="40" y1="40" x2="${f1(40 + 24 * Math.cos(a))}" y2="${f1(40 + 24 * Math.sin(a))}" ${cls ? `class="${cls}"` : 'stroke="currentColor" stroke-width="4.5" stroke-linecap="round"'}/>`; };
+const dialBox = fr => `<rect x="7" y="7" width="66" height="66" rx="7" fill="currentColor" fill-opacity="${fr ? .22 : 0}" stroke="currentColor" stroke-width="2.4"/>`;
 function dialSVG(o) {
-  const a = (o.ang * 45 - 90) * Math.PI / 180;
-  return `<svg viewBox="0 0 80 80" class="mcell" aria-hidden="true"><rect x="7" y="7" width="66" height="66" rx="7" fill="currentColor" fill-opacity="${o.fr ? .22 : 0}" stroke="currentColor" stroke-width="2.4"/><line x1="40" y1="40" x2="${(40 + 24 * Math.cos(a)).toFixed(1)}" y2="${(40 + 24 * Math.sin(a)).toFixed(1)}" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/><circle cx="40" cy="40" r="3.6" fill="currentColor"/><circle cx="${CORN[o.dot][0]}" cy="${CORN[o.dot][1]}" r="5.5" fill="currentColor"/></svg>`;
+  return `<svg viewBox="0 0 80 80" class="mcell" aria-hidden="true">${dialBox(o.fr)}${dialTicks()}${dialHand(o.ang)}<circle cx="40" cy="40" r="3.6" fill="currentColor"/><circle cx="${CORN[o.dot][0]}" cy="${CORN[o.dot][1]}" r="5.5" fill="currentColor"/></svg>`;
 }
+const notches = n => n === 1 ? 'שנתה אחת' : `${n} שנתות`;
+const turnName = n => ({ 1: 'שמינית סיבוב', 2: 'רבע סיבוב', 3: 'שלוש שמיניות סיבוב', 4: 'חצי סיבוב' })[n];
 function genShapeSeries(d) {
   const da = pick(d === 1 ? [1, 2] : [1, 2, 3]) * (R() < .5 ? 1 : -1), dd = d >= 2 ? pick([1, -1, 2]) : 0, alt = d >= 3;
   const a0 = ri(0, 7), dot0 = ri(0, 3);
   const at = i => ({ ang: ((a0 + i * da) % 8 + 8) % 8, dot: ((dot0 + i * dd) % 4 + 4) % 4, fr: alt ? i % 2 : 0 });
-  const len = d >= 4 ? 5 : 4, ans = at(len);
-  const k = o => `${o.ang}${o.dot}${o.fr}`;
-  const cands = [Object.assign({}, ans, { ang: (ans.ang + 2) % 8 }), Object.assign({}, ans, { dot: (ans.dot + 1) % 4 }), Object.assign({}, ans, { ang: ((ans.ang - da * 2) % 8 + 8) % 8 }), Object.assign({}, ans, { fr: 1 - ans.fr }), Object.assign({}, ans, { ang: (ans.ang + 4) % 8 }), at(len - 1)];
+  const len = d >= 4 ? 5 : 4, ans = at(len), lastC = at(len - 1);
+  const k = o => `${o.ang}${o.dot}${o.fr}`, m8 = v => (v % 8 + 8) % 8;
+  /* wrong answers a child really gives: the hand turned the other way, or one step too far; the dot not moved or moved the other way; the background not switched; the last box again */
+  const cands = [Object.assign({}, ans, { ang: m8(lastC.ang - da) }), Object.assign({}, ans, { ang: m8(ans.ang + da) })];
+  if (dd) cands.push(Object.assign({}, ans, { dot: lastC.dot }), Object.assign({}, ans, { dot: ((lastC.dot - dd) % 4 + 4) % 4 }));
+  if (alt) cands.push(Object.assign({}, ans, { fr: 1 - ans.fr }));
+  cands.push(lastC, Object.assign({}, ans, { ang: m8(ans.ang + 4) }), Object.assign({}, ans, { dot: (ans.dot + 1) % 4 }));
   const opts = [ans]; const seen = new Set([k(ans)]);
   for (const c of cands) { if (opts.length >= 5) break; if (!seen.has(k(c))) { seen.add(k(c)); opts.push(c); } }
   const m = mc(opts.map(dialSVG));
-  const deg = Math.abs(da) * 45, cw = da > 0 ? 'עם' : 'נגד';
-  const sh1 = `עקבו אחרי כל חלק לבד. ${dd ? 'כאן זזים גם המחוג וגם הנקודה' : 'כאן זז רק המחוג, הנקודה נשארת במקום'}${alt ? ', והרקע משתנה' : ''}. בכמה זז המחוג בין שתי המשבצות הראשונות?`;
-  const sh2 = `בכל צעד המחוג מסתובב ${L(deg + '°')} ${cw} כיוון השעון${dd ? `, והנקודה זזה ${Math.abs(dd) === 2 ? 'שתי פינות' : `פינה אחת ${dd > 0 ? 'עם' : 'נגד'} כיוון השעון`}` : ''}${alt ? ', והרקע מתחלף ריק ואפור' : ''}. מה בא אחרי המשבצת האחרונה?`;
+  const n = Math.abs(da), cw = da > 0 ? 'עם' : 'נגד';
+  const sh1 = `עקבו אחרי כל חלק לבד, ${dd ? 'קודם המחוג ואחר כך הנקודה' : 'כאן זז רק המחוג'}${alt ? ', ובסוף הרקע' : ''}. סביב המחוג יש שנתות קטנות: כמה שנתות הוא זז בין המשבצת הראשונה לשנייה? ובין השנייה לשלישית?`;
+  const sh2 = `בכל צעד המחוג זז ${notches(n)} ${cw} כיוון השעון${dd ? `, והנקודה ${Math.abs(dd) === 2 ? 'קופצת לפינה שמולה' : `זזה פינה אחת ${dd > 0 ? 'עם' : 'נגד'} כיוון השעון`}` : ''}${alt ? ', והרקע מתחלף ריק, אפור, ריק, אפור' : ''}. הזיזו כל חלק עוד צעד אחד מהמשבצת האחרונה.`;
   const seq = Array.from({ length: len + 1 }, (_, i) => at(i));
-  const lines = [`<span class="shl">${icoHand(da)}<span><b>מחוג:</b> מסתובב ${L(deg + '°')} ${cw} כיוון השעון בכל צעד${deg === 90 ? ' (רבע סיבוב)' : deg === 45 ? ' (חצי מרבע סיבוב)' : ''}.</span></span>`,
-    `<span class="shl">${icoDot(dd)}<span><b>נקודה:</b> ${!dd ? 'נשארת באותה פינה.' : Math.abs(dd) === 2 ? 'קופצת לפינה שמולה בכל צעד (באלכסון).' : `זזה פינה אחת ${dd > 0 ? 'עם' : 'נגד'} כיוון השעון בכל צעד.`}</span></span>`,
-    `<span class="shl">${icoFill(alt ? 1 : 0)}<span><b>רקע:</b> ${alt ? `מתחלף: ריק, אפור, ריק, אפור. אחרי ${seq[len - 1].fr ? 'אפור' : 'ריק'} בא <b>${ans.fr ? 'אפור' : 'ריק'}</b>.` : 'תמיד ריק.'}</span></span>`];
-  const ex = `<span class="shm"><b>השיטה:</b> עוקבים אחרי כל חלק לבד (מחוג, נקודה, רקע) ומוצאים את הצעד שחוזר בין כל שתי משבצות.</span><span class="shv">${dialStrip(seq, da, dd)}</span>${lines.join('')}`;
-  return withHint({ cat: 'matrix', d, prompt: 'מה הצורה הבאה בסדרה?', vis: `<div class="sseries">${Array.from({ length: len }, (_, i) => `<div class="fbox">${dialSVG(at(i))}</div>`).join('<span class="ar">←</span>')}<span class="ar">←</span><div class="fbox q">?</div></div>`, options: m.options, answer: m.answer, ex, meta: { da, dd, alt, len, ans, seq } }, sh1, sh2);
+  return withHint({ cat: 'matrix', d, prompt: 'מה הצורה הבאה בסדרה?', vis: `<div class="sseries">${Array.from({ length: len }, (_, i) => `<div class="fbox">${dialSVG(at(i))}</div>`).join('<span class="ar">←</span>')}<span class="ar">←</span><div class="fbox q">?</div></div>`, options: m.options, answer: m.answer, ex: dialEx(seq, da, dd, alt), meta: { da, dd, alt, len, ans, seq } }, sh1, sh2);
 }
-// inside a dial cell: where the hand and the dot were one step before, and the turn
-function dialMark(p, o, da) {
-  const a0 = p.ang * 45 - 90, a1 = a0 + da * 45, rad = x => x * Math.PI / 180;
-  let s = `<line x1="40" y1="40" x2="${f1(40 + 24 * Math.cos(rad(a0)))}" y2="${f1(40 + 24 * Math.sin(rad(a0)))}" class="gh"/>` + arcArrow(40, 40, 15, a0 + (da > 0 ? 8 : -8), a1 - (da > 0 ? 14 : -14), 'mk', 5);
-  if (p.dot !== o.dot) s += `<circle cx="${CORN[p.dot][0]}" cy="${CORN[p.dot][1]}" r="5.5" class="gh"/>`;
-  return s;
+/* one strip per part. Every box shows only that part; a dashed mark shows where it was one step before */
+function dialEx(seq, da, dd, alt) {
+  const n = Math.abs(da), cw = da > 0 ? 'עם' : 'נגד', ans = seq[seq.length - 1], prevC = seq[seq.length - 2], rot = s => s > 0 ? '↻' : '↺';
+  const box = (body, i) => `<span class="dx-c${i === seq.length - 1 ? ' ans' : ''}"><svg viewBox="0 0 80 80" aria-hidden="true">${body}</svg></span>`;
+  const strip = (cell, lab) => `<span class="dx-s">${seq.map((c, i) => (i ? `<span class="dx-a">${lab}<i>←</i></span>` : '') + box(cell(c, i ? seq[i - 1] : null), i)).join('')}</span>`;
+  const handCell = (c, p) => dialBox(0) + dialTicks() + (p ? dialHand(p.ang, 'gh') + arcArrow(40, 40, 15, p.ang * 45 - 90 + (da > 0 ? 7 : -7), p.ang * 45 - 90 + da * 45 + (da > 0 ? -12 : 12), 'mk', 4.5) : '') + dialHand(c.ang) + '<circle cx="40" cy="40" r="3.6" fill="currentColor"/>';
+  const dotCell = (c, p) => dialBox(0) + (p && p.dot !== c.dot ? `<circle cx="${CORN[p.dot][0]}" cy="${CORN[p.dot][1]}" r="5.5" class="ghd"/>` : '') + `<circle cx="${CORN[c.dot][0]}" cy="${CORN[c.dot][1]}" r="7" fill="currentColor"/>`;
+  const bgCell = c => dialBox(c.fr);
+  const part = (title, body, text) => `<span class="dx"><span class="dx-h">${title}</span>${body}<span class="dx-t">${text}</span></span>`;
+  let h = `<span class="sx-rule"><b>השיטה:</b> לא מסתכלים על כל המשבצת בבת אחת. עוקבים אחרי חלק אחד בכל פעם, ומזיזים אותו עוד צעד.</span>`;
+  h += part('1. המחוג', strip(handCell, `${n}${rot(da)}`), `בכל צעד המחוג זז ${notches(n)} (${turnName(n)}) ${cw} כיוון השעון. הקו המקווקו מראה איפה הוא היה צעד קודם.`);
+  h += dd ? part('2. הנקודה', strip(dotCell, Math.abs(dd) === 2 ? '⤡' : rot(dd)), Math.abs(dd) === 2 ? 'בכל צעד הנקודה קופצת באלכסון, לפינה שמולה.' : `בכל צעד הנקודה זזה פינה אחת ${dd > 0 ? 'עם' : 'נגד'} כיוון השעון. אחרי ${CORNN[prevC.dot]} באה הפינה ${CORNN[ans.dot]}.`)
+    : `<span class="dx"><span class="dx-h">2. הנקודה</span><span class="dx-t">לא זזה. היא תמיד בפינה ${CORNN[ans.dot]}.</span></span>`;
+  h += alt ? part('3. הרקע', strip(bgCell, ''), `הרקע מתחלף: ריק, אפור, ריק, אפור. אחרי ${prevC.fr ? 'אפור' : 'ריק'} בא <b>${ans.fr ? 'אפור' : 'ריק'}</b>.`)
+    : `<span class="dx"><span class="dx-h">3. הרקע</span><span class="dx-t">תמיד ריק.</span></span>`;
+  h += `<span class="sx-note"><b>מחברים את שלושת החלקים:</b> המחוג במקום החדש, הנקודה ${CORNN[ans.dot]}, והרקע ${ans.fr ? 'אפור' : 'ריק'}. זו המשבצת המסומנת.</span>`;
+  return h + `<span class="sx-next"><b>בפעם הבאה:</b> כסו באצבע את כל החלקים חוץ מאחד. ספרו בכמה שנתות או פינות הוא זז בין כל שתי משבצות, ובדקו שזה קבוע. רק אחר כך עברו לחלק הבא.</span>`;
 }
-// the solved series: every cell, the answer framed, and the step written under each arrow
-function dialStrip(seq, da, dd) {
-  const n = seq.length, s = 56, g = 30, fs = n >= 6 ? 21 : 17, W = n * s + (n - 1) * g, ly = s + 6 + fs, H = ly + (dd ? fs * 1.35 : 0) + 8;
-  const deg = Math.abs(da) * 45, ic = fs * .36;
-  let o = `<svg viewBox="-4 -4 ${W + 8} ${f1(H + 4)}" class="shx shstrip" aria-hidden="true">`;
-  seq.forEach((c, i) => { const x = W - s - i * (s + g), last = i === n - 1;
-    o += `<rect x="${x}" y="0" width="${s}" height="${s}" rx="8" class="pp${last ? ' pa' : ''}"/>${placeCell(dialSVG(c).replace(/<\/svg>$/, (i ? dialMark(seq[i - 1], c, da) : '') + '</svg>'), x + 1, 1, s - 2)}`;
-    if (last) o += `<rect x="${x - 2}" y="-2" width="${s + 4}" height="${s + 4}" rx="9" class="hlr"/>`;
-    if (i === n - 1) return;
-    const gx = x - g / 2, tw = String(deg).length * fs * .6 + fs * .45, tot = tw + 3 + ic * 2, x0 = gx - tot / 2;
-    o += `<line x1="${x - 5}" y1="${s / 2}" x2="${x - g + 9}" y2="${s / 2}" class="sar"/><polygon points="${x - g + 4},${s / 2} ${x - g + 11},${s / 2 - 4.5} ${x - g + 11},${s / 2 + 4.5}" class="sarh"/>`;
-    o += `<text x="${f1(x0)}" y="${f1(ly)}" class="slb" style="font-size:${fs}px" direction="ltr" text-anchor="start">${deg}°</text>` + arcArrow(x0 + tw + 3 + ic, ly - fs * .35, ic, da > 0 ? -290 : 110, da > 0 ? -20 : -160, 'sla', ic * .55);
-    if (dd) { const y2 = ly + fs * 1.3, dx = gx - ic * 1.4;
-      o += `<circle cx="${f1(dx)}" cy="${f1(y2 - fs * .35)}" r="${f1(fs * .2)}" class="sld"/>`;
-      o += Math.abs(dd) === 2 ? `<line x1="${f1(gx + ic * .1)}" y1="${f1(y2 - fs * .35 + ic)}" x2="${f1(gx + ic * 1.6)}" y2="${f1(y2 - fs * .35 - ic)}" class="sla"/><polygon points="${f1(gx + ic * 2.1)},${f1(y2 - fs * .35 - ic * 1.5)} ${f1(gx + ic * .9)},${f1(y2 - fs * .35 - ic * 1.1)} ${f1(gx + ic * 1.9)},${f1(y2 - fs * .35 - ic * .2)}" class="slah"/>` : arcArrow(gx + ic * 1.2, y2 - fs * .35, ic, dd > 0 ? -290 : 110, dd > 0 ? -20 : -160, 'sla', ic * .55); }
-  });
-  return o + '</svg>';
-}
-const icoHand = da => icoS(`<rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="12" y1="12" x2="12" y2="5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/>`);
-const icoDot = dd => icoS(`<rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="7.5" cy="7.5" r="2.8" fill="currentColor"/>`);
 function genShapes(d) { return R() < .4 ? genShapeSeries(d) : genMatrix(Math.min(d, 3)); }

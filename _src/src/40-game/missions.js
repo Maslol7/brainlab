@@ -41,12 +41,14 @@ function mkQ(c, d, typedP = 0) {
   if (canType(q) && (R() < typedP || (d >= 4 && R() < .6))) q.type = 'num';
   return q;
 }
-function startMission(kind, day, cat, size, path) {
+/* preset: a ready list of questions (the geometry practice) instead of drawing them from MIX */
+function startMission(kind, day, cat, size, path, preset) {
   ac();
   day = day || nextDay() || TOTAL;
   const base = baseDiff(day), hard = c => Math.max(qDiffFor(c, base), Math.min(3, base));
   let qs, chapters = null, mod = null;
-  if (kind === 'review') { const pool = (dueMist().length ? dueMist() : S.mist).slice(0, 8); qs = pool.map(mistQ); }
+  if (preset) qs = preset;
+  else if (kind === 'review') { const pool = (dueMist().length ? dueMist() : S.mist).slice(0, 8); qs = pool.map(mistQ); }
   else if (kind === 'sim') {
     const per = size === 'full' ? 12 : 6; qs = []; chapters = [];
     CHAPTERS.forEach(ch => { const s = qs.length; for (let j = 0; j < per; j++) { const c = ch.cats[j % ch.cats.length]; qs.push(mkQ(c, hard(c), .35)); } chapters.push({ n: ch.n, s, e: qs.length - 1, mins: per }); });

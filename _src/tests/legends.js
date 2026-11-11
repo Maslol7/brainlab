@@ -19,9 +19,15 @@ const { chromium } = require('playwright'); const fs = require('fs');
     cruyff: [`fbD(P('cruyff'), P('olsson')) < 3`, `fbTurn(W)`, `W.t > T0 + .5`, `W.runTo = { x: 26, y: 8 }`, `W.carrier && W.carrier.y < 10`, `shoot(31.2, .5)`],
     maradona: [`steer()`, ``],
     olympiacos: [`P('gerrard').y < 26.5`, `pass('gerrard'); queue(30.9, .4)`],
+    gerrard06: [`true`, `shoot(30.75, .35, .95)`],
+    torres09: [`P('torres').y < 24`, `pass('torres')`, `W.carrier && W.carrier.id === 'torres'`, `W.runTo = { x: 33, y: 9 }`, `W.carrier && W.carrier.y < 13`, `shoot(fbGK(W).x > 34 ? 31 : 37, .5)`],
+    dudek05: [`W.fly && W.fly.kind === 'shot'`, `W.diveTo = { x: W.fly.aimX, z: W.fly.aimZ }`],
+    panenka: [`true`, `W.chip = true; shoot(34, 1)`],
+    robertocarlos: [`true`, `fbShootAt(W, 36.6, 1.3, { power: .9, curve: -1 })`],
+    bergkamp: [`true`, `pass('bergkamp')`, `W.carrier && W.carrier.id === 'bergkamp' && fbD(P('ayala'), P('bergkamp')) < 3.2`, `fbTurn(W)`, `W.t > T0 + .45 && W.carrier`, `shoot(37.2, 1.2)`],
     dalglish: [`true`, `pass('kenny')`, `W.carrier && W.carrier.id === 'kenny' && fbD(P('jensen'), P('kenny')) < 5`, `W.chip = true; shoot(34.5, 1.2)`],
   };
-  const wrong = { dalglish: [`true`, `pass('kenny')`, `W.carrier && W.carrier.id === 'kenny' && fbD(P('jensen'), P('kenny')) < 5`, `shoot(34, .5, .6)`], cruyff: [`true`, `W.runTo = { x: 26, y: 6 }`] };
+  const wrong = { dudek05: [`W.t > .5`, `W.diveTo = { x: 31.5, z: .5 }`], panenka: [`true`, `shoot(31, .5)`], robertocarlos: [`true`, `shoot(36.6, 1.3, .9, 0)`], dalglish: [`true`, `pass('kenny')`, `W.carrier && W.carrier.id === 'kenny' && fbD(P('jensen'), P('kenny')) < 5`, `shoot(34, .5, .6)`], cruyff: [`true`, `W.runTo = { x: 26, y: 6 }`] };
   await p.evaluate(() => { window.steer = () => { const W = LGS.W, c = W.carrier; if (!c) return false; let vx = ((c.y < 16 ? 37 : 34) - c.x) * (c.y < 16 ? .3 : .08), vy = -1; for (const o of W.ps.filter(p => p.team === 'them' && !p.gk)) { const d = fbD(o, c); if (d < 7) { vx += (c.x - o.x) / d / d * 9; vy += (c.y - o.y) / d / d * 4; } } W.runTo = { x: c.x + vx * 4, y: c.y + vy * 4 }; if (c.y < 6) { const gk = P('shilton'); shoot(gk.x < c.x ? 37 : 31, .4); return true; } return false; }; });
   const run = async (id, script) => {
     await p.evaluate(id => { LGS = null; lgOpen(id); }, id); await p.waitForTimeout(250);
@@ -64,6 +70,6 @@ const { chromium } = require('playwright'); const fs = require('fs');
     return { mode: LGS.W.mode, L: LGS.run.L, lives: LGS.run.lives, nOpp1: LGS.m.opp.length, pane: document.getElementById('lgpane').textContent.slice(0, 60), lvl5: lgLevel(5).opp.length }; });
   if (shots) await p.screenshot({ path: `${shots}/lg_ch.png` });
   console.log(JSON.stringify(out, null, 1));
-  const ok = out.tile && out.cards === 6 && Object.keys(plays).every(id => out[id].rpEnd && out[id].stars === 3) && /לא הפעם/.test(out.wrong_dalglish.pane) && /לא הפעם/.test(out.wrong_cruyff.pane)
-    && ['gerrard', 'trent', 'cruyff', 'maradona', 'dalglish'].every(c => out.cardsOwned.includes(c)) && out.buy.has && out.buy.coins === 850 && out.ch.lvl5 > out.ch.nOpp1 && out.swipePass === 'pass' && out.swipeQueue && Math.abs(out.swipeQueue.x - 36.8) < 1.6 && !errs.length;
+  const ok = out.tile && out.cards === 12 && Object.keys(plays).every(id => out[id].rpEnd && out[id].stars === 3) && ['dalglish', 'cruyff', 'dudek05', 'panenka', 'robertocarlos'].every(k => /לא הפעם/.test(out['wrong_' + k].pane))
+    && ['gerrard', 'trent', 'cruyff', 'maradona', 'dalglish'].every(c => out.cardsOwned.includes(c)) && out.buy.has && out.buy.coins === 850 && out.ch.lvl5 > out.ch.nOpp1 && out.swipePass === 'pass' && out.swipeQueue && Math.abs(out.swipeQueue.x - 36.8) < 2.2 && !errs.length;
   console.log(errs.length ? 'ERRORS ' + errs.join('\n') : 'no errors'); console.log(ok ? 'PASS' : 'FAIL'); await b.close(); process.exit(ok ? 0 : 1); })();

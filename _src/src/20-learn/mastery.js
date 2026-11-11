@@ -32,7 +32,7 @@ function learnCard(where) {
 }
 /* a fresh question of this type: the type's own category generator until the lesson key matches */
 function genByKey(key, d) {
-  const cat = lkStat(key).cat || 'logic', g = GEN[cat]; if (!g) return null;
+  const cat = lkStat(key).cat || (typeof GEO_TOPIC !== 'undefined' && GEO_TOPIC[key] ? 'geo' : 'logic'), g = GEN[cat]; if (!g) return null;
   const snap = JSON.stringify(SEEN); let out = null;
   for (let k = 0; k < 150 && !out; k++) { let t; try { t = g(LEVEL4.has(cat) ? d : Math.min(d, 3)); } catch (e) { continue; } if (t && lessonFor(t) === key) out = t; }
   const back = JSON.parse(snap); Object.keys(SEEN).forEach(k => delete SEEN[k]); Object.assign(SEEN, back);

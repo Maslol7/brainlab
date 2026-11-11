@@ -9,15 +9,15 @@ const OPS = [
   { t: 'a × b + a', f: (a, b) => a * b + a, h: (a, b) => `קודם הכפל: ${L(`${a} × ${b} = ${a * b}`)}. עכשיו הוסיפו את a.`, s: (a, b) => `${a * b} + ${a}`,
     inv: (x, y, R0) => [[`x × ${y} + x = x × ${y + 1}`, `x ועוד ${y} פעמים x זה ${y + 1} פעמים x`], [`x × ${y + 1} = ${R0}`], [`x = ${R0} ÷ ${y + 1} = <b>${x}</b>`]] },
   { t: '2 × a − b', f: (a, b) => 2 * a - b, h: (a, b) => `קודם הכפל: ${L(`2 × ${a} = ${2 * a}`)}. עכשיו הורידו את b.`, s: (a, b) => `${2 * a} − ${b}`,
-    inv: (x, y, R0) => [[`2 × x = ${R0} + ${y} = ${R0 + y}`, `מבטלים את ה-${L(`− ${y}`)}: מוסיפים ${y}`], [`x = ${R0 + y} ÷ 2 = <b>${x}</b>`, 'מבטלים את הכפל ב-2: מחלקים ב-2']] },
+    inv: (x, y, R0) => [[`2 × x = ${R0} + ${y} = ${R0 + y}`, `מבטלים את החיסור של ${y}: מוסיפים ${y}`], [`x = ${R0 + y} ÷ 2 = <b>${x}</b>`, 'מבטלים את הכפל ב-2: מחלקים ב-2']] },
   { t: 'a × a − b', f: (a, b) => a * a - b, h: (a, b) => `קודם הכפל: ${L(`${a} × ${a} = ${a * a}`)}. עכשיו הורידו את b.`, s: (a, b) => `${a * a} − ${b}`,
-    inv: (x, y, R0) => [[`x × x = ${R0} + ${y} = ${R0 + y}`, `מבטלים את ה-${L(`− ${y}`)}: מוסיפים ${y}`], [`x = <b>${x}</b>`, `איזה מספר כפול עצמו נותן ${R0 + y}? ${L(`${x} × ${x} = ${x * x}`)}`]] },
+    inv: (x, y, R0) => [[`x × x = ${R0} + ${y} = ${R0 + y}`, `מבטלים את החיסור של ${y}: מוסיפים ${y}`], [`x = <b>${x}</b>`, `איזה מספר כפול עצמו נותן ${R0 + y}? ${L(`${x} × ${x} = ${x * x}`)}`]] },
   { t: '(a + b) × 2', f: (a, b) => (a + b) * 2, h: (a, b) => `קודם הסוגריים: ${L(`${a} + ${b} = ${a + b}`)}. עכשיו כפלו ב-2.`, s: (a, b) => `${a + b} × 2`,
-    inv: (x, y, R0) => [[`x + ${y} = ${R0} ÷ 2 = ${R0 / 2}`, 'מבטלים את הכפל ב-2: מחלקים ב-2'], [`x = ${R0 / 2} − ${y} = <b>${x}</b>`, `מבטלים את ה-${L(`+ ${y}`)}: מורידים ${y}`]] },
+    inv: (x, y, R0) => [[`x + ${y} = ${R0} ÷ 2 = ${R0 / 2}`, 'מבטלים את הכפל ב-2: מחלקים ב-2'], [`x = ${R0 / 2} − ${y} = <b>${x}</b>`, `מבטלים את החיבור של ${y}: מורידים ${y}`]] },
   { t: 'a × b − b', f: (a, b) => a * b - b, h: (a, b) => `קודם הכפל: ${L(`${a} × ${b} = ${a * b}`)}. עכשיו הורידו את b.`, s: (a, b) => `${a * b} − ${b}`,
-    inv: (x, y, R0) => [[`x × ${y} = ${R0} + ${y} = ${R0 + y}`, `מבטלים את ה-${L(`− ${y}`)}: מוסיפים ${y}`], [`x = ${R0 + y} ÷ ${y} = <b>${x}</b>`, `מבטלים את הכפל ב-${y}: מחלקים ב-${y}`]] },
+    inv: (x, y, R0) => [[`x × ${y} = ${R0} + ${y} = ${R0 + y}`, `מבטלים את החיסור של ${y}: מוסיפים ${y}`], [`x = ${R0 + y} ÷ ${y} = <b>${x}</b>`, `מבטלים את הכפל ב-${y}: מחלקים ב-${y}`]] },
   { t: 'a + 3 × b', f: (a, b) => a + 3 * b, h: (a, b) => `קודם הכפל: ${L(`3 × ${b} = ${3 * b}`)}. עכשיו הוסיפו את a.`, s: (a, b) => `${a} + ${3 * b}`,
-    inv: (x, y, R0) => [[`x + ${3 * y} = ${R0}`, `קודם הכפל: ${L(`3 × ${y} = ${3 * y}`)}`], [`x = ${R0} − ${3 * y} = <b>${x}</b>`, `מבטלים את ה-${L(`+ ${3 * y}`)}: מורידים ${3 * y}`]] }];
+    inv: (x, y, R0) => [[`x + ${3 * y} = ${R0}`, `קודם הכפל: ${L(`3 × ${y} = ${3 * y}`)}`], [`x = ${R0} − ${3 * y} = <b>${x}</b>`, `מבטלים את החיבור של ${3 * y}: מורידים ${3 * y}`]] }];
 
 /* ---- explanation building blocks (all inline spans; code.css gives them display:block) ---- */
 const cxRule = s => `<span class="cx-rule"><b>הכלל:</b> ${s}</span>`;
@@ -57,30 +57,44 @@ const opDef = op => `<span class="cx-def">${L(`${opPut('a ◆ b', 'a', 'b')} = $
 /* one full substitution: "x ◆ y = (definition with x, y) = middle = result" */
 const opCalc = (op, x, y, last) => cxMath([`${opPut('a ◆ b', x, y)} = ${opPut(op.t, x, y)}`, `= ${op.s(x, y)}`, `= ${last ? `<b>${op.f(x, y)}</b>` : op.f(x, y)}`]);
 const opWho = (x, y) => `<span class="cx-who">${L(`<span class="cx-a">a = ${x}</span>`)} ${L(`<span class="cx-b">b = ${y}</span>`)}</span>`;
-const OP_RULE = 'מעתיקים את ההגדרה. במקום a שמים את המספר הראשון, ובמקום b את השני. כפל וסוגריים לפני חיבור וחיסור.';
+const OP_RULE = 'המספר שלפני ◆ הוא a, והמספר שאחריו הוא b. מעתיקים את ההגדרה, ושמים את המספרים במקום a ו-b. כפל וסוגריים לפני חיבור וחיסור.';
+const OP_NEXT = `<span class="sx-next"><b>בפעם הבאה:</b> כתבו מתחת לתרגיל ${L('<span class="cx-a">a</span> = ...')} ו-${L('<span class="cx-b">b</span> = ...')}, ורק אחר כך העתיקו את ההגדרה עם המספרים.</span>`;
+/* the substitution table: one row per use of ◆. Columns (right to left): the exercise, a, b, the definition with the numbers in, the result.
+   rows: [{ x, y, mark: 'last' | 'ok' | 'no' }]; link: a line between rows (the result of row 1 goes in as a) */
+function opTable(op, rows, link) {
+  const head = `<span class="ox-r"><span class="ox-h">התרגיל</span><span class="ox-h">${L('<span class="cx-a">a</span>')}</span><span class="ox-h">${L('<span class="cx-b">b</span>')}</span><span class="ox-h">מציבים בהגדרה</span><span class="ox-h">תוצאה</span></span>`;
+  const row = ({ x, y, mark }) => { const v = op.f(x, y);
+    return `<span class="ox-r${mark ? ' ox-' + mark : ''}"><span class="ox-c ox-x">${L(opPut('a ◆ b', x, y))}</span><span class="ox-c cx-a">${x}</span><span class="ox-c cx-b">${y}</span><span class="ox-c ox-calc"><span>${L(opPut(op.t, x, y))}</span><span>${L(`= ${op.s(x, y)}`)}</span></span><span class="ox-c ox-res">${v}${mark === 'ok' ? ' ✓' : ''}</span></span>`; };
+  return `<span class="ox">${head}${rows.map((r, i) => (i && link ? `<span class="ox-link">${link}</span>` : '') + row(r)).join('')}</span>`;
+}
 function genOp(d) {
   const op = pick(OPS); const def = `<div class="eqs"><div class="eq">${L(`a ◆ b = ${op.t}`)}</div></div>`;
   if (d === 1) {
-    let x, y, ans, k = 0; do { x = ri(2, 9); y = ri(2, 6); ans = op.f(x, y); } while (ans < 2 && k++ < 50);
-    const ex = cxRule(OP_RULE) + opDef(op) + opMorphHTML(op.t, x, y, ans) + opWho(x, y) + opCalc(op, x, y, true) + cxAns(L(`${x} ◆ ${y} = ${ans}`));
+    let x, y, ans, k = 0; do { x = ri(2, 9); y = ri(2, 6); ans = op.f(x, y); } while ((ans < 2 || op.f(y, x) === ans) && k++ < 50);
+    const ex = cxRule(OP_RULE) + opDef(op) + opMorphHTML(op.t, x, y, ans) + opTable(op, [{ x, y, mark: 'last' }])
+      + (op.f(y, x) !== ans ? `<span class="sx-trap"><b>מלכודת:</b> מי שמחליף בין a ל-b מקבל ${L(`${op.f(y, x)}`)}. המספר הראשון, ${x}, הוא תמיד a.</span>` : '') + cxAns(L(`${x} ◆ ${y} = ${ans}`)) + OP_NEXT;
     return { ...withHint(numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`${x} ◆ ${y}`)}?`, def, ans, [op.f(y, x), ans + y, x * y], ex), `ב-${L(`${x} ◆ ${y}`)} המספר הראשון הוא ${L(`a = ${x}`)} והשני ${L(`b = ${y}`)}. הציבו אותם בהגדרה ${L(op.t)}.`, op.h(x, y)), lk: 'op' };
   }
   if (d === 2) {
     for (let k = 0; k < 100; k++) {
       const x = ri(1, 6), y = ri(1, 5), z = ri(1, 4); const in1 = op.f(x, y); if (in1 < 0) continue; const ans = op.f(in1, z); if (ans < 2 || ans > 300) continue;
-      const ex = cxRule(OP_RULE + ' קודם מה שבסוגריים, ואת התוצאה שלו מכניסים בתור a.') + opDef(op)
-        + opMorphHTML(op.t, x, y, in1) + `<span class="cx-steps">${cxStep(1, [[`(${x} ◆ ${y})`, 'קודם הסוגריים']])}</span>` + opWho(x, y) + opCalc(op, x, y, false)
-        + `<span class="cx-steps">${cxStep(2, [[`${opPut('a', in1)} ◆ ${opPut('b', '', z)}`, `התוצאה ${in1} נכנסת בתור a`]])}</span>` + opWho(in1, z) + opCalc(op, in1, z, true)
-        + cxAns(L(`(${x} ◆ ${y}) ◆ ${z} = ${ans}`));
-      return { ...withHint(numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`(${x} ◆ ${y}) ◆ ${z}`)}?`, def, ans, [op.f(x, op.f(y, z)), in1, op.f(z, in1)], ex), `קודם הסוגריים: חשבו ${L(`${x} ◆ ${y}`)} לפי ההגדרה. את התוצאה מכניסים בתור a, ואת ${z} בתור b.`, `${L(`${x} ◆ ${y} = ${in1}`)}. עכשיו חשבו ${L(`${in1} ◆ ${z}`)}, שוב לפי ההגדרה ${L(op.t)}.`), lk: 'op' };
+      const wrongOrder = op.f(x, op.f(y, z));
+      const ex = cxRule(OP_RULE + ' קודם מה שבסוגריים. התוצאה שלו נכנסת בתור a לתרגיל השני.') + opDef(op)
+        + opTable(op, [{ x, y }, { x: in1, y: z, mark: 'last' }], `↓ התוצאה ${in1} נכנסת בתור ${L('<span class="cx-a">a</span>')} ↓`)
+        + (wrongOrder !== ans && wrongOrder >= 0 ? `<span class="sx-trap"><b>מלכודת:</b> מי שמתחיל מ-${L(`${y} ◆ ${z}`)} מקבל ${wrongOrder}. אבל הסוגריים אומרים להתחיל מ-${L(`${x} ◆ ${y}`)}.</span>` : '')
+        + cxAns(L(`(${x} ◆ ${y}) ◆ ${z} = ${ans}`)) + OP_NEXT;
+      return { ...withHint(numQ('code', d, `הפעולה ◆ מוגדרת כך. כמה זה ${L(`(${x} ◆ ${y}) ◆ ${z}`)}?`, def, ans, [wrongOrder, in1, op.f(z, in1)], ex), `קודם הסוגריים: חשבו ${L(`${x} ◆ ${y}`)} לפי ההגדרה. את התוצאה מכניסים בתור a, ואת ${z} בתור b.`, `${L(`${x} ◆ ${y} = ${in1}`)}. עכשיו חשבו ${L(`${in1} ◆ ${z}`)}, שוב לפי ההגדרה ${L(op.t)}.`), lk: 'op' };
     }
   }
   for (let k = 0; k < 100; k++) {
     const x = ri(2, 9), y = ri(2, 6); const R0 = op.f(x, y); if (R0 < 1) continue;
-    const ex = cxRule('כותבים את ההגדרה עם x במקום a. אחר כך הולכים אחורה: כל פעולה מבטלים בפעולה ההפוכה.') + opDef(op) + opMorphHTML(op.t, 'x', y, R0) + opWho('x', y)
+    const q = numQ('code', 3, `הפעולה ◆ מוגדרת כך. אם ${L(`x ◆ ${y} = ${R0}`)}, מה x?`, def, x, [x + 1, x - 1, R0 - y, y], '');
+    const tries = q.options.map(o => +String(o).replace(/<[^>]+>/g, '')).filter(v => Number.isFinite(v)).sort((p1, p2) => p1 - p2).map(v => ({ x: v, y, mark: op.f(v, y) === R0 ? 'ok' : 'no' }));
+    q.ex = cxRule(`x נמצא לפני ◆, ולכן x הוא a. הדרך הבטוחה: מציבים כל תשובה במקום a, ובודקים איזו נותנת ${R0}.`) + opDef(op) + opTable(op, tries)
+      + `<span class="sx-note"><b>דרך נוספת, בלי לנחש:</b> כותבים את ההגדרה עם x, והולכים אחורה. כל פעולה מבטלים בפעולה ההפוכה.</span>`
       + `<span class="cx-steps">${cxStep(1, [`${opPut('a ◆ b', 'x', y)} = ${opPut(op.t, 'x', y)} = ${R0}`])}${op.inv(x, y, R0).map((l, i) => cxStep(i + 2, [l.length > 1 ? l : l[0]])).join('')}</span>`
-      + `<span class="cx-check">בדיקה: ${L(`${opPut('a ◆ b', x, y)} = ${opPut(op.t, x, y)} = ${R0}`)} ✓</span>` + cxAns(L(`x = ${x}`));
-    return { ...withHint(numQ('code', 3, `הפעולה ◆ מוגדרת כך. אם ${L(`x ◆ ${y} = ${R0}`)}, מה x?`, def, x, [x + 1, x - 1, R0 - y, y], ex), `בהגדרה ${L(op.t)}, כאן ${L(`b = ${y}`)} והתוצאה ${R0}. איזה מספר חסר במקום a?`, `הציבו ${L(`b = ${y}`)}: ${L(`${op.t.replace(/b/g, y).replace(/a/g, 'x')} = ${R0}`)}. נסו להציב בזה את התשובות לבחירה.`), lk: 'op' };
+      + cxAns(L(`x = ${x}`)) + `<span class="sx-next"><b>בפעם הבאה:</b> כשהנעלם בתוך ◆, מציבים את התשובות לבחירה אחת אחרי השנייה. זה לוקח חצי דקה, ותמיד עובד.</span>`;
+    return { ...withHint(q, `בהגדרה ${L(op.t)}, כאן ${L(`b = ${y}`)} והתוצאה ${R0}. איזה מספר חסר במקום a?`, `הציבו ${L(`b = ${y}`)}: ${L(`${op.t.replace(/b/g, y).replace(/a/g, 'x')} = ${R0}`)}. נסו להציב בזה את התשובות לבחירה.`), lk: 'op' };
   }
   return genSym(d);
 }

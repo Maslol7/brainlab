@@ -220,35 +220,69 @@ PASS.push({ t:'ארבעת היסודות', p:'לפני כ-2,500 שנה הציע 
       ['איזה משפט נכון לפי המדע של היום?',['מים בנויים ממימן וחמצן','אש היא יסוד כימי','יש בדיוק 4 יסודות','אפר הוא אדמה טהורה'],'"המדע של היום" = מה שמדענים גילו "במאות השנים האחרונות", לא הרעיון הישן.<span class="rdq">הם בנויים משני יסודות, מימן וחמצן</span>("הם" = המים).<span class="rdt"><b>מלכודת:</b> "אפר הוא אדמה טהורה". זה לפי הרעיון הישן של אמפדוקלס, לא לפי המדע של היום.</span>',2,'הם בנויים משני יסודות, מימן וחמצן'],
       ['מה דעת הכותב על הרעיון הישן?',['הוא היה ניסיון חכם, גם אם לא נכון','הוא היה טיפשי לגמרי','הוא עדיין נכון היום','אין טעם ללמוד עליו'],'את דעת הכותב מוצאים לרוב בסוף, אחרי מילים כמו "ובכל זאת".<span class="rdq">ובכל זאת, הרעיון הישן לא היה טיפשי</span>ומיד אחר כך: "הוא היה ניסיון ראשון להסביר עולם מסובך". הכותב מעריך את הניסיון, אף שהרעיון לא נכון.<span class="rdt"><b>מלכודת:</b> "הוא עדיין נכון היום". הקטע אומר שהיום מכירים 118 יסודות, ושהמים בכלל אינם יסוד.</span>',3,'ובכל זאת, הרעיון הישן לא היה טיפשי']] });
 PASS[PASS.length - 1].q.forEach(([q, o, ex, d, ev]) => RD.push({ pi: PASS.length - 1, q, o, ex, d, ev }));
-/* ---- invented language (מילות תפל) ---- */
+/* ---- invented language (מילות תפל) ----
+   The solution shows the given rows again with every word colored by its meaning (the same color in both languages),
+   then the dictionary built one word at a time, each with the reason, then the translation word by word. */
 const SYL = ['גלו', 'טרי', 'סמי', 'בופ', 'דקו', 'רימ', 'פזו', 'נול', 'קיפ', 'מרו', 'שבי', 'לוט', 'זבו', 'חני', 'טפו', 'ורק'];
+const lxW = (w, k) => `<span class="lx-w lw${k}">${w}</span>`;
+/* rows: [[invented words], [hebrew words]]; col: hebrew word -> color index; code: hebrew -> invented */
+function langRows(rows, col, code) {
+  return `<span class="lx">${rows.map(([z, he], i) => `<span class="lx-r"><span class="lx-n">${i + 1}</span><span class="lx-z">${z.map(w => lxW(w, col[Object.keys(code).find(h => code[h] === w)])).join('')}</span><span class="lx-e">=</span><span class="lx-he">${he.map(h => lxW(h, col[h])).join('')}</span></span>`).join('')}</span>`;
+}
+/* steps: [[hebrew word, reason]] in the order they are found */
+const langDict = (steps, col, code) => `<span class="lx-dict"><span class="lx-dh">המילון, מילה אחרי מילה:</span>${steps.map(([h, why], i) => `<span class="lx-d"><span class="lx-n">${i + 1}.</span>${lxW(h, col[h])}<span class="lx-e">=</span>${lxW(code[h], col[h])}<span class="lx-why">${why}</span></span>`).join('')}</span>`;
+/* word by word: every invented word with its hebrew word under it */
+const langTr = (ws, col, code) => `<span class="lx-tr">${ws.map(w => { const h = Object.keys(code).find(k => code[k] === w); return `<span class="lx-tw">${lxW(w, col[h])}<i>↓</i>${lxW(h, col[h])}</span>`; }).join('')}</span>`;
+const rowsOf = (rows, h) => rows.map((r, i) => r[1].includes(h) ? i + 1 : 0).filter(Boolean);
+const LANG_NEXT = '<span class="sx-next"><b>בפעם הבאה:</b> סמנו מילה בעברית שחוזרת בשתי שורות. המילה המומצאת שחוזרת באותן שתי שורות היא התרגום שלה. כך בונים מילון, מילה אחרי מילה, ולא מתרגמים לפי המקום של המילה.</span>';
 function genNonsense(d) {
   const sy = shuffle(SYL);
   if (d <= 2) {
     const N = shuffle(['כלב', 'חתול', 'סוס', 'דג', 'פיל']).slice(0, 2), A = shuffle(['גדול', 'קטן', 'מהיר', 'שמח', 'רטוב']).slice(0, 2);
     const code = {}; [...N, ...A].forEach((w, i) => code[w] = sy[i]);
     const nf = R() < .5;
-    const ph = (n, a) => nf ? `${code[n]} ${code[a]}` : `${code[a]} ${code[n]}`;
+    const ord = (n, a) => nf ? `${n} ${a}` : `${a} ${n}`;
+    const ph = (n, a) => ord(code[n], code[a]);
     const given = shuffle([[N[0], A[0]], [N[0], A[1]], [N[1], A[0]]]);
     const ans = ph(N[1], A[1]);
-    const swapped = nf ? `${code[A[1]]} ${code[N[1]]}` : `${code[N[1]]} ${code[A[1]]}`;
-    const m = mc([ans, swapped, ph(N[1], A[0]), ph(N[0], A[1])]);
-    return withHint({ cat: 'verbal', d, prompt: `בשפה המומצאת של כוכב זורגל, איך אומרים "${N[1]} ${A[1]}"?`, vis: `<div class="lang">${given.map(([n, a]) => `<div class="lr"><b>${ph(n, a)}</b><span>=</span><span>${n} ${a}</span></div>`).join('')}</div>`, options: m.options, answer: m.answer,
-      ex: `"${N[0]}" מופיע בשתי שורות, ולכן הוא המילה שמשותפת להן: "${code[N[0]]}". באותה דרך "${A[0]}" = "${code[A[0]]}". מכאן "${N[1]}" = "${code[N[1]]}" ו"${A[1]}" = "${code[A[1]]}". ושימו לב לסדר: בשפה הזו ${nf ? 'שם העצם בא לפני התואר' : 'התואר בא לפני שם העצם'}.` },
+    /* wrong answers: the right words in the wrong order; a word taken from the wrong place in its row */
+    const m = mc([ans, nf ? `${code[A[1]]} ${code[N[1]]}` : `${code[N[1]]} ${code[A[1]]}`, ord(code[A[0]], code[A[1]]), ord(code[N[1]], code[N[0]])]);
+    const col = { [N[0]]: 0, [A[0]]: 1, [N[1]]: 2, [A[1]]: 3 };
+    const rows = given.map(([n, a]) => [(nf ? [n, a] : [a, n]).map(w => code[w]), [n, a]]);
+    const rA = rowsOf(rows, N[0]), rB = rowsOf(rows, A[0]), rN1 = rowsOf(rows, N[1])[0], rA1 = rowsOf(rows, A[1])[0];
+    const dict = langDict([[N[0], `"${N[0]}" מופיע בשורות ${rA[0]} ו-${rA[1]}. רק "${code[N[0]]}" חוזרת בשתיהן.`], [A[0], `"${A[0]}" מופיע בשורות ${rB[0]} ו-${rB[1]}. רק "${code[A[0]]}" חוזרת בשתיהן.`],
+      [N[1], `בשורה ${rN1} כבר ידוע ש"${code[A[0]]}" = ${A[0]}. המילה שנשארה היא "${N[1]}".`], [A[1], `בשורה ${rA1} כבר ידוע ש"${code[N[0]]}" = ${N[0]}. המילה שנשארה היא "${A[1]}".`]], col, code);
+    const ex = `<span class="sx-rule"><b>השיטה:</b> מילה בעברית שמופיעה בשתי שורות מתורגמת למילה המומצאת שמופיעה באותן שתי שורות. כל צבע הוא מילה אחת, באותו צבע בשתי השפות.</span>`
+      + langRows(rows, col, code) + dict
+      + `<span class="lx-ans">את "${N[1]} ${A[1]}" כותבים כך:</span>` + langTr((nf ? [N[1], A[1]] : [A[1], N[1]]).map(h => code[h]), col, code)
+      + `<span class="sx-note">ושימו לב לסדר: בשפה הזו ${nf ? 'שם העצם בא לפני התואר, כמו בעברית' : 'התואר בא לפני שם העצם, הפוך מעברית'}. בודקים את זה בשורות שנתונות.</span>`
+      + (nf ? '' : `<span class="sx-trap"><b>מלכודת:</b> "${code[N[1]]} ${code[A[1]]}" מתרגם לפי הסדר של העברית. אבל בשפה הזו התואר בא ראשון.</span>`) + LANG_NEXT;
+    return withHint({ cat: 'verbal', d, prompt: `בשפה המומצאת של כוכב זורגל, איך אומרים "${N[1]} ${A[1]}"?`, vis: `<div class="lang">${given.map(([n, a]) => `<div class="lr"><b>${ph(n, a)}</b><span>=</span><span>${n} ${a}</span></div>`).join('')}</div>`, options: m.options, answer: m.answer, ex },
       `המילה "${N[0]}" מופיעה בשתי שורות. איזו מילה מומצאת חוזרת בשתי השורות האלה?`,
       `"${N[0]}" = "${code[N[0]]}" ו"${A[0]}" = "${code[A[0]]}". מה נשאר בשורה של "${N[1]} ${A[0]}"? ובדקו מה בא קודם: שם העצם או התואר.`);
   }
   const Sb = shuffle(['הילד', 'הכלב', 'החתול', 'הסוס']).slice(0, 2), V = shuffle(['רץ', 'קופץ', 'שוחה', 'אוכל']).slice(0, 2), A = shuffle(['מהר', 'לאט', 'הרבה', 'בשקט']).slice(0, 2);
   const code = {}; [...Sb, ...V, ...A].forEach((w, i) => code[w] = sy[i]);
   const perm = shuffle([0, 1, 2]);
-  const enc = (s, v, a) => perm.map(i => code[[s, v, a][i]]).join(' ');
+  const encW = (s, v, a) => perm.map(i => code[[s, v, a][i]]);
+  const enc = (s, v, a) => encW(s, v, a).join(' ');
   const heb = (s, v, a) => `${s} ${v} ${a}`;
   const given = shuffle([[Sb[0], V[0], A[0]], [Sb[0], V[1], A[1]], [Sb[1], V[0], A[1]]]);
   const m = mc([heb(Sb[1], V[1], A[0]), heb(Sb[1], V[0], A[0]), heb(Sb[0], V[1], A[0]), heb(Sb[1], V[1], A[1])]);
-  return withHint({ cat: 'verbal', d, prompt: `בשפה המומצאת של כוכב זורגל, מה פירוש המשפט "${enc(Sb[1], V[1], A[0])}"?`, vis: `<div class="lang">${given.map(g => `<div class="lr"><b>${enc(...g)}</b><span>=</span><span>${heb(...g)}</span></div>`).join('')}</div>`, options: m.options, answer: m.answer,
-    ex: `משווים זוגות של משפטים: המילה המשותפת לשני משפטים היא המילה שמשותפת גם בעברית. כך מגלים ש"${code[Sb[0]]}" = ${Sb[0]}, "${code[V[0]]}" = ${V[0]}, "${code[A[1]]}" = ${A[1]}. המילים שנשארו מתגלות לבד: "${code[Sb[1]]}" = ${Sb[1]}, "${code[V[1]]}" = ${V[1]}, "${code[A[0]]}" = ${A[0]}. מלכודת: סדר המילים בשפה הזו שונה מעברית, אז אסור להסתמך על המקום של המילה.` },
+  const col = { [Sb[0]]: 0, [V[0]]: 1, [A[1]]: 2, [Sb[1]]: 3, [V[1]]: 4, [A[0]]: 5 };
+  const rows = given.map(g => [encW(...g), g]);
+  const two = h => { const r = rowsOf(rows, h); return `"${h}" מופיע בשורות ${r[0]} ו-${r[1]}. רק "${code[h]}" חוזרת בשתיהן.`; };
+  const rest = (h, known) => `בשורה ${rowsOf(rows, h)[0]} כבר ידועות ${known.map(k => `"${code[k]}"`).join(' ו-')}. המילה שנשארה היא "${h}".`;
+  const rowOf = h => given.find(g => g.includes(h));
+  const dict = langDict([[Sb[0], two(Sb[0])], [V[0], two(V[0])], [A[1], two(A[1])], [Sb[1], rest(Sb[1], rowOf(Sb[1]).filter(w => w !== Sb[1]))], [V[1], rest(V[1], rowOf(V[1]).filter(w => w !== V[1]))], [A[0], rest(A[0], rowOf(A[0]).filter(w => w !== A[0]))]], col, code);
+  const role = ['מי', 'מה הוא עושה', 'איך'], same = perm.join('') === '012';
+  const ex = `<span class="sx-rule"><b>השיטה:</b> משווים שתי שורות שיש בהן מילה משותפת בעברית. המילה המומצאת שמשותפת לאותן שתי שורות היא התרגום שלה. כל צבע הוא מילה אחת, באותו צבע בשתי השפות.</span>`
+    + langRows(rows, col, code) + dict
+    + `<span class="lx-ans">מתרגמים מילה אחרי מילה:</span>` + langTr(encW(Sb[1], V[1], A[0]), col, code) + `<span class="sx-note">כלומר: <b>${heb(Sb[1], V[1], A[0])}</b>.</span>`
+    + `<span class="sx-note">${same ? 'כאן סדר המילים במקרה זהה לעברית. אבל תמיד בודקים במילון, לא לפי המקום.' : `סדר המילים בשפה הזו: ${perm.map(i => role[i]).join(', ')}. הוא שונה מעברית, ולכן אי אפשר לתרגם לפי המקום של המילה.`}</span>` + LANG_NEXT;
+  return withHint({ cat: 'verbal', d, prompt: `בשפה המומצאת של כוכב זורגל, מה פירוש המשפט "${enc(Sb[1], V[1], A[0])}"?`, vis: `<div class="lang">${given.map(g => `<div class="lr"><b>${enc(...g)}</b><span>=</span><span>${heb(...g)}</span></div>`).join('')}</div>`, options: m.options, answer: m.answer, ex },
     `"${Sb[0]}" מופיע בשני משפטים. איזו מילה מומצאת משותפת לשניהם? אל תסמכו על המקום של המילה.`,
-    `"${code[Sb[0]]}" = ${Sb[0]} ו"${code[V[0]]}" = ${V[0]}. מצאו באותה דרך מה פירוש "${A[1]}", ואז תרגמו מילה אחרי מילה.`);
+    `"${code[Sb[0]]}" = ${Sb[0]} ו"${code[V[0]]}" = ${V[0]}. מצאו באותה דרך את המילה של "${A[1]}", ואז תרגמו מילה אחרי מילה.`);
 }
 /* ---- next sentence in a story ---- */
 const NS = [

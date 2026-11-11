@@ -1,0 +1,30 @@
+/* ---- math explanations, part 2: the "how to recognise it" line, packs, age bars, parts bars, extra colours ---- */
+.mspot{display:block;margin-top:6px;padding:6px 10px;border-radius:10px;font-size:.84rem;background:color-mix(in srgb,var(--violet) 14%,transparent);border-inline-start:3px solid var(--violet)}
+.mspot b{color:var(--violet);font-weight:700}
+/* unit price: each pack is a row of boxes, one per item, with the price of one item in each box */
+.mpacks{display:block;margin:8px 0 6px}
+.mpk{display:block;margin:4px 0 6px}
+.mpkh{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px}
+.mpk.best .mpkh{color:var(--gold)}
+.mpk .mbc{flex-wrap:wrap;align-items:center}
+.mpk .mbc i{width:32px;font-size:.68rem}
+.mpk .mbc em{font-style:normal;font-size:.74rem;font-weight:700;color:var(--gold);margin-inline-start:6px}
+/* parts bar inside a calculation line (ages): a wider label for "לפני 4 שנים" */
+.calc .mbar{margin:6px 0 4px}
+.mbar.mparts .mbl{width:72px}
+/* age bars: child, dad, and the gold difference that keeps its length */
+.msvg .bc{fill:var(--acc-soft);stroke:var(--acc);stroke-width:1.2}
+.msvg .bd{fill:color-mix(in srgb,var(--violet) 28%,transparent);stroke:var(--violet);stroke-width:1.2}
+.msvg .bgap{fill:rgba(255,200,69,.28);stroke:var(--gold);stroke-width:1.2}
+.msvg text.gk{fill:var(--gold);font-weight:700}
+.msvg text.tt{fill:var(--ink);font-weight:700}
+.msvg .thin{stroke-opacity:.22}
+/* a third colour for a third bus line */
+.msvg circle.w,.msvg text.w{fill:var(--water)}
+.mleg i.w{background:var(--water);border-color:var(--water)}
+/* a small "how" line under a calculation step */
+.calc i.msub{display:block;font-style:normal;font-size:.8rem;line-height:1.5;color:var(--muted);margin:0 0 4px}
+/* guided math lesson: the options with a reason for each */
+.gwl{display:block;margin-top:6px}
+.gwl>span{display:block;padding:4px 0;border-top:1px solid var(--edge);font-size:.9rem}
+.gwl>span.ok{color:var(--good)}

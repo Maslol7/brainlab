@@ -1,0 +1,117 @@
+/* ---- school geometry drawings (10-content/geometry.js) and the geometry screen (70-ui/geo.js) ----
+   Colours carry meaning and do not follow the world accent (a skin can make the accent gold or white):
+   shape = ink outline on a blue tint, given angle = blue arc, what we look for = gold (pill or x),
+   height = violet dashed line, found on the way = green, the answer in a solution = gold. */
+.gsv{--g-ink:var(--ink);--g-fill:color-mix(in srgb,var(--water) 17%,transparent);--g-given:var(--water);--g-ask:var(--gold);--g-ht:var(--violet);--g-ok:var(--good);--g-halo:var(--bg0);
+  direction:ltr;display:block;width:100%;height:auto;margin:8px auto 4px;overflow:visible;font-family:var(--f-body);font-variant-numeric:tabular-nums}
+.gsv text{fill:var(--g-ink);font-weight:600;paint-order:stroke fill;stroke:var(--g-halo);stroke-width:4px;stroke-linejoin:round}
+.gsv .gk{stroke:var(--g-ink);stroke-width:2.2;fill:none;stroke-linecap:round}
+.gsv .gk2{stroke:var(--g-ink);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-opacity:.85}
+.gsv .gsh{fill:var(--g-fill);stroke:var(--g-ink);stroke-width:2.2;stroke-linejoin:round}
+.gsv .gsh0{fill:none}
+.gsv .gper{stroke:var(--g-ask);stroke-width:4}
+.gsv .gdot{fill:var(--g-ink)}
+.gsv .gref{stroke:var(--muted);stroke-width:1.4;stroke-dasharray:5 4}
+.gsv .gtk{stroke:var(--g-ink);stroke-width:2}
+/* angles */
+.gsv .gak{stroke:var(--g-given);stroke-width:2.2;fill:none}
+.gsv .gax{stroke:var(--g-ask);stroke-width:3;fill:none}
+.gsv .gas{stroke:var(--g-ask);stroke-width:2.6;fill:none}
+.gsv .gasf{fill:color-mix(in srgb,var(--g-ask) 30%,transparent)}
+.gsv .gag{stroke:var(--g-ok);stroke-width:2.4;fill:none}
+.gsv .gagf{fill:color-mix(in srgb,var(--g-ok) 24%,transparent)}
+.gsv .gan{stroke:var(--muted);stroke-width:1.5;fill:none}
+.gsv .gra{stroke:var(--g-ink);stroke-width:1.6;fill:none}
+.gsv .grah{stroke:var(--g-ht);stroke-width:1.6;fill:none}
+/* labels */
+.gsv text.gtx{fill:var(--g-ask);font-weight:800}
+.gsv text.gts{fill:var(--g-ask);font-weight:800}
+.gsv text.gtg{fill:var(--g-ok);font-weight:700}
+.gsv text.gtv{fill:var(--g-ht);font-weight:700}
+.gsv text.gtm{fill:var(--muted);font-weight:500}
+.gsv text.gtb{font-weight:800}
+.gsv .gqp{fill:var(--g-ask)}
+.gsv text.gqt{fill:#2E2100;stroke:none;font-weight:800}
+/* area */
+.gsv .ght{stroke:var(--g-ht);stroke-width:2.2;stroke-dasharray:6 4;fill:none}
+.gsv .ghtb{stroke-width:3.4}
+.gsv .gbase{stroke:var(--g-ask);stroke-width:4;stroke-linecap:round}
+.gsv .gext{stroke:var(--muted);stroke-width:1.6;stroke-dasharray:4 4}
+.gsv .ggr{stroke:var(--g-ink);stroke-opacity:.4;stroke-width:1}
+.gsv .grect{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:4 4}
+.gsv .gcut{fill:color-mix(in srgb,var(--muted) 10%,transparent);stroke:var(--muted);stroke-width:1.4;stroke-dasharray:4 4}
+.gsv .gmove{fill:color-mix(in srgb,var(--g-ok) 26%,transparent);stroke:var(--g-ok);stroke-width:1.6;stroke-dasharray:4 3}
+.gsv .gpa{fill:color-mix(in srgb,var(--water) 28%,transparent)}
+.gsv .gpb{fill:color-mix(in srgb,var(--violet) 32%,transparent)}
+.gsv .gsplit{stroke:var(--g-ok);stroke-width:2.2;stroke-dasharray:6 4}
+.gsv .glawn{fill:color-mix(in srgb,var(--good) 18%,transparent)}
+.gsv .ghole{fill:var(--bg0);stroke:var(--g-ink);stroke-width:1.8;stroke-dasharray:5 3}
+.gsv .gpool{fill:color-mix(in srgb,var(--water) 45%,transparent);stroke:var(--g-ink);stroke-width:1.8}
+.gsv .gholex{fill:var(--bg0);stroke:var(--bad);stroke-dasharray:5 3}
+/* circle */
+.gsv .gcir{fill:var(--g-fill);stroke:var(--g-ink);stroke-width:2.2}
+.gsv .gfil{fill:color-mix(in srgb,var(--g-ask) 26%,transparent)}
+.gsv .gdia,.gsv .grad{stroke:var(--g-ink);stroke-width:2}
+.gsv .grad2{stroke:var(--g-ink);stroke-width:2;stroke-dasharray:5 3}
+.gsv .ghl2{stroke:var(--g-ok);stroke-width:3.4}
+.gsv .garcp{fill:none;stroke:var(--g-ok);stroke-width:4}
+.gsv .gring{fill:color-mix(in srgb,var(--water) 40%,transparent);stroke:var(--g-ink);stroke-width:2.2}
+.gsv .gringx{fill:color-mix(in srgb,var(--g-ask) 30%,transparent)}
+/* solids */
+.gsv .gbf{fill:color-mix(in srgb,var(--water) 22%,transparent)}
+.gsv .gbt{fill:color-mix(in srgb,var(--water) 34%,transparent)}
+.gsv .gbs{fill:color-mix(in srgb,var(--water) 11%,transparent)}
+.gsv .gbo{fill:none;stroke:var(--g-ink);stroke-width:2.1;stroke-linejoin:round}
+.gsv .ghid{stroke:var(--g-ink);stroke-opacity:.55;stroke-width:1.5;stroke-dasharray:5 4}
+.gsv .ghl{fill:color-mix(in srgb,var(--g-ask) 38%,transparent)}
+.gsv .ghle{stroke:var(--g-ask);stroke-width:2}
+.gsv .gone{fill:color-mix(in srgb,var(--g-ask) 45%,transparent);stroke:var(--g-ask);stroke-width:1.4}
+.gsv .gpf{fill:color-mix(in srgb,var(--violet) 32%,transparent)}
+.gsv .gpt{fill:color-mix(in srgb,var(--water) 36%,transparent)}
+.gsv .gps{fill:color-mix(in srgb,var(--good) 26%,transparent)}
+.gsv .gdotv{fill:var(--g-ask)}
+.gsv .gdoth{fill:none;stroke:var(--g-ask);stroke-width:2}
+/* nets */
+.gsv .gnf{fill:color-mix(in srgb,var(--water) 20%,transparent);stroke:var(--g-ink);stroke-width:1.8}
+.gsv .gna{fill:color-mix(in srgb,var(--water) 38%,transparent)}
+.gsv .gnb{fill:color-mix(in srgb,var(--violet) 38%,transparent)}
+.gsv .gnc{fill:color-mix(in srgb,var(--good) 30%,transparent)}
+.gsv .gfold{stroke:var(--g-ink);stroke-width:1.2;stroke-dasharray:3 3;stroke-opacity:.7}
+.gsv.gcells{margin:2px auto}
+.gsv.gcells text{stroke-width:3px}
+.opts.grid:has(.gcells){grid-template-columns:1fr 1fr}
+.opts.grid .opt .gsv.gcells{width:100%;max-width:104px}
+.solx .gsv.gcells,.sol .gsv.gcells{width:auto;max-width:150px}
+/* in a solution the drawing sits between the method line and the calculation */
+.solx .gsv,.sol .gsv,.gstep .gsv{margin:8px auto 6px}
+.mleg i.k{background:var(--violet);border-color:var(--violet)}
+
+/* ---- the geometry screen ---- */
+.geo-top{display:flex;align-items:center;gap:10px}
+.geo-top .icon-btn{flex:none}
+.geo-top h2{font-size:1.5rem;line-height:1.1}
+.geo-top p{margin:2px 0 0;font-size:.82rem;color:var(--muted)}
+.geo-lv{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.geo-lv .chip{padding:6px 10px;font-size:.82rem}
+.geo-lv .chip.on{background:var(--water);border-color:var(--water);color:var(--bg0);font-weight:700}
+.geo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.geo-t{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:20px;background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 20%,transparent),var(--panel) 70%);border:1px solid color-mix(in srgb,var(--tc) 40%,var(--edge))}
+.geo-t .gti{display:flex;align-items:center;gap:8px}
+.geo-t .gti svg{flex:none;width:38px;height:38px;color:var(--tc)}
+.geo-t h4{font-size:1.08rem;line-height:1.15}
+.geo-t .gtd{margin:0;font-size:.76rem;color:var(--muted);line-height:1.35}
+.geo-t .gres{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.76rem;color:var(--muted);min-height:18px}
+.geo-dots{display:inline-flex;gap:3px}
+.geo-dots i{width:9px;height:9px;border-radius:50%;background:var(--edge2)}
+.geo-dots i.o{background:var(--good)}
+.geo-dots i.x,.geo-dots i.g,.geo-dots i.s{background:var(--bad)}
+.geo-t .row{gap:6px;margin-top:auto}
+.geo-t .btn{min-height:42px;padding:8px 10px;font-size:.95rem;border-radius:13px}
+.geo-t .btn-primary{flex:1.4}
+.geo-t .btn-ghost{flex:1}
+.geo-mix{display:flex;align-items:center;gap:12px}
+.geo-mix .grow p{margin:2px 0 0;font-size:.8rem;color:var(--muted)}
+.geo-log{display:flex;flex-direction:column;gap:4px;font-size:.84rem}
+.geo-log div{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--edge);padding-top:4px}
+.geo-log div:first-child{border-top:0;padding-top:0}
+.geo-log b{font-variant-numeric:tabular-nums}

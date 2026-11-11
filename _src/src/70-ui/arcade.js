@@ -1,3 +1,5 @@
+/* the exam-prep site the family subscribes to; only a link, the app never signs in there */
+const MIHONAN_URL = 'https://mihonan-online.co.il/';
 function viewArcade() {
   const dm = dueMist().length, tm = S.mist.length;
   return `<div class="stack">${hud()}
@@ -5,6 +7,8 @@ function viewArcade() {
   <div class="tiles">${songsTile()}
     <button class="tile" style="--tc:${EC.water}" data-go="sprint"><span class="ti">${IC.calc}</span><h4>ספרינט חשבון</h4><p>60 שניות של תרגילים בראש</p><span class="best">שיא: ${S.arcade.sprint}</span></button>
     <button class="tile" style="--tc:#A98BFF" data-go="piano"><span class="ti">${IC.keys}</span><h4>זיכרון פסנתר</h4><p>שמע, זכור, נגן בחזרה</p><span class="best">שיא: ${S.arcade.piano}</span></button>
+${geoTile()}
+    <a class="tile wide" style="--tc:#3FA9F5" href="${MIHONAN_URL}" target="_blank" rel="noopener"><span class="ti">${IC.book}</span><div class="grow"><h4>מחוננים אונליין</h4><p>האתר שקנינו לך לתרגול למבחן. נפתח בדפדפן.</p></div><span class="best">↗</span></a>
     <button class="tile wide" style="--tc:#E8364F" data-go="legends"><span class="ti">${IC.game}</span><div class="grow"><h4>רגעים גדולים בכדורגל</h4><p>צופים במהלך מפורסם מההיסטוריה, ואז מנסים בעצמך: אוריגי, ג'רארד, קרויף, מראדונה ועוד.</p></div><span class="best">${Object.values((S.arcade || {}).leg || {}).reduce((a, b) => a + b, 0)} ★</span></button>
     <button class="tile wide" style="--tc:${EC.fire}" data-go="kupa"><span class="ti">${IC.cart}</span><div class="grow"><h4>קופה ראשית</h4><p>משמרת של 90 שניות. סכומים, עודף והנחות, מהר ובלי מחשבון.</p></div><span class="best">שיא: ${S.arcade.kupa}</span></button>
     <button class="tile wide" style="--tc:var(--gold)" data-act="review" ${tm ? '' : 'disabled'}><span class="ti">${IC.book}</span><div class="grow"><h4>מחברת הטעויות</h4><p>${tm ? `${tm} שאלות במחברת${dm ? `. <b style="color:var(--gold)">${dm} מחכות לחזרה היום</b>` : ''}` : 'ריקה כרגע. כל טעות נכנסת לכאן וחוזרת עד שתשלוט בה.'}</p></div></button>
