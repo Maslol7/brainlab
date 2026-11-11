@@ -97,3 +97,4 @@ mark.s2c{background:var(--acc-soft);color:var(--acc);border-radius:5px;padding:0
 /* a tile that is a link (the prep site) looks like the other tiles */
 a.tile{text-decoration:none;color:inherit}
 a.tile p{color:var(--muted)}
+.lg-ctx{font-size:.9rem;color:var(--muted)}

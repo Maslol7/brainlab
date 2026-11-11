@@ -3,7 +3,7 @@ const MIHONAN_URL = 'https://mihonan-online.co.il/';
 function viewArcade() {
   const dm = dueMist().length, tm = S.mist.length;
   return `<div class="stack">${hud()}
-  <div class="sec-h"><h3>ארקייד</h3><span class="muted small">משחקים שמאמנים את המוח</span></div>
+  <div class="sec-h page"><h3>ארקייד</h3><span class="muted small">משחקים שמאמנים את המוח</span></div>
   <div class="tiles">${songsTile()}
     <button class="tile" style="--tc:${EC.water}" data-go="sprint"><span class="ti">${IC.calc}</span><h4>ספרינט חשבון</h4><p>60 שניות של תרגילים בראש</p><span class="best">שיא: ${S.arcade.sprint}</span></button>
     <button class="tile" style="--tc:#A98BFF" data-go="piano"><span class="ti">${IC.keys}</span><h4>זיכרון פסנתר</h4><p>שמע, זכור, נגן בחזרה</p><span class="best">שיא: ${S.arcade.piano}</span></button>

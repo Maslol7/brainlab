@@ -6,5 +6,6 @@ The one tap target that moves the kid forward; a 3D press that sinks 3px when ta
 - `btn-gold`: spending or getting rewards (shop, exchange, champion question). Shadow `press-gold`.
 - `btn-boss`: boss fights and full simulations only. Shadow `press-boss`.
 - `btn-ghost`: the quiet way out ("לא היום", "דלג"). Fill `panel2`.
-- Add `btn-wide` for the main action of a card. Height is at least 54px: a 12-year-old thumb on a phone.
+- Add `btn-wide` for the main action of a card. Height is at least 56px: a 12-year-old thumb on a phone.
+- Disabled: no colour and no press, a quiet outlined slot in `dim`, so it never looks like a muddy version of the real button.
 - Labels are short verbs from the kid's side: "יאללה!", "לשאלה הבאה", "לקרב!". No "אישור/ביטול" language in the game.

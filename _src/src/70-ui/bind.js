@@ -70,4 +70,5 @@ function bindV11() {
   on('learnlater', () => { (S.learnQ || []).forEach(x => { if (x.at <= todayStr()) x.at = addDays(todayStr(), 1); }); save(); render(); });
   on('xtra', startXtra);
   on('xtraskip', () => { S.xtraSkip = todayStr(); save(); render(); });
+  if (app.querySelector('.wis')) wisBind();
 }

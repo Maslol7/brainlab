@@ -74,9 +74,11 @@ function renderQuiz() {
   const gkey = !deferred(c.kind) && !r ? lessonFor(q) : null, guide = gkey && SHAPE_KEYS[gkey] ? gkey : null;
   const gchip = guide ? `<button class="chip gbtn" data-guide="${guide}">איך פותרים?</button>` : '';
   const gfirst = guide && !(S.guideSeen || {})[guide] ? `<div class="gfirst"><b>סוג שאלה חדש: ${SHAPE_KEYS[guide]}</b><span>שיעור של דקה, עם דוגמה. אחרי זה, השאלה שלך.</span><div class="row" style="gap:8px;margin-top:8px"><button class="btn btn-primary" data-guide="${guide}" style="flex:1;min-height:40px">כן, תראו לי</button><button class="btn btn-ghost" data-gskip="${guide}" style="flex:1;min-height:40px">אני יודע</button></div></div>` : '';
+  /* the question card slides in once per new question */
+  const qk = `${c.kind}|${c.day}|${c.i}|${c.qs.length}`, qfresh = app.dataset.q !== qk; app.dataset.q = qk;
   const duo = c.duo ? '<div class="duo">אתגר עם אבא: כל אחד אומר בקול מה הוא חושב, ורק אז בוחרים.</div>' : '';
   app.innerHTML = `<div class="qbar"><button class="icon-btn" data-act="quit" aria-label="יציאה">${IC.x}</button><div class="pdots">${dots}</div><div class="qmeta"><span class="pts">${c.pts} נק׳</span><span class="tm" id="tm"></span></div></div>${chTag}${battle}
-  <div class="card ${q.champ ? 'champq' : ''}"><div class="qtop"><span class="tag ${q.rev ? 'rev' : ''}">${q.champ ? 'שאלת האלוף · ' : q.rev ? (q.twin ? 'מהמחברת · גרסה קלה · ' : 'מהמחברת · ') : ''}${CATS[q.cat].n}</span>${comboTag}<span class="lvl">רמה ${lvl}</span>${gchip}</div>${duo}${pace}
+  <div class="card qcard${q.champ ? ' champq' : ''}${qfresh ? ' q-enter' : ''}"><div class="qtop"><span class="tag ${q.rev ? 'rev' : ''}">${q.champ ? 'שאלת האלוף · ' : q.rev ? (q.twin ? 'מהמחברת · גרסה קלה · ' : 'מהמחברת · ') : ''}${CATS[q.cat].n}</span>${comboTag}<span class="lvl">רמה ${lvl}</span>${gchip}</div>${duo}${pace}
   ${gfirst}<p class="qprompt">${q.prompt}</p><div class="qvis">${answered && q.evidence && q.vis.includes(q.evidence) ? q.vis.replace(q.evidence, `<mark class="ev">${q.evidence}</mark>`) : q.vis}</div>${body}${hint}${fb}</div>
   <div class="qfoot"><div class="in">${foot}</div></div>`;
   bind();

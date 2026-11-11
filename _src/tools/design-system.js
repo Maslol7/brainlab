@@ -18,9 +18,9 @@ const accs = { air: ['#7fe3d6', '#c2f5ee'], water: ['#53a8ff', '#b5daff'], earth
 const per = i => Object.fromEntries(themes.map(([t]) => [t, accs[t][i]]));
 const tokens = {
   name: 'מעבדת המוח', version: 1,
-  meta: { source: 'code', paths: { tokens: ['src/styles/app.css'], icons: ['src/00-core/icons.js'] }, synced: '2026-10-29' },
+  meta: { source: 'code', paths: { tokens: ['src/styles/app.css'], icons: ['src/00-core/icons.js'] }, synced: '2026-11-11' },
   color: {
-    note: 'One dark night-sky look. Each theme is a world of the journey: only the accent changes. In the app the world is set with data-w on <html>.',
+    note: 'One dark night-sky look. Each theme is a world of the journey: only the accent changes. In the app the world is set with data-w on <html>. Depth comes from three surface tiers (s1 card, s2 raised, s3 well), not from borders.',
     themes: themes.map(([id, name]) => ({ id, name })),
     tokens: [
       C('bg0', '#0a0f24', 'Page ground: the night sky. Also the ink on bright fills (on-acc).'),
@@ -44,6 +44,11 @@ const tokens = {
       C('violet', '#a98bff', 'Boss fights and exam simulations: boss button, boss hero, the sim tile.'),
       C('good', '#46e0a0', 'Correct answer: option border, feedback box, progress dot, the celebration ring and sticker.'),
       C('bad', '#ff5c7a', 'Wrong answer and errors. Always with a word ("התשובה:") or a shake, never colour alone.'),
+      C('s1', 'linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035))', 'Surface tier 1, the card: lists, stats, tiles, rows. With a line edge, the hi highlight and sh1. Always over the sky.'),
+      C('s2', 'linear-gradient(180deg, #232c62, #171f48)', 'Surface tier 2, raised: the one hero of a screen, the question card, modals, the diamonds box. Solid, with an accent wash from the top corner and sh2.'),
+      C('s3', 'rgba(3,6,20,0.4)', 'Surface tier 3, the well: sunk areas inside a surface (question visuals, inputs, progress tracks, the tab bar). Darker than what is around it.'),
+      C('line', 'rgba(255,255,255,0.08)', 'Hairline edge of s1 cards and dividers inside a card.'),
+      C('line2', 'rgba(255,255,255,0.14)', 'Stronger hairline: chips, ghost buttons, the HUD capsule, dividers between stats.'),
       C('paper', '#fffbf2', 'Reading passages: the paper card a story is printed on.'),
       C('paper-ink', '#2a2a33', 'Text on paper (13:1).'),
     ],
@@ -53,19 +58,19 @@ const tokens = {
     families: { display: "'Fredoka', 'Rubik', 'Arial Hebrew', system-ui, sans-serif", body: "'Rubik', 'Arial Hebrew', 'Segoe UI', system-ui, sans-serif" },
     groups: [
       { name: 'Display', family: 'display', styles: [
-        { name: 'hero-title', fontSize: '36.8px', lineHeight: 1, fontWeight: 700, sample: 'יאללה, יונתן!', usage: 'The big line of the hero card on the home screen.' },
-        { name: 'stat-number', fontSize: '32px', lineHeight: 1, fontWeight: 700, sample: '78', usage: 'Big numbers in stat tiles: days to the exam, streak, missions.' },
-        { name: 'screen-title', fontSize: '27.2px', lineHeight: 1, fontWeight: 700, sample: 'יונתן', usage: 'The name in the HUD at the top of each screen.' },
-        { name: 'section-title', fontSize: '24px', lineHeight: 1.2, fontWeight: 700, sample: 'המסע', usage: 'Section headers (sec-h h3).' },
-        { name: 'card-title', fontSize: '18.4px', lineHeight: 1.3, fontWeight: 700, sample: 'נכון! +15', usage: 'Feedback titles, tile titles, small card headings.' },
-        { name: 'button', fontSize: '17.6px', lineHeight: 1.2, fontWeight: 700, sample: 'לשאלה הבאה', usage: 'Every .btn.' },
+        { name: 'hero-title', fontSize: '38px', lineHeight: 1.02, fontWeight: 700, sample: 'יאללה, יונתן!', usage: 'The big line of the hero card on the home screen.' },
+        { name: 'stat-number', fontSize: '25.6px', lineHeight: 1.05, fontWeight: 700, sample: '78', usage: 'Tabular. Big numbers in stat tiles: days to the exam, streak, missions.' },
+        { name: 'screen-title', fontSize: '28px', lineHeight: 1.1, fontWeight: 700, sample: 'ארקייד', usage: 'The page title of a screen without a hero (sec-h page). The HUD name uses 26px. Before: The name in the HUD at the top of each screen.' },
+        { name: 'section-title', fontSize: '22px', lineHeight: 1.2, fontWeight: 700, sample: 'המסע', usage: 'Section headers (sec-h h3).' },
+        { name: 'card-title', fontSize: '18px', lineHeight: 1.3, fontWeight: 700, sample: 'נכון! +15', usage: 'Feedback titles, tile titles, small card headings.' },
+        { name: 'button', fontSize: '18px', lineHeight: 1.2, fontWeight: 700, sample: 'לשאלה הבאה', usage: 'Every .btn.' },
       ] },
       { name: 'Text', family: 'body', styles: [
-        { name: 'question', fontSize: '17.9px', lineHeight: 1.55, fontWeight: 500, sample: 'איזה מספר מתאים במקום סימן השאלה?', usage: 'The question prompt.' },
-        { name: 'answer', fontSize: '16.6px', lineHeight: 1.4, fontWeight: 400, sample: 'כשסוף סוף הופיעו עננים כהים, הם שמחו מאוד.', usage: 'Answer options.' },
+        { name: 'question', fontSize: '19.2px', lineHeight: 1.5, fontWeight: 600, sample: 'איזה מספר מתאים במקום סימן השאלה?', usage: 'The question prompt.' },
+        { name: 'answer', fontSize: '16.8px', lineHeight: 1.4, fontWeight: 500, sample: 'כשסוף סוף הופיעו עננים כהים, הם שמחו מאוד.', usage: 'Answer options.' },
         { name: 'body', fontSize: '16px', lineHeight: 1.5, fontWeight: 400, sample: 'כל טעות נשמרת במחברת וחוזרת אליך אחרי יום.', usage: 'Running text.' },
-        { name: 'small', fontSize: '13.1px', lineHeight: 1.5, fontWeight: 400, sample: 'סונכרן לפני 2 דקות', usage: 'Captions and secondary lines, in muted.' },
-        { name: 'eyebrow', fontSize: '11.8px', lineHeight: 1.4, fontWeight: 700, letterSpacing: '0.06em', sample: 'אוויר · משימה 12/75', usage: 'The label above a title, in muted.' },
+        { name: 'small', fontSize: '13px', lineHeight: 1.5, fontWeight: 400, sample: 'סונכרן לפני 2 דקות', usage: 'Captions and secondary lines, in muted.' },
+        { name: 'eyebrow', fontSize: '12px', lineHeight: 1.4, fontWeight: 600, letterSpacing: '0.03em', sample: 'אוויר · משימה 12/75', usage: 'The label above a title, in muted.' },
       ] },
     ],
   },
@@ -76,13 +81,16 @@ const tokens = {
     { name: 'pad-option', value: '12px', usage: 'Inside an answer option.' },
     { name: 'gap-stack', value: '16px', usage: 'Between blocks of a screen (.stack).' },
     { name: 'pad-card', value: '16px', usage: 'Inside a card. The side gutter of the screen is the same 16px.' },
-    { name: 'pad-hero', value: '18px', usage: 'Inside the hero card.' },
-    { name: 'nav-clearance', value: '104px', usage: 'Bottom space so the fixed nav and the quiz footer never cover content.' },
+    { name: 'pad-hero', value: '20px', usage: 'Inside the hero card.' },
+    { name: 'gap-section', value: '24px', usage: 'Above a section title: a section header plus the stack gap.' },
+    { name: 'nav-clearance', value: '112px', usage: 'Bottom space so the fixed nav and the quiz footer never cover content.' },
   ] },
   radius: { tokens: [
-    { name: 'radius-letter', value: '9px', usage: 'The letter square (א ב ג ד) inside an answer option.' },
+    { name: 'radius-small', value: '12px', usage: 'Small wells and inputs (--r-sm in the code).' },
+    { name: 'radius-letter', value: '10px', usage: 'The letter square (א ב ג ד) inside an answer option.' },
     { name: 'radius-button', value: '16px', usage: 'Buttons, answer options, feedback box, hint box.' },
     { name: 'radius-card', value: '20px', usage: 'Cards and banners (--r in the code).' },
+    { name: 'radius-hero', value: '26px', usage: 'The raised hero, the question card, the world map and modals (--r-lg in the code).' },
     { name: 'radius-tile', value: '22px', usage: 'Arcade tiles.' },
     { name: 'radius-pill', value: '999px', usage: 'Chips, tags, the combo badge, the celebration sticker.' },
   ] },
@@ -90,6 +98,9 @@ const tokens = {
     { name: 'press-primary', value: '0 5px 0 #40726b, 0 10px 24px -8px rgba(127,227,214,0.45)', usage: 'The 3D press under a primary button (air world; the app mixes it from acc). On press it drops to 2px and the button moves down 3px.' },
     { name: 'press-gold', value: '0 5px 0 #a07510', usage: 'Under gold buttons (rewards, shop).' },
     { name: 'press-boss', value: '0 5px 0 #4b2fa3, 0 10px 24px -8px rgba(138,99,242,0.6)', usage: 'Under boss and simulation buttons.' },
+    { name: 'hi', value: 'inset 0 1px 0 rgba(255,255,255,0.07)', usage: 'The top highlight every surface carries: light comes from above.' },
+    { name: 'sh1', value: '0 10px 28px -20px rgba(0,0,0,0.9)', usage: 'Soft lift under s1 cards.' },
+    { name: 'sh2', value: '0 28px 56px -28px rgba(0,0,0,0.95), 0 2px 6px -2px rgba(0,0,0,0.4)', usage: 'Real depth under s2 surfaces (hero, question card, modal).' },
     { name: 'glow-correct', value: '0 0 0 2px #46e0a0, 0 0 26px rgba(70,224,160,0.45)', usage: 'A correct answer while it celebrates.' },
   ] },
 };
@@ -114,7 +125,7 @@ const end = '</div>\n';
 const P = {};
 P.Button = head('Actions', 230) + `<div class="stack" style="max-width:420px"><button class="btn btn-primary btn-wide">יאללה, יונתן!</button><div class="row"><button class="btn btn-gold" style="flex:1">להמיר</button><button class="btn btn-boss" style="flex:1">לקרב!</button></div><div class="row"><button class="btn btn-ghost" style="flex:1">לא היום</button><button class="btn btn-primary" style="flex:1" disabled>בדיקה</button></div></div>` + end;
 P.Chip = head('Actions', 120) + `<div class="demo"><button class="chip">+1</button><button class="chip hot">רצף 7</button><span class="tag">מילולי</span><span class="tag rev">מהמחברת · גרסה קלה</span><span class="combo">${IC.flame}3</span></div>` + end;
-P.Card = head('Surfaces', 330) + `<div class="stack" style="max-width:440px"><section class="card hero"><div class="eyebrow">אוויר · משימה 12/75</div><div class="stage"><div class="grow"><div class="bubble">מי שעוצר לחשוב, מנצח.</div></div></div><h2>משימה 12</h2><p>קלאסי · 10 שאלות · 2 מהמחברת</p><button class="btn btn-primary btn-wide">יאללה, יונתן!</button></section><section class="card"><div class="eyebrow">לפי פרקים</div><p class="small muted" style="margin:6px 0 0">כרטיס רגיל: זכוכית כהה מעל השמיים.</p></section></div>` + end;
+P.Card = head('Surfaces', 470) + `<div class="stack" style="max-width:440px"><section class="card hero"><div class="eyebrow">אוויר · משימה 12/75</div><div class="stage"><div class="grow"><div class="bubble">מי שעוצר לחשוב, מנצח.</div></div></div><h2>משימה 12</h2><p>קלאסי · 10 שאלות · 2 מהמחברת</p><button class="btn btn-primary btn-wide">יאללה, יונתן!</button></section><section class="card"><div class="eyebrow">לפי פרקים</div><p class="small muted" style="margin:6px 0 0">כרטיס רגיל (s1): זכוכית שקטה מעל השמיים.</p><div class="xpbar"><i style="width:62%"></i></div></section><div class="mini"><div><b>65</b><span>ימים למבחן</span></div><div><b>4</b><span>ימים ברצף</span></div><div><b>12/75</b><span>משימות</span></div></div></div>` + end;
 P.Banner = head('Surfaces', 200) + `<div class="stack" style="max-width:440px"><div class="banner">${DIA.replace('<svg', '<svg style="width:44px;height:44px;flex:none"')}<div class="grow"><b>+2 יהלומים של אבא!</b><div class="small muted">3 כוכבים במשימה 12 · משימה מושלמת</div></div></div><div class="banner">${IC.cake}<div class="grow">עוד 5 ימים ליום ההולדת!</div></div></div>` + end;
 P.AnswerOption = head('Quiz', 400, 'States: open, selected, correct (celebrating), wrong, removed after a first wrong try') + `<div class="stack" style="max-width:440px;gap:10px">
 <button class="opt"><span class="lt">א</span><span class="ob">הם התלוננו שיש יותר מדי מים בשדות.</span></button>
@@ -129,7 +140,7 @@ P.Stats = head('Progress', 230) + `<div class="stack" style="max-width:440px"><d
 <div class="pdots" style="display:flex"><i class="ok"></i><i class="ok"></i><i class="no"></i><i class="cur"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <div class="row"><span class="lvl">רמה <i class="on"></i><i class="on"></i><i></i><i></i></span></div></div>` + end;
 P.Tile = head('Games', 260) + `<div class="tiles" style="max-width:440px"><button class="tile" style="--tc:var(--water)"><span class="ti">${IC.calc}</span><h4>ספרינט חשבון</h4><p>60 שניות של תרגילים בראש</p><span class="best">שיא: 14</span></button><button class="tile" style="--tc:var(--violet)"><span class="ti">${IC.keys}</span><h4>זיכרון פסנתר</h4><p>שמע, זכור, נגן בחזרה</p><span class="best">שיא: 7</span></button></div>` + end;
-P.Nav = head('Navigation', 110) + `<div style="position:relative;height:80px"><nav class="nav four" style="position:absolute"><div class="in">${[['מסע', IC.home, 1], ['משחקים', IC.game], ['התקדמות', IC.chart], ['חנות', IC.shop]].map(([n, ic, on]) => `<button class="${on ? 'on' : ''}">${ic}${n}</button>`).join('')}</div></nav></div>` + end;
+P.Nav = head('Navigation', 130) + `<div style="position:relative;height:100px"><nav class="nav four" style="position:absolute"><div class="in">${[['מסע', IC.home, 1], ['משחקים', IC.game], ['התקדמות', IC.chart], ['חנות', IC.shop]].map(([n, ic, on]) => `<button class="${on ? 'on' : ''}"><span class="ni">${ic}</span><span class="nl">${n}</span></button>`).join('')}</div></nav></div>` + end;
 P.Icons = head('Foundations', 170, 'The app\'s inline SVG set (src/00-core/icons.js) and the diamond') + `<div class="demo" style="color:var(--ink)">${Object.entries(Object.assign({}, IC, { diamond: DIA })).map(([k, s]) => `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:58px"><span style="width:28px;height:28px;display:block">${s.replace('<svg', '<svg style="width:28px;height:28px;display:block"')}</span><span class="lbl" style="margin:0" dir="ltr">${k}</span></div>`).join('')}</div>` + end;
 P.Hint = head('Quiz', 300, 'The hint before an answer, and the stronger one after a first wrong try') + `<div class="stack" style="max-width:440px"><div class="hintbox"><span class="hi">${IC.bulb}</span><div><b>רמז</b><p>כתבו מה קורה בכל צעד: כמה עולה או יורד מ-3 ל-6, ומ-6 ל-11?</p></div></div><div class="retry"><span class="hi">${IC.bulb}</span><div><b>כמעט.</b> נסה שוב.<span class="rh"><span class="ltr" dir="ltr">3 × 2 = 6</span><br><span class="ltr" dir="ltr">6 + 5 = 11</span><br>שימו לב: יש שתי פעולות שמתחלפות.</span></div></div></div>` + end;
 const docs = {
@@ -137,31 +148,39 @@ const docs = {
 - \`btn-gold\`: spending or getting rewards (shop, exchange, champion question). Shadow \`press-gold\`.
 - \`btn-boss\`: boss fights and full simulations only. Shadow \`press-boss\`.
 - \`btn-ghost\`: the quiet way out ("לא היום", "דלג"). Fill \`panel2\`.
-- Add \`btn-wide\` for the main action of a card. Height is at least 54px: a 12-year-old thumb on a phone.
+- Add \`btn-wide\` for the main action of a card. Height is at least 56px: a 12-year-old thumb on a phone.
+- Disabled: no colour and no press, a quiet outlined slot in \`dim\`, so it never looks like a muddy version of the real button.
 - Labels are short verbs from the kid's side: "יאללה!", "לשאלה הבאה", "לקרב!". No "אישור/ביטול" language in the game.`],
   Chip: ['Chip', 'Small rounded labels: `chip` is tappable, `tag` names a category, `combo` counts a streak.', `- \`chip\`: secondary choices (amounts, reasons, filters). \`chip.hot\` (gold) marks the one that matters now.
 - \`tag\`: the category of a question, in the world accent. \`tag.rev\` (gold) marks a question from the mistakes notebook.
 - \`combo\`: flame + number, gold, only from 2 correct answers in a row.`],
-  Card: ['Card', 'Glass panels over the night sky; `hero` is the one card that says what to do next.', `- \`card\`: fill \`panel\`, border \`edge\`, radius \`radius-card\`, padding \`pad-card\`, 6px backdrop blur.
-- \`hero\`: one per screen, at the top of the home screen: eyebrow, a speech bubble, a big title (\`hero-title\`), one line, one wide primary button. \`hero.boss\` uses violet.
+  Card: ['Card', 'Three surface tiers over the night sky; `hero` is the one raised card that says what to do next.', `- \`card\` (tier s1): fill \`s1\`, a \`line\` edge, the \`hi\` top highlight and \`sh1\`, radius \`radius-card\`, padding \`pad-card\`, 8px backdrop blur.
+- Tier s2 (raised): \`hero\`, \`res-hero\`, \`me-hero\`, \`intro-card\`, the question card (\`qcard\`), modals and the diamonds box. Fill \`s2\` plus an accent wash from the top corner, radius \`radius-hero\`, shadow \`sh2\`. One per screen.
+- Tier s3 (well): sunk areas inside a surface: question visuals, inputs, progress tracks, the tab bar, the intro's rules box.
+- \`hero\`: eyebrow with a coloured dot, a speech bubble that points at the avatar, a big title (\`hero-title\`), one line, one wide primary button. The wash colour is \`--hc\` (the world accent by default; gold for the notebook, violet for boss and sims).
+- \`mini\`: three numbers in one card, split by \`line2\` dividers, not three boxes.
 - Do not nest cards. Do not give every block a card: section headers and lists sit on the sky.`],
   Banner: ['Banner', 'A warm gold strip for news the kid should feel good about: diamonds won, a birthday, a new song.', `- An icon at 44px, then one or two short lines. Bold the number or the thing won.
 - Gold strip = good news. Errors never use a banner; they use \`bad\` text in place.
 - At most two banners above a result.`],
-  AnswerOption: ['AnswerOption', 'One answer of a multiple-choice question, with its letter (א ב ג ד) and its states.', `- States: open, \`sel\` (simulations: chosen, not judged), \`ok\` (correct, plus \`yay\` while it celebrates), \`no\` (wrong, a short shake), \`gone\` (tried and removed before the second try).
+  AnswerOption: ['AnswerOption', 'One answer of a multiple-choice question, with its letter (א ב ג ד) and its states.', `- States: open, \`sel\` (simulations: chosen, not judged), \`ok\` (correct, plus \`yay\` while it celebrates), \`no\` (wrong, a short shake), \`gone\` (tried and removed before the second try: dashed and struck through).
+- The letter badge is neutral while open; it fills with \`acc\`, \`good\` or \`bad\` with the state. \`ok\` and \`no\` also get a round check or cross at the end of the row, so the state never rests on colour alone.
 - The letter square keeps the option findable when the text is long. Pictures switch the list to a 2-column grid (\`opts grid\`).
 - Correct answers celebrate: a \`good\` ring, a sticker with a short cheer ("בול!", "על האש!"), small confetti from the option. A streak of 3, a hard question or the champion question gets the gold sticker and more confetti. Respect reduced motion.`],
-  Feedback: ['Feedback', 'The box under a question after it is answered: the result, the rule, and the full solution.', `- Title: a cheer and the points when correct, "התשובה: ג" when wrong, plus the time chip.
+  Feedback: ['Feedback', 'The box under a question after it is answered: the result, the rule, and the full solution.', `- A tinted box with a 3px cap in \`good\` (correct), \`gold\` (wrong: help, never red) or \`water\` (a worked example).
+- Title: a cheer and the points when correct, "התשובה: ג" when wrong, plus the time chip.
 - \`rule\`: the one-line rule of this question type (\`LESSONS\`). "כלל חדש" the first time.
 - The solution shows the calculation, one line per step, in a \`calc\` block. Numbers and math are always wrapped in \`ltr\`; the answer is bold gold.
 - Correct: the solution is folded under "איך פותרים". Wrong: it is open.
 - Ends with the quiet "יש בעיה בשאלה?" link.`],
-  Stats: ['Stats', 'Numbers the kid tracks: the three mini stats, the progress dots of a mission, the level dots.', `- \`mini\`: three numbers in \`stat-number\`, a \`small\` label under each. Days to the exam always first.
+  Stats: ['Stats', 'Numbers the kid tracks: the three mini stats, the progress dots of a mission, the level dots.', `- \`mini\`: three tabular numbers in \`stat-number\` in one card, a small icon above and a \`small\` label under each. Days to the exam always first.
+- Progress tracks (xp, world, chapter, rank) share one look: an \`s3\` well and a bright fill with a top highlight.
 - Progress dots: \`good\`, \`bad\`, current in \`acc\` with a glow, simulations in \`muted\` (no judgement until the end).
 - Level dots: gold, 1 to 4.`],
   Tile: ['Tile', 'A game in the arcade: icon, name, one line, the best score.', `- Each tile sets \`--tc\` to a world colour or \`violet\`; the fill and the icon square mix from it.
 - Two per row; \`wide\` spans the row for the notebook and the simulations.`],
-  Nav: ['Nav', 'The fixed bottom bar with the four main places: journey, games, progress, shop.', `- Four items, icon over a word. The current one takes \`acc\`.
+  Nav: ['Nav', 'A floating bottom bar with the four main places: journey, games, progress, shop.', `- Four items, icon over a word. The current icon sits in an \`acc\` pill (\`ni\`), its word turns \`ink\`, and the button has aria-current.
+- The bar floats 12px from the edges with a 28px radius and a blur; the sky fades in under it.
 - Fixed to the bottom with the safe-area inset; screens keep \`nav-clearance\` free under their content.`],
   Hint: ['Hint', 'The question\'s own hint: a gold note with a bulb, written for this exact question.', `- Two levels, both from \`q.hint\`: the first when the kid taps "רמז" (points the eye), the second after a first wrong try (does the first step).
 - A hint names this question\'s own numbers, words or parts. A tip that could fit any question of the type is not a hint.

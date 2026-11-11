@@ -1,0 +1,13 @@
+/* thought corner */
+.wis{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;border-color:color-mix(in srgb,var(--wk) 45%,var(--edge));background:linear-gradient(160deg,color-mix(in srgb,var(--wk) 16%,var(--panel)),var(--panel) 70%)}
+.wis::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:4px;background:var(--wk)}
+.wis-kind{color:var(--wk)}
+.wis-t{font-size:1.2rem;line-height:1.3}
+.wis-b{margin:0;line-height:1.6;color:var(--ink)}
+.wis-opts{display:flex;flex-direction:column;gap:8px}
+.wis-opt{text-align:start;padding:12px 14px;border-radius:14px;background:var(--panel2);border:1px solid var(--edge);color:var(--ink);font-size:.95rem;line-height:1.4;min-height:48px}
+.wis-opt:active{transform:translateY(1px)}
+.wis-reply{padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--wk) 12%,transparent);border:1px solid color-mix(in srgb,var(--wk) 40%,transparent)}
+.wis-reply p{margin:6px 0 0;line-height:1.55}
+.wis-try{font-size:.92rem;line-height:1.5;padding:10px 12px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--wk) 55%,var(--edge))}
+.wis-ok{align-self:flex-start;min-height:44px;padding:8px 18px;font-size:.95rem}

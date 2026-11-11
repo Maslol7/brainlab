@@ -47,7 +47,7 @@ function render() {
 function nav(v) {
   v = { me: 'stats', tips: 'stats', parent: 'stats', result: 'home' }[v] || v;
   const it = [['home', 'מסע', IC.home, 0], ['arcade', 'משחקים', IC.game, 0], ['stats', 'התקדמות', IC.chart, 0], ['shop', 'חנות', IC.shop, 0]];
-  return `<nav class="nav four"><div class="in">${it.map(([k, n, ic, dot]) => `<button data-go="${k}" class="${v === k ? 'on' : ''}">${ic}${n}${dot ? '<span class="dot"></span>' : ''}</button>`).join('')}</div></nav>`;
+  return `<nav class="nav four"><div class="in">${it.map(([k, n, ic, dot]) => `<button data-go="${k}" class="${v === k ? 'on' : ''}"${v === k ? ' aria-current="page"' : ''}><span class="ni">${ic}</span><span class="nl">${n}</span>${dot ? '<span class="dot"></span>' : ''}</button>`).join('')}</div></nav>`;
 }
 function hud() {
   const { r, pct } = rankOf(S.xp);
@@ -68,7 +68,10 @@ function modal(title, text, okLbl, onOk, okCls = 'btn-primary', single = false) 
   app.appendChild(m);
   m.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (e.target === m || (b && b.dataset.m === 'no')) m.remove(); else if (b) { m.remove(); onOk(); } });
 }
+/* the screens that rise in once when they open (not on every re-render, and never the game canvases) */
+const ENTER_VIEWS = ['home', 'arcade', 'shop', 'stats', 'tips', 'me', 'parent', 'result', 'songs'];
 function renderView() {
+  const fresh = app.dataset.v !== S.view; app.dataset.v = S.view; app.classList.toggle('enter', fresh && ENTER_VIEWS.includes(S.view));
   if (S.view !== 'quiz') stopMG();
   if (S.view === 'songs') {
     if (SL) return renderSongOnly();
