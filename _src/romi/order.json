@@ -1,0 +1,23 @@
+[
+ "src/00-core/util.js",
+ "src/00-core/sound.js",
+ "romi/src/00-base.js",
+ "romi/src/10-words.js",
+ "romi/src/20-state.js",
+ "romi/src/25-speech.js",
+ "romi/src/27-voice.js",
+ "romi/src/30-engine.js",
+ "romi/src/40-art.js",
+ "romi/src/45-kbd.js",
+ "romi/src/50-home.js",
+ "romi/src/55-practice.js",
+ "romi/src/60-test.js",
+ "romi/src/65-games.js",
+ "romi/src/66-wand.js",
+ "romi/src/70-more.js",
+ "romi/src/75-extras.js",
+ "romi/src/80-parent.js",
+ "romi/src/82-vrec.js",
+ "romi/src/85-cloud.js",
+ "romi/src/99-main.js"
+]

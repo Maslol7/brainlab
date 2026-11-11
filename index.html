@@ -6196,7 +6196,7 @@ async function pullParent(force) {
 }
 
 /* ---- 70-ui/shell.js ---- */
-const APP_VER = '30';
+const APP_VER = '33';
 function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
 async function remoteVer() { try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return null; return (await r.json()).v; } catch (e) { return null; } }
 async function doUpdate() {

@@ -6,4 +6,5 @@ run() { cd /home/claude/brainlab-src/dist && timeout 150 node -r ../tests/seed.j
 export -f run; mkdir -p /tmp/claude-0/legacy-out/new
 ls tests/legacy | xargs -P 6 -I{} bash -c 'run {}'
 for f in $(ls tests/legacy); do rc=$(cat /tmp/claude-0/legacy-out/new/$f.rc); if [ "$rc" != "0" ] || grep -qE "PE |pageerror|ERRORS [^\[]|Error:" /tmp/claude-0/legacy-out/new/$f.txt; then echo "FAIL legacy $f (rc $rc)"; grep -E "PE |pageerror|Error" /tmp/claude-0/legacy-out/new/$f.txt | head -3; fail=1; fi; done
+romi/tests/run.sh || fail=1
 [ $fail = 0 ] && echo "ALL PASS"; exit $fail

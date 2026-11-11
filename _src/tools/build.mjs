@@ -23,10 +23,25 @@ for (const f of fs.readdirSync(ROOT + 'src/static')) if (/\.(png|webmanifest)$/.
 fs.writeFileSync(ROOT + DIST + '/pwa/sw.js', rd('src/static/sw.js').replace(/__VER__/g, V));
 fs.writeFileSync(ROOT + DIST + '/pwa/version.json', JSON.stringify({ v: V }));
 console.log(`built v${V}: ${js.split('\n').length} lines of JS, ${order.length} modules`);
+/* Romi's English app (סלטה): its own page in pwa/romi/, sharing 00-core util and sound with the main app */
+{
+  const ro = JSON.parse(rd('romi/order.json'));
+  const rjs = ro.map(m => `/* ---- ${m} ---- */\n` + rd(m)).join('\n').replace(/__VER__/g, V) + '\nboot();\n';
+  new Function(rjs);
+  const rhead = rd('romi/static/head.html') + '<style>\n' + rd('romi/styles.css') + '</style>\n' + rd('romi/static/body.html');
+  const RD = ROOT + DIST + '/pwa/romi'; fs.mkdirSync(RD, { recursive: true });
+  fs.writeFileSync(ROOT + DIST + '/romi.html', rhead + '<script>\n' + rjs + '</script>\n');
+  const rsw = "if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));\n";
+  fs.writeFileSync(RD + '/index.html', rd('romi/static/pwa-top.html') + rhead + '<script>\n' + rjs + rsw + '</script>\n</body></html>\n');
+  for (const f of fs.readdirSync(ROOT + 'romi/static')) if (/\.(png|webmanifest)$/.test(f)) fs.copyFileSync(ROOT + 'romi/static/' + f, RD + '/' + f);
+  fs.writeFileSync(RD + '/sw.js', rd('romi/static/sw.js').replace(/__VER__/g, V));
+  fs.writeFileSync(RD + '/version.json', JSON.stringify({ v: V }));
+  console.log(`built romi v${V}: ${rjs.split('\n').length} lines of JS, ${ro.length} modules`);
+}
 if (release) {
   const zip = `/mnt/user-data/outputs/brainlab-pwa-v${V}.zip`;
   /* the source travels with the site in _src/ (GitHub Pages does not publish folders that start with _) */
-  execSync(`rm -rf ${ROOT}dist/pwa/_src && mkdir -p ${ROOT}dist/pwa/_src && cd ${ROOT} && cp -r src tools tests design-system README.md package.json version.json dist/pwa/_src/ && rm -rf dist/pwa/_src/tools/inventory.json`);
+  execSync(`rm -rf ${ROOT}dist/pwa/_src && mkdir -p ${ROOT}dist/pwa/_src && cd ${ROOT} && cp -r src romi tools tests design-system README.md package.json version.json dist/pwa/_src/ && rm -rf dist/pwa/_src/tools/inventory.json`);
   execSync(`cd ${ROOT}dist/pwa && rm -f ${zip} && zip -qr ${zip} .`);
   console.log('zip', zip);
 }

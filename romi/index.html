@@ -1,0 +1,1851 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F6F7FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1124" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="סלטה">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+</head>
+<body>
+<title>סלטה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Heebo:wght@400;500;700;800&family=Andika:wght@400;700&display=swap">
+<style>
+/* סלטה. Layout: the competition floor. A blue mat with its white boundary line holds the countdown; the words are the routine under it; games are apparatus tiles.
+   Type: Secular One for headings and scores (scoreboard), Heebo for Hebrew text, Andika for English words (school letters: one-storey a and g, like she writes them). */
+:root{
+  --chalk:#F5F6FB; --surface:#FFFFFF; --surface-2:#EDF0F8; --line:#DDE2EF; --ink:#151936; --ink-2:#5C6388; --ink-3:#8B92B4;
+  --floor:#2D5BFF; --floor-2:#1F44D6; --floor-ink:#FFFFFF; --leo:#FF3D8B; --leo-soft:#FFE3EF; --candy:#FFB915; --candy-soft:#FFF3D1;
+  --good:#10A87C; --good-soft:#DDF6EE; --bad:#E5395A; --bad-soft:#FDE6EA; --paper:#FFFDF6; --paper-ink:#24263F; --paper-line:rgba(45,91,255,.22); --red-pen:#D8243F;
+  --key:#FFFFFF; --key-shadow:#C4CADD; --shadow:0 1px 2px rgba(21,25,54,.06),0 8px 24px -12px rgba(21,25,54,.18);
+  --g0:#2D5BFF; --g1:#FF3D8B; --g2:#0FA3B1; --g3:#7B61FF; --g4:#F28C28; --g5:#10A87C;
+  --f-display:'Secular One','Heebo','Arial Hebrew',system-ui,sans-serif; --f-body:'Heebo','Arial Hebrew',system-ui,sans-serif; --f-word:'Andika','Heebo',system-ui,sans-serif;
+  --r:18px; --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --chalk:#0E1124; --surface:#171B35; --surface-2:#20264A; --line:#2B3260; --ink:#EEF0FF; --ink-2:#A6ACD6; --ink-3:#737BA8;
+  --floor:#3B63F5; --floor-2:#2A4AD0; --leo:#FF5C9E; --leo-soft:#3A1C33; --candy:#FFC63D; --candy-soft:#3A3018;
+  --good:#2FD3A2; --good-soft:#14362E; --bad:#FF6A83; --bad-soft:#3E1C27; --paper:#FFFCF2; --paper-ink:#24263F;
+  --key:#2A3159; --key-shadow:#11152E; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.6);
+  --g0:#5C80FF; --g1:#FF5C9E; --g2:#2CC4D2; --g3:#9A86FF; --g4:#FF9F45; --g5:#2FD3A2; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --chalk:#0E1124; --surface:#171B35; --surface-2:#20264A; --line:#2B3260; --ink:#EEF0FF; --ink-2:#A6ACD6; --ink-3:#737BA8;
+  --floor:#3B63F5; --floor-2:#2A4AD0; --leo:#FF5C9E; --leo-soft:#3A1C33; --candy:#FFC63D; --candy-soft:#3A3018;
+  --good:#2FD3A2; --good-soft:#14362E; --bad:#FF6A83; --bad-soft:#3E1C27; --paper:#FFFCF2; --paper-ink:#24263F;
+  --key:#2A3159; --key-shadow:#11152E; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.6);
+  --g0:#5C80FF; --g1:#FF5C9E; --g2:#2CC4D2; --g3:#9A86FF; --g4:#FF9F45; --g5:#2FD3A2; color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--chalk);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+body{min-height:100vh;min-height:100dvh}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation;text-align:inherit}
+button:disabled{cursor:default}
+:focus-visible{outline:3px solid var(--floor);outline-offset:2px;border-radius:10px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;line-height:1.15;text-wrap:balance}
+h1{font-size:1.65rem} h2{font-size:1.28rem} h3{font-size:1.1rem}
+p{margin:.35em 0}
+.small{font-size:.86rem}.muted{color:var(--ink-2)}.center{text-align:center}.grow{flex:1;min-width:0}.bad{color:var(--bad)}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.row.center{justify-content:center}
+.stack{display:flex;flex-direction:column;gap:12px}
+.en{font-family:var(--f-word);direction:ltr;unicode-bidi:isolate}
+#app{max-width:540px;margin:0 auto}
+.page{padding-block:calc(var(--safe-t) + 14px) calc(var(--safe-b) + 28px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 18px;border-radius:14px;font-family:var(--f-display);font-size:1.08rem;transition:transform .12s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn-main{background:var(--floor);color:var(--floor-ink);box-shadow:0 4px 0 var(--floor-2)}
+.btn-main:active{box-shadow:0 1px 0 var(--floor-2);transform:translateY(3px)}
+.btn-ghost{background:var(--surface-2);color:var(--ink)}
+.btn-danger{background:var(--bad);color:#fff}
+.btn.big{min-height:58px;font-size:1.22rem;width:100%}
+.btn:disabled{opacity:.45;box-shadow:none}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;min-height:40px;border-radius:999px;background:var(--surface-2);color:var(--ink);font-size:.92rem;font-weight:500}
+.chip.on{background:var(--ink);color:var(--chalk)}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-family:var(--f-display);font-size:1.02rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.icon-btn{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--surface-2);color:var(--ink)}
+.icon-btn.say{color:var(--floor);background:color-mix(in srgb,var(--floor) 12%,var(--surface))}
+.icon-btn.say.big{width:88px;height:88px;border-radius:50%;background:var(--floor);color:#fff;box-shadow:0 0 0 10px color-mix(in srgb,var(--floor) 14%,transparent);animation:pulse 2.4s infinite}
+.icon-btn.say.big svg{width:40px;height:40px}
+@keyframes pulse{50%{box-shadow:0 0 0 16px color-mix(in srgb,var(--floor) 6%,transparent)}}
+.dadv{font-size:.8rem;font-weight:700;color:var(--leo);background:var(--leo-soft);padding:2px 10px;border-radius:99px}
+.txt{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:16px}
+.txt:focus{outline:none;border-color:var(--floor)}
+textarea.txt{resize:vertical;line-height:1.6}
+label.small{display:flex;flex-direction:column;gap:6px}
+label.small.row{flex-direction:row}
+.tag{font-size:.8rem;font-weight:700;color:var(--ink-2);background:var(--surface-2);padding:3px 10px;border-radius:99px;font-variant-numeric:tabular-nums}
+.tag.candy{color:#8A5A00;background:var(--candy-soft)}
+/* header */
+.top{display:flex;align-items:center;gap:12px}
+.ava{width:56px;height:56px;border-radius:50%;background:var(--leo-soft);overflow:hidden;flex:none;display:grid;place-items:center;box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--leo)}
+.ava .romi{width:58px;height:58px;margin-top:6px}
+.top .sub{color:var(--ink-2);font-size:.92rem}
+.pills{display:flex;gap:6px}
+.bar{display:flex;align-items:center;gap:10px;min-height:48px}
+.bar h2{flex:1;font-size:1.2rem}
+.prog{flex:1;height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.page > .prog{flex:none}
+.prog i{display:block;height:100%;background:var(--floor);border-radius:99px;transition:width .4s}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sec{margin-top:4px}
+.block{display:flex;flex-direction:column;gap:10px}
+/* the floor: countdown on the blue mat, inside its white boundary line */
+.floor{display:flex;flex-direction:column;gap:12px}
+.mat{position:relative;display:flex;align-items:flex-end;gap:8px;min-height:176px;padding:22px 22px 16px;border-radius:22px;color:var(--floor-ink);overflow:hidden;
+  background:repeating-linear-gradient(90deg,transparent 0 25%,rgba(255,255,255,.05) 25% 50%),linear-gradient(160deg,var(--floor),var(--floor-2))}
+.mat::before{content:'';position:absolute;inset:10px;border:2px solid rgba(255,255,255,.75);border-radius:14px;pointer-events:none}
+.fl-txt{position:relative;flex:1;min-width:0;align-self:stretch;display:flex;flex-direction:column}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.06em;opacity:.85}
+.fl-date{font-family:var(--f-display);font-size:1.25rem}
+.fl-count{margin-top:auto;display:flex;align-items:baseline;gap:8px;font-family:var(--f-display)}
+.fl-count b{font-weight:400;font-size:4.2rem;line-height:.9;font-variant-numeric:tabular-nums}
+.fl-count span{font-size:1.3rem}
+.chip.on-mat{margin-top:auto;align-self:flex-start;background:rgba(255,255,255,.18);color:#fff}
+.fl-romi{position:relative;width:86px;flex:none;margin-bottom:-6px}
+.floor.did .fl-romi .romi{animation:sway 2.6s ease-in-out infinite;transform-origin:50% 95%}
+.romi{display:block;width:100%;height:auto;overflow:visible}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.days{display:flex;gap:4px;justify-content:space-between}
+.dd{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.72rem;color:var(--ink-3)}
+.dd b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--surface);border:1.5px solid var(--line);font-family:var(--f-display);font-weight:400;font-size:.95rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.dd.done b{background:var(--good);color:#fff;border-color:transparent}
+.dd.today b{border-color:var(--floor);color:var(--floor);border-width:2.5px}
+.dd.today small{color:var(--floor);font-weight:700}
+.dd.miss b{opacity:.45}
+.dd.exam b{background:var(--leo);color:#fff;border-color:transparent}
+.dd.exam small{color:var(--leo);font-weight:700}
+/* the routine: the words */
+.routine{display:flex;flex-direction:column;gap:12px}
+.wlist{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wchip{position:relative;display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;border-radius:14px;background:var(--surface);border:1px solid var(--line);min-width:0}
+.wem{display:grid;place-items:center;width:42px;height:42px;flex:none;border-radius:12px;background:var(--surface-2);font-size:1.45rem}
+.wtx{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.wchip .w{font-size:1.08rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:start}
+.segs{display:flex;gap:2px;direction:rtl}
+.segs i{flex:1;height:5px;border-radius:3px;background:var(--surface-2)}
+.segs i.on{background:var(--floor)}
+.wchip.star{border-color:color-mix(in srgb,var(--candy) 60%,transparent);background:color-mix(in srgb,var(--candy) 9%,var(--surface))}
+.wchip.star .segs i{background:var(--candy)}
+.wchip .st{position:absolute;top:5px;inset-inline-end:6px}
+.hint{margin:0;color:var(--ink-2);font-size:.88rem;text-align:center}
+/* actions: mock dictation, review */
+.duo{display:grid;grid-template-columns:1fr;gap:8px}
+.act{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.act b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.08rem}
+.act .grow span{display:block;color:var(--ink-2);font-size:.85rem}
+.act-ic{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:color-mix(in srgb,var(--floor) 12%,var(--surface));color:var(--floor)}
+.act:last-child .act-ic{background:color-mix(in srgb,var(--g2) 14%,var(--surface));color:var(--g2)}
+.grade{font-family:var(--f-display);font-size:1.25rem;color:var(--red-pen);border:2px solid var(--red-pen);border-radius:50%;width:50px;height:50px;display:grid;place-items:center;transform:rotate(-8deg);flex:none;background:var(--paper)}
+.grade.good{color:#0E8A62;border-color:#0E8A62}
+/* games: apparatus tiles */
+.games{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.game{--gc:var(--g0);position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:14px;min-height:124px;border-radius:18px;background:color-mix(in srgb,var(--gc) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--gc) 22%,transparent)}
+.game.g1{--gc:var(--g1)}.game.g2{--gc:var(--g2)}.game.g3{--gc:var(--g3)}.game.g4{--gc:var(--g4)}.game.g5{--gc:var(--g5)}
+.gic{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:var(--gc);color:#fff;margin-bottom:6px}
+.game b{font-family:var(--f-display);font-weight:400;font-size:1.08rem}
+.gd{color:var(--ink-2);font-size:.84rem;line-height:1.35}
+.best{margin-top:auto;padding-top:4px;font-size:.78rem;font-weight:700;color:var(--gc)}
+.packs{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-inline:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-inline:max(16px,env(safe-area-inset-right,0px));scroll-snap-type:x mandatory;scrollbar-width:none}
+.packs::-webkit-scrollbar{display:none}
+.pack{flex:none;width:136px;display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;background:var(--surface);border:1px solid var(--line);scroll-snap-align:start}
+.pk-em{font-size:1.35rem;letter-spacing:2px}
+.pack b{font-family:var(--f-display);font-weight:400;font-size:1rem}
+.bar2{margin-top:auto;width:100%;height:5px;border-radius:9px;background:var(--surface-2);overflow:hidden}
+.bar2 i{display:block;height:100%;background:var(--leo)}
+.foot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding-top:4px}
+.foot .chip{background:transparent;border:1px solid var(--line);color:var(--ink-2)}
+/* notes: from dad, birthday */
+.note{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:16px;background:var(--leo-soft);color:var(--ink)}
+.note b{display:block;color:var(--leo);font-family:var(--f-display);font-weight:400}
+.note-ic{color:var(--leo);flex:none}
+.note.static{cursor:default}
+.bday{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;color:#fff;background:linear-gradient(120deg,var(--leo),#FF8A3D)}
+.bday b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.2rem}
+.bday span{font-size:.88rem;opacity:.95}
+.bd-ic{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.2);flex:none}
+.soon{display:flex;align-items:center;gap:8px;align-self:flex-start;padding:6px 12px;border-radius:99px;background:var(--leo-soft);color:var(--leo);font-weight:700;font-size:.88rem}
+.confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:70}
+/* practice */
+.play{min-height:100vh;min-height:100dvh}
+.play.haskbd{padding-bottom:0}
+.mini-romi{position:fixed;top:calc(var(--safe-t) + 68px);inset-inline-start:max(10px,calc(50% - 260px));width:44px;z-index:2;pointer-events:none}
+.mini-romi.hop{animation:hop .6s ease-out}
+.mini-romi.flip{animation:flip 1s ease-in-out}
+.mini-romi.wobble,.tr-romi.wobble{animation:wobble .5s}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-26px)}}
+@keyframes flip{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-40px) rotate(-180deg)}100%{transform:translateY(0) rotate(-360deg)}}
+@keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+.q{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.ask{color:var(--ink-2);font-weight:700;font-size:.95rem}
+.prompt{display:flex;flex-direction:column;align-items:center;gap:10px}
+.prompt .em{font-size:3rem;line-height:1}
+.em.big{font-size:4rem;line-height:1}
+.word{font-family:var(--f-word);font-weight:700;font-size:2.6rem;direction:ltr;line-height:1.15}
+.word.huge,.he.huge{font-size:3rem}
+.he{font-size:1.3rem;font-weight:700}
+.he.big{font-size:2.1rem;font-family:var(--f-display);font-weight:400}
+.learn{display:flex;flex-direction:column;align-items:center;gap:10px}
+.lt{display:inline-block;transition:transform .2s,color .2s}
+.lt.lit{color:var(--leo);transform:translateY(-8px) scale(1.25)}
+.lt.sp{width:.5em}
+.tip{position:relative;background:var(--candy-soft);color:var(--ink);border-radius:12px;padding:10px 12px 10px 12px;padding-inline-start:30px;font-size:.92rem;text-align:start;margin:0}
+.tip::before{content:'';position:absolute;inset-inline-start:12px;top:15px;width:8px;height:8px;border-radius:50%;background:var(--candy)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{min-height:66px;padding:10px;border-radius:16px;background:var(--surface);border:2px solid var(--line);font-family:var(--f-word);font-size:1.35rem;font-weight:700;text-align:center;box-shadow:0 3px 0 var(--line);transition:transform .1s}
+.opts.he .opt{font-family:var(--f-body)}
+.opts:has(> :nth-child(3):last-child){grid-template-columns:repeat(3,1fr)}
+.opts:has(> :nth-child(3):last-child) .opt{font-size:1.2rem;padding:8px 4px}
+.opt:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.opt.good,.opt.show{background:var(--good-soft);border-color:var(--good);box-shadow:0 3px 0 var(--good)}
+.opt.show{animation:glow 1s infinite}
+.opt.bad{background:var(--bad-soft);border-color:var(--bad);opacity:.75;box-shadow:none}
+@keyframes glow{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--good) 25%,transparent)}}
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+#fb:empty{display:none}
+.fb{border-radius:14px;padding:12px 14px;text-align:center;font-weight:700;animation:pop .25s}
+.fb-good{background:var(--good-soft);color:var(--ink)}
+.fb-bad{background:var(--bad-soft);color:var(--ink)}
+.fb .small{font-weight:400;color:var(--ink-2);margin-top:4px}
+.fb .big{font-size:1.4rem}
+.plus{display:inline-flex;align-items:center;gap:4px;color:#B07800}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+.cmp{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0}
+.cmp .lbl{font-size:.78rem;color:var(--ink-2);width:40px;font-weight:500}
+.mine,.right{font-family:var(--f-word);font-size:1.8rem;letter-spacing:.05em}
+.mine{color:var(--ink-2)}
+.mine .diff{color:var(--bad);text-decoration:line-through;text-decoration-thickness:2px}
+.right .diff{color:var(--leo);text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px}
+.fixing .q .ask,.fixing .q .chip,.fixing .q [data-say="slow"],.fixing .dadv{display:none}
+.fixing .icon-btn.say.big{width:56px;height:56px;animation:none}.fixing .icon-btn.say.big svg{width:28px;height:28px}
+.fixing .he.big,.fixing .word{font-size:1.5rem}
+.ans{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.haskbd .ans{position:sticky;bottom:0;z-index:3;margin-inline:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) calc(var(--safe-b) + 8px);background:var(--surface-2);border-radius:20px 20px 0 0}
+.typed{min-height:60px;border-radius:14px;background:var(--surface);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--f-word);font-weight:700;font-size:2rem;letter-spacing:.04em;padding:4px 10px}
+.typed.he{font-family:var(--f-body);letter-spacing:0}
+.caret{display:inline-block;width:3px;height:1.1em;background:var(--floor);margin-inline-start:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.slots{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;direction:ltr}
+.slot{width:38px;height:50px;border-radius:10px;border-bottom:3px solid var(--ink-3);background:var(--surface);display:grid;place-items:center;font-family:var(--f-word);font-size:1.7rem;font-weight:700}
+.slot.full{border-color:var(--floor);background:color-mix(in srgb,var(--floor) 10%,var(--surface))}
+.slot.gap{width:14px;background:none;border:0}
+.kbd{display:flex;flex-direction:column;gap:8px;padding-top:2px;user-select:none;-webkit-user-select:none}
+.krow{display:flex;gap:5px;justify-content:center}
+.key{flex:1;max-width:44px;height:48px;border-radius:9px;background:var(--key);color:var(--ink);font-family:var(--f-word);font-size:1.4rem;font-weight:700;text-align:center;box-shadow:0 2px 0 var(--key-shadow)}
+.kbd.he .key{font-family:var(--f-body);font-size:1.3rem;font-weight:500}
+.key:active{background:var(--floor);color:#fff;transform:translateY(1px);box-shadow:none}
+.key.fn{max-width:62px;flex:1.4;display:grid;place-items:center;background:var(--surface)}
+.key.space{max-width:none;flex:3;font-size:1rem;font-family:var(--f-body);font-weight:500}
+.key.enter{max-width:none;flex:2;background:var(--floor);color:#fff;font-size:1.05rem;font-family:var(--f-display);font-weight:400;box-shadow:0 2px 0 var(--floor-2)}
+.tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;direction:ltr}
+.tile{width:52px;height:58px;border-radius:12px;background:var(--surface);color:var(--ink);border:2px solid var(--line);font-family:var(--f-word);font-size:1.8rem;font-weight:700;text-align:center;box-shadow:0 4px 0 var(--line)}
+.tile:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.tile:disabled{opacity:.2;box-shadow:none}
+.tile.fn{display:grid;place-items:center;background:var(--surface-2);border-color:transparent;box-shadow:none}
+.tile.glow{animation:glow 1s infinite;border-color:var(--candy)}
+/* done */
+.done{align-items:stretch}
+.big-romi{width:116px;margin:0 auto}
+.big-romi.flip{animation:flip 1.2s ease-in-out .2s 2}
+.earned{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-display);font-size:2.1rem;color:#B07800;font-variant-numeric:tabular-nums}
+.done .wchips,.wchips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* paper: the mock dictation, like a page in her notebook */
+.paper{background:var(--paper);color:var(--paper-ink);border-radius:12px;padding:12px 16px;background-image:repeating-linear-gradient(180deg,transparent 0 31px,var(--paper-line) 31px 32px);box-shadow:var(--shadow);position:relative;max-height:30vh;overflow:auto}
+.paper::after{content:'';position:absolute;top:0;bottom:0;inset-inline-start:52px;width:1.5px;background:rgba(216,36,63,.35)}
+.paper.result,.paper.check{max-height:none}
+.paper ol{margin:0;padding-inline-start:48px;line-height:32px;font-family:var(--f-word);font-size:1.12rem}
+.paper li .muted{color:#7B7393}
+.paper.result h2{font-size:1.1rem;margin:0 0 6px;padding-inline-end:84px;min-height:64px;padding-inline-start:20px}
+.grade-big{position:absolute;top:10px;inset-inline-end:12px;width:72px;height:72px;border-radius:50%;border:3px solid var(--red-pen);color:var(--red-pen);display:grid;place-items:center;font-family:var(--f-display);font-size:1.8rem;transform:rotate(-10deg);z-index:1}
+.grade-big.good{color:#0E8A62;border-color:#0E8A62}
+.ln .ok{color:#0E7A55}.ln .no{color:var(--red-pen);text-decoration:line-through}
+.ln .fix{color:var(--red-pen);font-weight:700}
+.paper.check li{display:flex;align-items:center;gap:6px}
+.mk{width:40px;height:30px;border-radius:8px;background:rgba(0,0,0,.06);color:#888;font-size:1.1rem;text-align:center}
+.mk.on.ok{background:#0E8A62;color:#fff}.mk.on.no{background:var(--red-pen);color:#fff}
+/* games */
+.scene{position:relative;height:min(270px,34vh);flex:none;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#9FC2FF,#D9E7FF 70%,#EEF3FF)}
+.trail{position:absolute;top:14px;left:0;right:0;text-align:center;font-family:var(--f-word);font-size:2.5rem;font-weight:700;letter-spacing:.06em;color:var(--floor-2)}
+.tramp{position:absolute;bottom:14px;left:50%;width:150px;height:20px;margin-left:-75px;border-radius:50%;background:radial-gradient(ellipse at center,#20264A 40%,#2D5BFF 41%,#2D5BFF 62%,#1F44D6 63%);box-shadow:0 8px 0 -4px #1F44D6}
+.tr-romi{--h:40px;position:absolute;bottom:26px;left:50%;width:80px;margin-left:-40px;transform-origin:50% 60%}
+.tr-romi.boing{animation:boing .7s ease-out}
+.tr-romi.tflip{animation:tflip 1.2s ease-in-out}
+@keyframes boing{0%,100%{transform:translateY(0)}45%{transform:translateY(calc(-1*var(--h)))}}
+@keyframes tflip{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-150px) rotate(-180deg)}100%{transform:translateY(0) rotate(-360deg)}}
+.prompt.rp{flex-direction:row;flex-wrap:wrap;justify-content:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px}
+.prompt.rp .em{font-size:2rem}
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mcard{position:relative;height:94px;border-radius:16px;perspective:600px}
+.mcard .back,.mcard .face{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .35s}
+.mcard .back{background:var(--surface);border:1px solid var(--line);box-shadow:0 3px 0 var(--line)}
+.mcard .face{background:var(--paper);color:var(--paper-ink);transform:rotateY(180deg);font-size:.95rem;padding:4px;text-align:center;border:1px solid var(--line)}
+.mcard .face b{font-family:var(--f-word);font-size:1.25rem}
+.mcard .face .em{font-size:1.7rem}
+.mcard.up .back{transform:rotateY(180deg)}.mcard.up .face{transform:rotateY(0)}
+.mcard.got .face{background:#DDF6EE;box-shadow:0 0 0 3px var(--good)}
+.rain{position:relative;height:calc(100dvh - 280px);min-height:320px;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,color-mix(in srgb,var(--g2) 18%,var(--surface)),var(--surface))}
+.lives{position:absolute;top:8px;inset-inline-start:10px;z-index:2;font-size:1.1rem}
+.orb{--c:var(--g0);position:absolute;top:0;width:30%;min-height:66px;padding:6px 4px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--c);color:#fff;box-shadow:0 6px 16px -6px var(--c);will-change:transform;text-align:center}
+.orb b{font-family:var(--f-word);font-size:1.2rem}
+.orb.burst{animation:burst .4s forwards}
+.orb.wrong{background:var(--bad);opacity:.6}
+.orb.gone{opacity:0;transition:opacity .3s}
+.orb.show{box-shadow:0 0 0 4px var(--candy)}
+@keyframes burst{to{transform:scale(1.6);opacity:0}}
+.teach .word,.teach .he{margin:16px 0}
+.speak{padding-top:8px}
+.micbtn{display:grid;place-items:center;width:92px;height:92px;border-radius:50%;background:var(--leo);color:#fff;margin-top:8px;box-shadow:0 0 0 10px var(--leo-soft)}
+.micbtn svg{width:40px;height:40px}
+.micbtn.on{animation:pulse2 1s infinite}
+@keyframes pulse2{50%{box-shadow:0 0 0 18px var(--leo-soft)}}
+/* shop */
+.shoptop{display:flex;align-items:center;gap:16px}
+.shoptop .big-romi{width:100px;margin:0}
+.jar{position:relative;width:96px;height:118px;margin:0 auto;border-radius:18px 18px 26px 26px;border:3px solid var(--line);overflow:hidden;background:var(--surface-2)}
+.jar i{position:absolute;bottom:0;left:0;right:0;background:repeating-radial-gradient(circle at 30% 40%,var(--leo) 0 6px,var(--candy) 6px 12px,var(--g2) 12px 18px);opacity:.9}
+.jar span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-size:1.8rem;color:var(--ink);text-shadow:0 0 6px var(--surface),0 0 12px var(--surface)}
+.shopgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.shopit{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:14px;background:var(--surface);border:1px solid var(--line);text-align:center}
+.shopit.cur{border:2px solid var(--leo);background:var(--leo-soft)}
+.shopit .sw{width:40px;height:40px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+.album{display:flex;flex-wrap:wrap;gap:10px}
+.sticker{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:76px;height:76px;border-radius:50%;background:radial-gradient(circle,#FFF6DA,#FFC63D);color:#3A2600;font-size:2rem;box-shadow:0 3px 0 #C99A1E;transform:rotate(-6deg)}
+.sticker small{font-size:.6rem;font-weight:700}
+/* the Magic E wand */
+.sent{font-family:var(--f-word);font-size:1.6rem;font-weight:700;line-height:1.4;text-align:center;padding:8px 4px}
+.sent .blank{color:var(--floor);letter-spacing:.1em}
+.opts.two .opt{min-height:96px;font-size:2rem}
+/* recording a whole list */
+.vrec{min-height:100vh;min-height:100dvh}
+.recdot{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--bad);font-weight:700}
+.recdot i{width:12px;height:12px;border-radius:50%;background:var(--bad);animation:blink 1s steps(1) infinite}
+.vr-word{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 0;text-align:center}
+.vr-word .em{font-size:3.4rem;line-height:1}.vr-word .word{font-size:3.2rem}
+.vr-next{margin-top:auto;min-height:38vh;border-radius:24px;background:var(--floor);color:#fff;font-family:var(--f-display);font-size:1.5rem;text-align:center;box-shadow:0 6px 0 var(--floor-2)}
+.vr-next:active{transform:translateY(4px);box-shadow:0 2px 0 var(--floor-2)}
+/* parent */
+.parent h3{color:var(--floor)}
+.howto{margin:0;padding-inline-start:20px;font-size:.9rem;color:var(--ink-2);line-height:1.7}
+details summary{cursor:pointer;padding:4px 0}
+details .txt{margin:6px 0}
+.lrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lrow:last-child{border:0}
+.ptab{width:100%;border-collapse:collapse;font-size:.88rem}
+.ptab th{color:var(--ink-2);font-weight:500;text-align:start;padding:4px}
+.ptab td{padding:6px 4px;border-top:1px solid var(--line)}
+.drow{display:grid;grid-template-columns:52px 1fr 1fr 40px;gap:6px;align-items:center}
+.drow .txt{padding:9px 8px}
+.drow .em{text-align:center}
+.draft .row .txt[type=date]{width:auto}
+.vlist{display:flex;flex-direction:column}
+.vrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.vrow:last-child{border:0}
+.vw{flex:1;font-family:var(--f-word);font-weight:700;font-size:1.1rem}
+.vrow.has .vw::after{content:' ✓';color:var(--good)}
+.vbtn{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--surface-2);color:var(--ink)}
+.vbtn.rec{color:var(--bad)}
+.vbtn.rec.on{background:var(--bad);color:#fff;animation:pulse2 1s infinite}
+.vbtn:disabled{opacity:.35}
+.pin{text-align:center;font-size:1.6rem;letter-spacing:.5em;max-width:200px;margin:0 auto}
+.sel{user-select:all;-webkit-user-select:all}
+/* modal and toast */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(14,17,36,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:calc(var(--safe-b) + 16px);animation:fade .2s;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.sheet{width:100%;max-width:480px;max-height:88vh;overflow:auto;animation:up .25s}
+.sheet h3{font-size:1.35rem;margin-bottom:8px;text-align:center}
+.sheet .romi{width:88px;margin:0 auto}
+.mbtns{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.wcard{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.steps{display:flex;gap:4px}
+.steps span{width:24px;height:7px;border-radius:9px;background:var(--surface-2)}
+.steps span.on{background:var(--floor)}
+@keyframes fade{from{opacity:0}}
+@keyframes up{from{transform:translateY(30px);opacity:0}}
+#toast{position:fixed;left:50%;top:calc(var(--safe-t) + 12px);transform:translate(-50%,-160%);z-index:60;max-width:90vw;background:var(--ink);color:var(--chalk);padding:12px 18px;border-radius:14px;text-align:center;transition:transform .3s;box-shadow:var(--shadow);font-weight:500}
+#toast.on{transform:translate(-50%,0)}
+@media (max-height:700px){.key{height:44px}.icon-btn.say.big{width:72px;height:72px}.prompt .em{font-size:2.4rem}.word{font-size:2.1rem}.mat{min-height:150px}.fl-count b{font-size:3.4rem}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+<div id="app" dir="rtl" lang="he"></div>
+<script>
+/* ---- src/00-core/util.js ---- */
+const R = Math.random;
+const ri = (a, b) => a + Math.floor(R() * (b - a + 1));
+const pick = a => a[Math.floor(R() * a.length)];
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function mc(opts) { const idx = shuffle(opts.map((_, i) => i)); return { options: idx.map(i => opts[i]), answer: idx.indexOf(0) }; }
+const fmt = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
+const L = s => `<span class="ltr" dir="ltr">${s}</span>`;
+/* ---------- state ---------- */
+function todayStr(d = new Date()) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function dayDiff(a, b) { const [y1, m1, d1] = a.split('-').map(Number), [y2, m2, d2] = b.split('-').map(Number); return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 864e5); }
+function addDays(s, n) { const [y, m, d] = s.split('-').map(Number); return todayStr(new Date(y, m - 1, d + n)); }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const strip = s => String(s || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+const weekKey = () => Math.floor(dayDiff(S.start, todayStr()) / 7);
+const arr = x => Array.isArray(x) ? x.filter(v => v != null) : x && typeof x === 'object' ? Object.values(x) : [];
+
+/* ---- src/00-core/sound.js ---- */
+/* ---------- sound ---------- */
+let AC = null;
+function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+function tone(f, t0, dur, type = 'triangle', vol = .16) { if (!S.sound) return; const a = ac(); if (!a) return; const o = a.createOscillator(), gn = a.createGain(), t = a.currentTime + t0; o.type = type; o.frequency.value = f; gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + .012); gn.gain.exponentialRampToValueAtTime(.0008, t + dur); o.connect(gn); gn.connect(a.destination); o.start(t); o.stop(t + dur + .05); }
+const NOTES = [261.63, 293.66, 329.63, 349.23, 392, 440, 493.88, 523.25];
+function pianoNote(f) { tone(f, 0, 1.1, 'triangle', .22); tone(f * 2, 0, .5, 'sine', .05); }
+const SFX = {
+  ok() { tone(660, 0, .12); tone(990, .08, .2); }, no() { tone(180, 0, .28, 'sawtooth', .07); buzz(60); },
+  combo() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .07, .22)); }, coin() { tone(988, 0, .08, 'square', .05); tone(1319, .07, .22, 'square', .05); },
+  hit() { tone(140, 0, .16, 'square', .1); tone(90, .05, .2, 'sawtooth', .06); }, win() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, i * .11, .28)); }, tap() { tone(520, 0, .04, 'sine', .05); },
+  beep() { tone(1760, 0, .09, 'square', .05); }, soft() { tone(392, 0, .14, 'sine', .07); tone(330, .1, .2, 'sine', .06); buzz(30); },
+};
+function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { } }
+
+/* ---- romi/src/00-base.js ---- */
+/* ---------- סלטה: Romi's English words app. Base: page, small helpers, toast and modal ---------- */
+document.documentElement.setAttribute('dir', 'rtl');
+document.documentElement.setAttribute('lang', 'he');
+const APP_VER = '33';
+const APP_URL = 'https://maslol7.github.io/brainlab/romi/';
+const app = document.getElementById('app');
+const NAME = 'רומי';
+const DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+function dateHe(s) { if (!s) return ''; const [y, m, d] = s.split('-').map(Number); const dt = new Date(y, m - 1, d); return `יום ${DAYS[dt.getDay()]} ${d}.${m}`; }
+const EN = s => `<span class="en" dir="ltr">${esc(s)}</span>`;
+const plural = (n, one, many) => n === 1 ? one : `${n} ${many}`;
+let timers = [];
+const later = (fn, ms) => { const h = setTimeout(fn, ms); timers.push(h); return h; };
+function clearTimers() { timers.forEach(h => { clearTimeout(h); clearInterval(h); }); timers = []; if (typeof RAF !== 'undefined' && RAF) { cancelAnimationFrame(RAF); RAF = 0; } }
+function toast(msg, ms = 2600) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), ms); }
+/* modal(title, html, buttons): buttons = [[label, fn, cls]]; a click outside closes it */
+function modal(title, html, buttons = [['סגור']]) {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card sheet" role="dialog" aria-modal="true">${title ? `<h3>${title}</h3>` : ''}<div class="mbody">${html}</div><div class="mbtns">${buttons.map(([l, , c], i) => `<button class="btn ${c || (i === 0 ? 'btn-main' : 'btn-ghost')}" data-mi="${i}">${l}</button>`).join('')}</div></div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e => { const b = e.target.closest('[data-mi]'); if (e.target !== m && !b) return; m.remove(); if (b) { const fn = buttons[+b.dataset.mi][1]; if (fn) fn(); } });
+  return m;
+}
+const on = (sel, fn, root = app) => { root.querySelectorAll(sel).forEach(e => e.onclick = ev => fn(e, ev)); };
+
+/* ---- romi/src/10-words.js ---- */
+/* ---------- words: the class lists, bonus packs, spelling families, and the parser for the teacher's message ---------- */
+const W = (en, he, em) => ({ en, he: Array.isArray(he) ? he : [he], em: em || '' });
+/* the first list, from the teacher's message (dictation on 18.11.2026) */
+const LIST0 = {
+  id: 'c-2026-11-18', t: 'הכתבה 18.11', date: '2026-11-18', src: 'class', he: true,
+  words: [W('Neighbor', ['שכן', 'שכנה'], '🏡'), W('Flower', 'פרח', '🌷'), W('Road', 'כביש', '🛣️'), W('Plane', 'מטוס', '✈️'), W('Mountain', 'הר', '⛰️'), W('Below', 'מתחת', '⬇️'), W('Between', 'בין', '↔️'), W('Grass', 'דשא', '🌱')],
+};
+/* bonus packs: her world. Hebrew writing is not asked here, only the English */
+const PACKS = [
+  { id: 'p-acro', t: 'אקרובטיקה', em: '🤸‍♀️', c: 'var(--pink)', words: [W('jump', 'לקפוץ', '🦘'), W('flip', ['סלטה', 'היפוך'], '🔄'), W('balance', 'שיווי משקל', '⚖️'), W('strong', ['חזק', 'חזקה'], '💪'), W('team', ['נבחרת', 'קבוצה'], '👯‍♀️'), W('coach', ['מאמן', 'מאמנת'], '📣'), W('stretch', ['מתיחה', 'למתוח'], '🧘‍♀️'), W('medal', 'מדליה', '🥇'), W('trophy', 'גביע', '🏆'), W('practice', ['אימון', 'להתאמן'], '⏱️')] },
+  { id: 'p-sweet', t: 'ממתקים', em: '🍬', c: 'var(--gold)', words: [W('candy', ['ממתק', 'סוכרייה'], '🍬'), W('chocolate', 'שוקולד', '🍫'), W('sugar', 'סוכר', '🧂'), W('cookie', 'עוגייה', '🍪'), W('sweet', 'מתוק', '🍭'), W('honey', 'דבש', '🍯'), W('cupcake', 'קאפקייק', '🧁'), W('lollipop', 'סוכרייה על מקל', '🍭'), W('donut', 'סופגנייה', '🍩')] },
+  { id: 'p-friends', t: 'חברות', em: '👭', c: 'var(--mint)', words: [W('friend', ['חבר', 'חברה'], '👭'), W('together', 'ביחד', '🤝'), W('share', ['לשתף', 'לחלוק'], '🍪'), W('laugh', 'לצחוק', '😂'), W('secret', 'סוד', '🤫'), W('play', 'לשחק', '🎲'), W('hug', 'חיבוק', '🤗'), W('happy', ['שמח', 'שמחה'], '😊'), W('party', 'מסיבה', '🎉')] },
+  { id: 'p-elements', t: 'ארבעה יסודות', em: '🌀', c: 'var(--sky)', words: [W('air', 'אוויר', '💨'), W('water', 'מים', '💧'), W('earth', ['אדמה', 'כדור הארץ'], '🌍'), W('fire', 'אש', '🔥'), W('wind', 'רוח', '🌬️'), W('wave', 'גל', '🌊'), W('stone', 'אבן', '🪨'), W('flame', 'להבה', '🕯️'), W('arrow', 'חץ', '🏹'), W('sky', 'שמיים', '☁️')] },
+  { id: 'p-bday', t: 'יום הולדת', em: '🎂', words: [W('birthday', 'יום הולדת', '🎂'), W('cake', 'עוגה', '🍰'), W('candle', 'נר', '🕯️'), W('gift', 'מתנה', '🎁'), W('balloon', 'בלון', '🎈'), W('wish', 'משאלה', '🌠'), W('ten', 'עשר', '🔟'), W('celebrate', 'לחגוג', '🥳')] },
+  { id: 'p-dad', t: 'אבא ואני', em: '❤️', c: 'var(--rose)', words: [W('dad', 'אבא', '👨'), W('love', 'אהבה', '❤️'), W('family', 'משפחה', '👨‍👩‍👧‍👦'), W('home', 'בית', '🏠'), W('proud', ['גאה', 'גאים'], '🌟'), W('smile', 'חיוך', '😊'), W('kiss', 'נשיקה', '😘'), W('brother', 'אח', '👦')] },
+];
+/* spelling families: a chunk from her class words, with a short tip and more words that share it */
+const FAMILIES = [
+  { id: 'f-ee', ch: 'ee', test: w => /ee/.test(w), tip: 'שתי e ביחד נשמעות כמו "אִי" ארוך.', words: [W('tree', 'עץ', '🌳'), W('green', 'ירוק', '🟢'), W('sleep', 'לישון', '😴'), W('sweet', 'מתוק', '🍬'), W('queen', 'מלכה', '👸'), W('feet', 'רגליים', '🦶')] },
+  { id: 'f-be', ch: 'be', test: w => /^be/.test(w), tip: 'הרבה מילים של מקום וזמן מתחילות ב-be.', words: [W('behind', 'מאחורי', '🔙'), W('before', 'לפני', '⏮️'), W('beside', ['ליד', 'לצד'], '👫'), W('begin', 'להתחיל', '🏁'), W('because', ['כי', 'בגלל'], '🤔')] },
+  { id: 'f-owo', ch: 'ow', test: w => /ow$/.test(w), tip: 'ow בסוף מילה נשמע לרוב כמו "אוֹ".', words: [W('snow', 'שלג', '❄️'), W('slow', 'לאט', '🐢'), W('grow', 'לגדול', '🌱'), W('yellow', 'צהוב', '💛'), W('window', 'חלון', '🪟'), W('rainbow', 'קשת בענן', '🌈')] },
+  { id: 'f-owa', ch: 'ow', test: w => /ow(er|n)/.test(w), tip: 'ow באמצע מילה נשמע לפעמים כמו "אַאוּ". אותן אותיות, צליל אחר.', words: [W('tower', 'מגדל', '🗼'), W('power', 'כוח', '⚡'), W('shower', 'מקלחת', '🚿'), W('town', 'עיירה', '🏘️'), W('clown', 'ליצן', '🤡'), W('crown', 'כתר', '👑')] },
+  { id: 'f-oa', ch: 'oa', test: w => /oa/.test(w), tip: 'oa נשמע כמו "אוֹ". ה-a שקטה.', words: [W('boat', 'סירה', '⛵'), W('coat', 'מעיל', '🧥'), W('goat', 'עז', '🐐'), W('soap', 'סבון', '🧼'), W('toast', 'טוסט', '🍞')] },
+  { id: 'f-ae', ch: 'a_e', test: w => /a[^aeiou]e$/.test(w), tip: 'e בסוף מילה היא e קסומה: לא שומעים אותה, אבל בגללה ה-a נשמעת "אֵיי". plan ← plane.', words: [W('cake', 'עוגה', '🎂'), W('lake', 'אגם', '🏞️'), W('name', 'שם', '📛'), W('game', 'משחק', '🎮'), W('snake', 'נחש', '🐍'), W('skate', 'להחליק', '🛼')] },
+  { id: 'f-ss', ch: 'ss', test: w => /ss$/.test(w), tip: 'בסוף מילה קצרה כותבים לרוב s כפולה.', words: [W('glass', ['כוס', 'זכוכית'], '🥛'), W('class', 'כיתה', '🏫'), W('dress', 'שמלה', '👗'), W('kiss', 'נשיקה', '😘'), W('chess', 'שחמט', '♟️'), W('mess', 'בלגן', '🌀')] },
+  { id: 'f-ain', ch: 'ain', test: w => /ain/.test(w), tip: 'ain נשמע כמו "אֵין". ב-mountain כמעט לא שומעים אותו, אז זוכרים: mount + ain.', words: [W('rain', 'גשם', '🌧️'), W('train', 'רכבת', '🚆'), W('brain', 'מוח', '🧠'), W('chain', 'שרשרת', '⛓️'), W('paint', 'לצבוע', '🎨'), W('fountain', 'מזרקה', '⛲')] },
+  { id: 'f-eigh', ch: 'eigh', test: w => /eigh/.test(w), tip: 'eigh נשמע כמו "אֵיי". ה-gh שקטה לגמרי, לא שומעים אותה.', words: [W('eight', 'שמונה', '8️⃣'), W('weigh', 'לשקול', '⚖️'), W('weight', 'משקל', '🏋️'), W('sleigh', 'מזחלת', '🛷'), W('eighty', 'שמונים', '💯')] },
+];
+const famOf = en => FAMILIES.filter(f => f.test(en.toLowerCase()));
+/* ---------- parse a pasted message (WhatsApp from the teacher, or plain lines) ---------- */
+const EMO_RE = /\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}|️⃣)*/u;
+function parseList(text) {
+  const out = { words: [], date: '' };
+  const lines = String(text || '').split(/\r?\n/);
+  for (let raw of lines) {
+    const numbered = /^\s*\d{1,2}\s*[.)\-]\s*/.test(raw);
+    let s = raw.replace(/^\s*\d{1,2}\s*[.)\-]\s*/, '');
+    const em = (s.match(EMO_RE) || [''])[0] || ((s.match(/[0-9]️⃣/) || [''])[0]);
+    const en = (s.match(/[A-Za-z]+(?:[ '\-][A-Za-z]+)*/) || [''])[0].trim();
+    if (!en || en.split(' ').length > 3) continue;
+    const heRaw = s.replace(/[A-Za-z]+/g, ' ').replace(EMO_RE, ' ').replace(/[֑-ׇ]/g, '');
+    const he = heRaw.split(/[\/,;|]|\sאו\s/).map(x => (x.match(/[א-ת]+(?:[ '"״׳\-][א-ת]+)*/) || [''])[0].trim()).filter(Boolean);
+    if (!he.length && !numbered) continue;
+    if (out.words.some(w => w.en.toLowerCase() === en.toLowerCase())) continue;
+    out.words.push({ en, he, em });
+  }
+  const m = /(\d{1,2})[./](\d{1,2})(?:[./](\d{2,4}))?/.exec(text || '');
+  if (m) {
+    const d = +m[1], mo = +m[2]; let y = m[3] ? +m[3] : new Date().getFullYear(); if (y < 100) y += 2000;
+    if (d >= 1 && d <= 31 && mo >= 1 && mo <= 12) {
+      let ds = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      if (!m[3] && dayDiff(todayStr(), ds) < -60) ds = `${y + 1}-${ds.slice(5)}`;
+      out.date = ds;
+    }
+  }
+  return out;
+}
+/* ---------- the English test on 23.11.2026 (My Way 2, unit 1): Magic E and long vowel sounds ----------
+   The book's vocabulary pages are behind the school's login, so this list covers the two spelling topics the teacher named. */
+const LIST_EXAM = {
+  id: 'e-2026-11-23', t: 'מבחן 23.11', date: '2026-11-23', src: 'class', kind: 'exam', he: false,
+  words: [W('cape', 'גלימה', '🦸'), W('kite', 'עפיפון', '🪁'), W('bike', 'אופניים', '🚲'), W('home', 'בית', '🏠'), W('bone', 'עצם', '🦴'), W('cube', 'קובייה', '🧊'), W('tube', 'שפופרת', '🧴'), W('five', 'חמש', '🖐️'),
+    W('rain', 'גשם', '🌧️'), W('play', 'לשחק', '🎲'), W('tree', 'עץ', '🌳'), W('sea', 'ים', '🌊'), W('boat', 'סירה', '⛵'), W('snow', 'שלג', '❄️'), W('night', 'לילה', '🌙'), W('blue', 'כחול', '🔵')],
+};
+/* Magic E pairs: the E at the end makes the vowel say its name */
+const MAGIC = [['cap', 'cape', 'כובע', 'גלימה'], ['kit', 'kite', 'ערכה', 'עפיפון'], ['hop', 'hope', 'לקפץ', 'תקווה'], ['tub', 'tube', 'אמבט', 'שפופרת'], ['plan', 'plane', 'תוכנית', 'מטוס'], ['pin', 'pine', 'סיכה', 'אורן'], ['not', 'note', 'לא', 'פתק'], ['cub', 'cube', 'גור', 'קובייה'], ['can', 'cane', 'פחית', 'מקל הליכה'], ['bit', 'bite', 'קצת', 'לנגוס'], ['rob', 'robe', 'לשדוד', 'חלוק'], ['mad', 'made', 'כועס', 'עשה']];
+/* long vowel teams: the same sound, different spellings */
+const VOWEL_TEAMS = [['rain', ['rane', 'rayn']], ['play', ['plai', 'plae']], ['tree', ['trea', 'trie']], ['sea', ['see', 'sie']], ['boat', ['bote', 'bowt']], ['snow', ['snoe', 'snoa']], ['night', ['nite', 'niht']], ['blue', ['bloo', 'blew']], ['train', ['trane', 'trayn']], ['green', ['grean', 'grene']], ['coat', ['cote', 'cowt']], ['light', ['lite', 'liht']]];
+/* complete the sentence (like the test) */
+const SENTENCES = [['I fly my ___ in the park.', 'kite'], ['The ___ is in the sky.', 'plane'], ['I ride my ___ to school.', 'bike'], ['My dog eats a ___.', 'bone'], ['I go ___ after school.', 'home'], ['We swim in the ___.', 'sea'], ['The ___ is tall and green.', 'tree'], ['I sail in a ___.', 'boat'], ['Let\'s ___ a game!', 'play'], ['The hero has a red ___.', 'cape'], ['An ice ___ is cold.', 'cube'], ['I have ___ fingers on my hand.', 'five'], ['Take an umbrella. It is ___ing.', 'rain'], ['At ___ I see the moon.', 'night'], ['The sky is ___.', 'blue'], ['In winter there is ___ on the mountain.', 'snow']];
+/* the dictation on 4.11.2026 (unit 1, London). It has passed; its words stay in the general review */
+const LIST_1104 = {
+  id: 'c-2026-11-04', t: 'הכתבה 4.11', date: '2026-11-04', src: 'class', he: true,
+  words: [W('Live', 'לחיות', '💓'), W('Palace', 'ארמון', '🏰'), W('Home', 'בית', '🏠'), W('Flag', 'דגל', '🇬🇧'), W('Tour', 'סיור', '🗺️'), W('Bus', 'אוטובוס', '🚌'), W('Clock', 'שעון', '🕰️'), W('Scone', ['לחמניית סקון', 'סקון'], '🥯'), W('Game', 'משחק', '🎲')],
+};
+SENTENCES.push(['The king lives in a ___.', 'palace'], ['I ride a red ___ in London.', 'bus'], ['Big Ben is a big ___.', 'clock'], ['I eat a ___ with jam.', 'scone'], ['We go on a ___ of the city.', 'tour']);
+const SENT_WORDS = () => [...new Set([...LIST_EXAM.words, ...LIST_1104.words].map(x => x.en.toLowerCase()))];
+
+/* ---- romi/src/20-state.js ---- */
+/* ---------- saved state ---------- */
+const KEY = 'salta-romi-v1';
+const DAD_DEF = ['רומי, אבא אוהב אותך.', 'אבא גאה בך. לא בגלל הציון, בגלל שאת מתאמנת.', 'כמו באקרובטיקה: עוד אימון ועוד אימון, ופתאום זה קל. אבא איתך.', 'טעות היא חלק מהאימון. אבא סומך עלייך.', 'אבא אוהב אותך. עכשיו לכי לשתות מים ולעשות גלגלון.', 'כל מילה שלמדת היא שלך לתמיד. אבא גאה בך.'];
+const DAD_HARD = ['קשה? זה בסדר. אבא אוהב אותך, וזה לא תלוי בציון.', 'נשימה עמוקה. גם באימון לא כל קפיצה יוצאת בפעם הראשונה. אבא איתך.'];
+function fresh() {
+  return { v: 1, start: todayStr(), lists: [JSON.parse(JSON.stringify(LIST_1104)), JSON.parse(JSON.stringify(LIST0)), JSON.parse(JSON.stringify(LIST_EXAM))], p: {}, candy: 0, candyAll: 0, days: {}, sessions: 0, tests: [], stickers: [], own: { leo: ['violet'], rib: ['pink'] }, leo: 'violet', rib: 'pink', best: {}, dadMsgs: null, dadI: 0, sound: 1, rate: .85, pin: '', seen: {}, view: 'home', pv: '' };
+}
+function norm(o) {
+  const f = fresh();
+  for (const k in f) if (o[k] == null) o[k] = f[k];
+  o.lists = arr(o.lists).map(l => (l.words = arr(l.words).map(w => (w.he = arr(w.he), w)), l));
+  o.tests = arr(o.tests); o.stickers = arr(o.stickers); o.own.leo = arr(o.own.leo); o.own.rib = arr(o.own.rib);
+  if (o.dadMsgs) o.dadMsgs = arr(o.dadMsgs);
+  for (const k in o.p) { const q = o.p[k]; q.wr = arr(q.wr); }
+  /* lists that ship with a version are added once, also to a phone that already has data */
+  o.seen = o.seen || {}; if (!o.seen.exam1123) { o.seen.exam1123 = 1; [LIST_1104, LIST_EXAM].forEach(L => { if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
+  return o;
+}
+let S = (() => { try { const r = localStorage.getItem(KEY); if (r) return norm(JSON.parse(r)); } catch (e) { } return fresh(); })();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } if (typeof cloudSoon === 'function') cloudSoon(); }
+const kOf = w => w.en.toLowerCase().trim();
+const allClass = () => S.lists.filter(l => l.src === 'class');
+/* the class list she prepares for now: the nearest dictation that has not passed; else the newest list */
+function curList() {
+  const t = todayStr(), c = allClass();
+  const up = c.filter(l => l.date && l.date >= t).sort((a, b) => a.date < b.date ? -1 : 1);
+  if (up.length) return up[0];
+  return c.slice().sort((a, b) => (a.date || '') < (b.date || '') ? 1 : -1)[0] || c[0];
+}
+const listById = id => id === 'review' ? reviewList() : S.lists.find(l => l.id === id) || PACKS.find(l => l.id === id) || FAMILIES.find(l => l.id === id);
+/* every list she can practise: class lists, then the bonus packs and families */
+const bonusLists = () => [...PACKS, ...FAMILIES.map(f => ({ ...f, t: `${f.ch} כמו ב-${famExample(f)}`, em: '🔤' }))];
+function famExample(f) { for (const l of allClass()) for (const w of l.words) if (f.test(w.en.toLowerCase())) return w.en; return f.words[0].en; }
+function addCandy(n, why) { if (!n) return; S.candy = Math.max(0, (S.candy || 0) + n); if (n > 0) S.candyAll = (S.candyAll || 0) + n; }
+function markDay(n = 1) { const t = todayStr(); S.days[t] = (S.days[t] || 0) + n; }
+function streak() { let n = 0, d = todayStr(); if (!S.days[d]) d = addDays(d, -1); while (S.days[d]) { n++; d = addDays(d, -1); } return n; }
+function dadLine(hard) { const l = (S.dadMsgs && S.dadMsgs.length) ? S.dadMsgs : hard ? DAD_HARD : DAD_DEF; S.dadI = ((S.dadI || 0) + 1) % l.length; return l[S.dadI]; }
+
+/* ---- romi/src/25-speech.js ---- */
+/* ---------- speech: the phone reads words aloud (iPhone: works only after the first tap, so every first call comes from a tap) ---------- */
+const TTS = window.speechSynthesis || null;
+let VOICES = [];
+function loadVoices() { try { VOICES = TTS ? TTS.getVoices() : []; } catch (e) { VOICES = []; } }
+if (TTS) { loadVoices(); try { TTS.addEventListener('voiceschanged', loadVoices); } catch (e) { TTS.onvoiceschanged = loadVoices; } }
+const EN_PREF = ['Samantha', 'Karen', 'Moira', 'Tessa', 'Daniel', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny'];
+function voiceFor(lang) {
+  if (!VOICES.length) loadVoices();
+  const vs = VOICES.filter(v => (v.lang || '').toLowerCase().startsWith(lang));
+  if (lang === 'en') { for (const n of EN_PREF) { const v = vs.find(x => x.name.startsWith(n)); if (v) return v; } return vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null; }
+  return vs[0] || null;
+}
+const hasHeVoice = () => !!voiceFor('he');
+function say(text, lang = 'en', rate) {
+  if (!TTS || !text) return false;
+  try {
+    if (TTS.speaking || TTS.pending) TTS.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang === 'he' ? 'he-IL' : 'en-US'; const v = voiceFor(lang); if (v) u.voice = v;
+    u.rate = rate || (lang === 'he' ? .95 : (S.rate || .85)); u.pitch = 1.05;
+    TTS.speak(u); return true;
+  } catch (e) { return false; }
+}
+/* spell letter by letter: "N, E, I, G..." and light each letter on screen as it is said */
+function spellOut(word, el) {
+  const letters = word.replace(/[^A-Za-z]/g, '').toUpperCase().split('');
+  say(letters.join(', '), 'en', .6);
+  if (!el) return;
+  const spans = el.querySelectorAll('.lt');
+  spans.forEach((s, i) => later(() => { spans.forEach(x => x.classList.remove('lit')); s.classList.add('lit'); }, 350 + i * 620));
+  later(() => spans.forEach(x => x.classList.remove('lit')), 350 + spans.length * 620 + 400);
+}
+const letterSpans = w => [...w].map(c => c === ' ' ? '<span class="lt sp"> </span>' : `<span class="lt">${esc(c)}</span>`).join('');
+
+/* ---- romi/src/27-voice.js ---- */
+/* ---------- dad's voice: dad records each word once, and the app says the word in his voice ----------
+   Recordings live in their own localStorage key (not in S, so the state stays small), and in the cloud under brainlab/<code>-v.json, one child per word.
+   Playback goes through Web Audio, so it also works after a timer (iPhone allows it once the first touch unlocked the audio). */
+const VKEY = 'salta-voice';
+let VOICE = (() => { try { return JSON.parse(localStorage.getItem(VKEY)) || {}; } catch (e) { return {}; } })();
+const VBUF = {};
+function saveVoice() { try { localStorage.setItem(VKEY, JSON.stringify(VOICE)); } catch (e) { toast('אין מקום לשמור עוד הקלטות בטלפון'); } }
+const hasVoice = w => !!(w && VOICE[kOf(w)]) && S.dadVoice !== 0;
+/* iPhone: let the sound play even when the side switch is on silent */
+try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { }
+async function playVoice(k) {
+  const a = ac(); const src = VOICE[k]; if (!a || !src) return false;
+  try {
+    if (!VBUF[k]) { const bin = atob(src.split(',')[1]); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); VBUF[k] = await new Promise((res, rej) => a.decodeAudioData(u8.buffer, res, rej)); }
+    const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1.6; n.buffer = VBUF[k]; n.connect(g); g.connect(a.destination); n.start(); return true;
+  } catch (e) { return false; }
+}
+/* say an English word: dad's recording when there is one, else the phone's voice */
+function sayWord(w, rate) {
+  if (!w) return;
+  if (!rate && hasVoice(w)) { try { if (TTS) TTS.cancel(); } catch (e) { } playVoice(kOf(w)).then(ok => { if (!ok) say(w.en); }); return; }
+  say(w.en, 'en', rate);
+}
+/* ---------- recording (parent area) ---------- */
+let REC = null;
+const recOK = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+async function recStart(k, onDone) {
+  if (REC) return recStop();
+  if (!recOK()) return toast('הטלפון הזה לא מאפשר הקלטה כאן');
+  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { return toast('צריך לאשר גישה למיקרופון (הגדרות ← ספארי ← מיקרופון)', 4500); }
+  const type = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+  const mr = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 32000 } : {}), parts = [];
+  mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
+  mr.onstop = () => {
+    stream.getTracks().forEach(t => t.stop()); const b = new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' });
+    const fr = new FileReader(); fr.onload = () => { VOICE[k] = fr.result; delete VBUF[k]; saveVoice(); voicePush(k); REC = null; onDone && onDone(); playVoice(k); }; fr.readAsDataURL(b);
+  };
+  REC = { mr, k, t: setTimeout(recStop, 2600) }; mr.start(); SFX.beep && SFX.beep(); onDone && onDone(true);
+}
+function recStop() { if (!REC) return; clearTimeout(REC.t); try { REC.mr.stop(); } catch (e) { REC = null; } }
+function voiceDel(k) { delete VOICE[k]; delete VBUF[k]; saveVoice(); voicePush(k, true); }
+/* cloud: one child per word, so two phones never overwrite each other's words */
+async function voicePush(k, del) {
+  const c = typeof cloudCfg === 'function' ? cloudCfg() : {}; if (!c.code) return;
+  try { await fetchT(`${c.url.replace(/\/+$/, '')}/brainlab/${c.code}-v/${encodeURIComponent(k)}.json`, { method: del ? 'DELETE' : 'PUT', body: del ? undefined : JSON.stringify(VOICE[k]) }); } catch (e) { return; }
+  if (isDad()) { PDOC = PDOC || {}; PDOC.vv = Date.now(); await pPut(c, PDOC); }
+}
+async function voicePull() {
+  const c = typeof cloudCfg === 'function' ? cloudCfg() : {}; if (!c.code) return;
+  const g = await cGet(c, '-v'); if (!g.data || typeof g.data !== 'object') return;
+  let n = 0; for (const [k, v] of Object.entries(g.data)) if (typeof v === 'string' && VOICE[k] !== v) { VOICE[k] = v; delete VBUF[k]; n++; }
+  if (n) saveVoice();
+}
+
+/* ---- romi/src/30-engine.js ---- */
+/* ---------- the practice engine: each word climbs 7 steps, wrong answers step down, learned words come back after 1, 2, 4, 7 days ----------
+   steps: 0 meet the word · 1 meaning (choose) · 2 spelling (choose) · 3 build from letters · 4 hear English, type · 5 hear Hebrew, type English · 6 write the Hebrew meaning
+   bonus lists stop at 6 (no Hebrew writing). */
+const STEP_NAMES = ['חדשה', 'פירוש', 'זיהוי', 'הרכבה', 'הכתבה', 'מעברית', 'פירוש בכתב', 'כוכב'];
+const maxSt = l => l && l.he ? 7 : 6;
+function prog(w) { const k = kOf(w); return S.p[k] || (S.p[k] = { st: 0, r: 0, ok: 0, bad: 0, wr: [] }); }
+const stageOf = w => (S.p[kOf(w)] || {}).st || 0;
+const mastered = (w, l) => stageOf(w) >= maxSt(l);
+const pctOf = (w, l) => Math.min(100, Math.round(stageOf(w) / maxSt(l) * 100));
+const isDue = w => { const q = S.p[kOf(w)]; return !!(q && q.due && q.due <= todayStr()); };
+function listPct(l) { if (!l || !l.words.length) return 0; return Math.round(l.words.reduce((a, w) => a + pctOf(w, l), 0) / l.words.length); }
+const listStars = l => l.words.filter(w => mastered(w, l)).length;
+/* which words go into today's session */
+function planSession(list) {
+  if (list.id === 'review') return reviewPlan(list);
+  const t = todayStr(), ws = list.words.slice(), left = list.date ? dayDiff(t, list.date) : 99;
+  const un = ws.filter(w => !mastered(w, list)).sort((a, b) => stageOf(b) - stageOf(a));
+  const started = un.filter(w => stageOf(w) > 0), news = shuffle(un.filter(w => stageOf(w) === 0));
+  const rev = shuffle(ws.filter(w => mastered(w, list) && (isDue(w) || left <= 1)));
+  let q = [...shuffle(started), ...news.slice(0, Math.max(2, 5 - started.length))];
+  q = q.concat(q.length < 3 ? rev : rev.slice(0, 3));
+  if (!q.length) q = shuffle(ws).slice(0, Math.min(6, ws.length));
+  const n = left <= 1 ? 16 : 14;
+  return { q, n };
+}
+function itemType(w, list) {
+  const st = stageOf(w), M = maxSt(list);
+  if (st >= M) return pick(list.he ? ['typeEN', 'typeHE2EN', 'writeHE'] : ['typeEN', 'typeHE2EN']);
+  return ['learn', R() < .5 ? 'meanEN' : 'meanHE', 'pick', 'tiles', 'typeEN', 'typeHE2EN', 'writeHE'][st];
+}
+/* record a result. ok = right on the first try */
+function grade(w, list, type, ok, attempt) {
+  const q = prog(w), M = maxSt(list), t = todayStr(); q.last = t;
+  if (type === 'learn') { q.st = Math.max(q.st, 1); return 'up'; }
+  const wasM = q.st >= M;
+  if (ok) {
+    q.ok++;
+    if (wasM) { q.r = (q.r || 0) + 1; q.due = addDays(t, [1, 2, 4, 7, 14][Math.min(4, q.r - 1)]); return 'keep'; }
+    q.st++; if (q.st >= M) { q.r = 0; q.due = addDays(t, 1); q.mt = t; return 'star'; }
+    return 'up';
+  }
+  q.bad++; if (attempt) { q.wr.unshift(attempt); q.wr = q.wr.slice(0, 4); }
+  if (wasM) { q.st = M - 2; q.r = 0; q.due = null; } else q.st = Math.max(1, q.st - 1);
+  return 'down';
+}
+/* ---------- checking answers ---------- */
+const normEn = s => String(s || '').toLowerCase().replace(/[^a-z' ]/g, '').replace(/\s+/g, ' ').trim();
+const FIN = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+const normHe = s => String(s || '').replace(/[֑-ׇ]/g, '').replace(/[^א-ת ]/g, '').replace(/[ךםןףץ]/g, c => FIN[c]).replace(/יי/g, 'י').replace(/וו/g, 'ו').replace(/\s+/g, ' ').trim();
+const checkEn = (w, typed) => normEn(typed) === normEn(w.en);
+const checkHe = (w, typed) => { const t = normHe(typed); return !!t && w.he.some(h => normHe(h) === t); };
+const finalNote = typed => String(typed || '').trim().split(/\s+/).some(x => /[כמנפצ]$/.test(x)) ? 'שימי לב: בסוף מילה כותבים אות סופית (ך ם ן ף ץ).' : '';
+/* ---------- wrong spellings that look real: the mistakes kids make ---------- */
+/* ordered: the most likely mistakes first */
+const MIS_RULES = [[/eigh/, 'ay'], [/eigh/, 'ei'], [/gh/, ''], [/ain$/, 'in'], [/ou/, 'ow'], [/ou/, 'au'], [/ow$/, 'o'], [/ow$/, 'oe'], [/ower/, 'awer'], [/ow/, 'ou'], [/oa/, 'o'], [/oa/, 'ow'], [/oa/, 'oe'], [/ee/, 'ea'], [/ee/, 'i'], [/ea/, 'ee'], [/ai/, 'a'], [/ai/, 'ay'], [/a([^aeiou])e$/, 'ai$1'], [/a([^aeiou])e$/, 'a$1'], [/ss$/, 's'], [/ss$/, 'z'], [/or$/, 'er'], [/er$/, 'a'], [/er$/, 'or'], [/^be/, 'bi'], [/ph/, 'f'], [/ck/, 'k'], [/c/, 'k'], [/k/, 'c'], [/y$/, 'ie'], [/ie/, 'ei'], [/ei/, 'ie'], [/([a-z])\1/, '$1'], [/u/, 'a'], [/e$/, '']];
+function misspell(word, n = 3) {
+  const lw = word.toLowerCase(), rule = [], swap = new Set();
+  MIS_RULES.forEach(([re, r]) => { if (re.test(lw)) { const x = lw.replace(re, r); if (x && x !== lw && x.length > 1 && !rule.includes(x)) rule.push(x); } });
+  for (let i = 1; i < lw.length - 1; i++) { const x = lw.slice(0, i) + lw[i + 1] + lw[i] + lw.slice(i + 2); if (x !== lw && lw[i] !== lw[i + 1]) swap.add(x); }
+  const out = shuffle(rule.slice(0, n + 2)).slice(0, n); for (const x of shuffle([...swap])) { if (out.length >= n) break; if (!out.includes(x)) out.push(x); }
+  return out;
+}
+/* other words to use as wrong options: same list first, then any other list */
+function others(w, list, n) {
+  const pool = [...list.words, ...LIST0.words, ...PACKS.flatMap(p => p.words)].filter(x => kOf(x) !== kOf(w) && !x.he.some(h => w.he.includes(h)));
+  const seen = new Set(), out = [];
+  for (const x of [...shuffle(list.words.filter(x => pool.includes(x))), ...shuffle(pool)]) { if (seen.has(kOf(x))) continue; seen.add(kOf(x)); out.push(x); if (out.length >= n) break; }
+  return out;
+}
+/* ---------- where the mistake is: align what she typed with the right word ---------- */
+function align(typed, right) {
+  const a = [...typed.toLowerCase()], b = [...right.toLowerCase()], n = a.length, m = b.length;
+  const D = Array.from({ length: n + 1 }, (_, i) => Array.from({ length: m + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0));
+  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++) D[i][j] = Math.min(D[i - 1][j] + 1, D[i][j - 1] + 1, D[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  const R1 = [], R2 = []; let i = n, j = m;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && D[i][j] === D[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)) { const ok = a[i - 1] === b[j - 1]; R1.unshift([a[i - 1], ok]); R2.unshift([right[j - 1], ok]); i--; j--; }
+    else if (j > 0 && D[i][j] === D[i][j - 1] + 1) { R2.unshift([right[j - 1], false]); j--; }
+    else { R1.unshift([a[i - 1], false]); i--; }
+  }
+  return { mine: R1, right: R2 };
+}
+const alignHTML = cells => cells.map(([c, ok]) => `<span class="${ok ? '' : 'diff'}">${c === ' ' ? '&nbsp;' : esc(c)}</span>`).join('');
+
+/* ---- romi/src/40-art.js ---- */
+/* ---------- art: Romi the gymnast (an original drawing: blonde ponytail, blue eyes, a leotard she picks), candies, elements ---------- */
+const LEOS = {
+  violet: { t: 'סגול', c: ['#9B5DE5', '#F15BB5'], price: 0 }, pink: { t: 'ורוד', c: ['#FF5FA2', '#FFC2DD'], price: 25 }, mint: { t: 'מנטה', c: ['#14B8A6', '#A7F3D0'], price: 25 },
+  sky: { t: 'שמיים', c: ['#3A86FF', '#A5D8FF'], price: 40 }, gold: { t: 'זהב', c: ['#F59E0B', '#FDE68A'], price: 40 }, galaxy: { t: 'גלקסיה', c: ['#3C096C', '#C77DFF'], price: 60 },
+  rainbow: { t: 'קשת', c: ['#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93'], price: 90 },
+  bday: { t: 'יום הולדת', c: ['#FFC229', '#FF3D8B', '#7B61FF', '#FFC229'], price: 0, gift: 1 },
+};
+const RIBS = { pink: { t: 'ורוד', c: '#FF5FA2', price: 0 }, red: { t: 'אדום', c: '#E63946', price: 15 }, blue: { t: 'כחול', c: '#3A86FF', price: 15 }, mint: { t: 'מנטה', c: '#2EC4B6', price: 15 }, gold: { t: 'זהב', c: '#FFC845', price: 20 }, white: { t: 'לבן', c: '#FFFFFF', price: 20 } };
+let ARTN = 0;
+const SKIN = '#FFD9C4', HAIR = '#F4CF5D', HAIR2 = '#D9A93A';
+function romiSVG(o = {}) {
+  const n = ++ARTN, L = LEOS[o.leo || S.leo] || LEOS.violet, rib = (RIBS[o.rib || S.rib] || RIBS.pink).c;
+  const stops = L.c.map((c, i) => `<stop offset="${Math.round(i / (L.c.length - 1) * 100)}%" stop-color="${c}"/>`).join('');
+  const head = `<path d="M70 21 C93 12 106 31 99 53 C96 63 89 71 84 77 C88 62 88 47 76 37 Z" fill="${HAIR}" stroke="${HAIR2}" stroke-width="1.5"/>
+  <circle cx="60" cy="40" r="21" fill="${SKIN}"/>
+  <path d="M38.5 43 C35 21 51 13 62 14 C77 15 86 26 82.5 43 C79 33 71 27 61 29 C55 30 49 32 46 37 C44 34 41 38 38.5 43 Z" fill="${HAIR}" stroke="${HAIR2}" stroke-width="1.2"/>
+  <path d="M71 19 l-8 -8 l0 13 z M75 19 l10 -7 l-2 13 z" fill="${rib}" stroke="rgba(0,0,0,.15)" stroke-width=".8"/><circle cx="73" cy="19" r="3.2" fill="${rib}" stroke="rgba(0,0,0,.15)" stroke-width=".8"/>
+  <ellipse cx="52" cy="43" rx="4.3" ry="5.2" fill="#fff"/><circle cx="52.3" cy="44" r="3.3" fill="#3B82F6"/><circle cx="52.3" cy="44.3" r="1.5" fill="#1E293B"/><circle cx="53.4" cy="42.6" r="1" fill="#fff"/>
+  <ellipse cx="68" cy="43" rx="4.3" ry="5.2" fill="#fff"/><circle cx="67.7" cy="44" r="3.3" fill="#3B82F6"/><circle cx="67.7" cy="44.3" r="1.5" fill="#1E293B"/><circle cx="68.8" cy="42.6" r="1" fill="#fff"/>
+  <path d="M47.5 37.5 l3 -1.6 M72.5 37.5 l-3 -1.6" stroke="${HAIR2}" stroke-width="1.4" stroke-linecap="round"/>
+  <ellipse cx="46.5" cy="51" rx="3.6" ry="2.1" fill="#FF9EB5" opacity=".75"/><ellipse cx="73.5" cy="51" rx="3.6" ry="2.1" fill="#FF9EB5" opacity=".75"/>
+  <path d="M54 53 Q60 59 66 53" stroke="#C2185B" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  if (o.head) return `<svg class="romi head" viewBox="30 6 72 64" aria-hidden="true">${head}</svg>`;
+  return `<svg class="romi" viewBox="0 0 120 200" aria-hidden="true"><defs><linearGradient id="lg${n}" x1="0" y1="0" x2="1" y2="1">${stops}</linearGradient></defs>
+  <path d="M47 76 L27 30 M73 76 L93 30" stroke="${SKIN}" stroke-width="9" stroke-linecap="round"/><circle cx="26" cy="27" r="6" fill="${SKIN}"/><circle cx="94" cy="27" r="6" fill="${SKIN}"/>
+  <path d="M53 126 L49 181 M67 126 L71 181" stroke="${SKIN}" stroke-width="11" stroke-linecap="round"/><ellipse cx="46" cy="186" rx="8" ry="4.5" fill="${SKIN}"/><ellipse cx="74" cy="186" rx="8" ry="4.5" fill="${SKIN}"/>
+  <rect x="55" y="56" width="10" height="12" rx="3" fill="${SKIN}"/>
+  <path d="M43 71 Q60 64 77 71 L75 104 Q73 120 68 131 L60 123 L52 131 Q47 120 45 104 Z" fill="url(#lg${n})"/>
+  <circle cx="46" cy="75" r="6.5" fill="url(#lg${n})"/><circle cx="74" cy="75" r="6.5" fill="url(#lg${n})"/>
+  <path d="M55 86 l1.4 3 3 1.4 -3 1.4 -1.4 3 -1.4 -3 -3 -1.4 3 -1.4z M67 100 l1 2 2 1 -2 1 -1 2 -1 -2 -2 -1 2 -1z" fill="#fff" opacity=".9"/>
+  ${head}</svg>`;
+}
+function candySVG(c = '#FF5FA2', s = 22) {
+  return `<svg class="candy" width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><path d="M9 20 L1 12 L3 28 Z M31 20 L39 12 L37 28 Z" fill="${c}" opacity=".8"/><ellipse cx="20" cy="20" rx="12" ry="10" fill="${c}"/><path d="M12 15 Q20 22 28 15 M12 24 Q20 30 28 24" stroke="#fff" stroke-width="2.4" fill="none" opacity=".75"/><ellipse cx="15" cy="16" rx="3" ry="2" fill="#fff" opacity=".6"/></svg>`;
+}
+const CANDY = (s = 20) => candySVG('#FF5FA2', s);
+const ELEMS = {
+  air: { t: 'אוויר', c: '#7FE3D6', p: '<path d="M8 15 h16 a5 5 0 1 0 -5 -5 M6 22 h22 a5 5 0 1 1 -5 5 M10 29 h8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>' },
+  water: { t: 'מים', c: '#53A8FF', p: '<path d="M20 6 C14 15 10 20 10 25 a10 10 0 0 0 20 0 C30 20 26 15 20 6 Z" fill="#fff"/>' },
+  earth: { t: 'אדמה', c: '#8BC34A', p: '<path d="M5 31 L15 14 L21 23 L26 17 L35 31 Z" fill="#fff"/>' },
+  fire: { t: 'אש', c: '#FF7A3D', p: '<path d="M20 5 C23 13 30 15 30 25 a10 10 0 0 1 -20 0 C10 19 14 16 15 11 C17 15 19 16 20 5 Z" fill="#fff"/>' },
+};
+const elemSVG = (k, s = 26) => `<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true">${ELEMS[k].p}</svg>`;
+const IC = {
+  sound: '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+  slow: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 16c0-4 3-7 7-7s7 3 7 7z" fill="currentColor"/><circle cx="19" cy="13" r="2.5" fill="currentColor"/><path d="M5 16v2M15 16v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  back: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  x: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2c1.5 4 6 6 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 2.5-6.5C9.5 9.5 11 10 12 2z" fill="#FF8A3D"/></svg>',
+  star: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#FFC845"/></svg>',
+  bs: '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9l6 6M18 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+};
+/* pictograms for the games and actions: line drawings in the current color */
+const pic = (d, s = 30) => `<svg class="pic" viewBox="0 0 32 32" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const GIC = {
+  tramp: pic('<ellipse cx="16" cy="25" rx="11" ry="3"/><path d="M7 26.5l-1.5 3.5M25 26.5l1.5 3.5"/><circle cx="16" cy="6" r="2.4"/><path d="M16 8.5v7M12 11l4-2 4 2M13.5 20l2.5-4.5 2.5 4.5"/>'),
+  memory: pic('<rect x="4" y="7" width="12" height="17" rx="2.5" transform="rotate(-8 10 15)"/><rect x="16" y="7" width="12" height="17" rx="2.5" transform="rotate(8 22 15)"/><path d="M20.5 13.5l2 2 3-3.5"/>'),
+  rain: pic('<path d="M16 4c-3.5 5-6 8-6 11a6 6 0 0 0 12 0c0-3-2.5-6-6-11z"/><path d="M6 24c2 2 4 2 6 0M20 24c2 2 4 2 6 0M13 28c2 1.5 4 1.5 6 0"/>'),
+  teach: pic('<rect x="4" y="5" width="24" height="16" rx="2"/><path d="M10 26l3-5M22 26l-3-5M9 15l2.5-6 2.5 6M10 13h3M19 11.5a2 2 0 1 0 0 3.5M21 9v6"/>'),
+  duel: pic('<circle cx="10" cy="9" r="3"/><circle cx="22" cy="9" r="3"/><path d="M4 26c0-5 3-8 6-8s6 3 6 8M16 26c0-5 3-8 6-8s6 3 6 8"/>'),
+  speak: pic('<rect x="12" y="4" width="8" height="14" rx="4"/><path d="M8 15a8 8 0 0 0 16 0M16 23v5M12 28h8"/>'),
+  paper: pic('<path d="M8 4h12l5 5v19H8z"/><path d="M20 4v5h5M12 15h9M12 19h9M12 23h5"/>'),
+  loop: pic('<path d="M25 12a10 10 0 0 0-17-3L6 11M7 20a10 10 0 0 0 17 3l2-2"/><path d="M6 5v6h6M26 27v-6h-6"/>'),
+  heart: pic('<path d="M16 27S5 20 5 12a5.5 5.5 0 0 1 11-1.5A5.5 5.5 0 0 1 27 12c0 8-11 15-11 15z"/>'),
+  cake: pic('<path d="M5 27h22M7 27V17h18v10M7 21c3 2 6-2 9 0s6-2 9 0M11 17v-4M16 17v-4M21 17v-4"/><path d="M11 9.5c0-1 1-2 0-3M16 9.5c0-1 1-2 0-3M21 9.5c0-1 1-2 0-3"/>'),
+  list: pic('<path d="M11 8h15M11 16h15M11 24h15"/><circle cx="6" cy="8" r="1.4"/><circle cx="6" cy="16" r="1.4"/><circle cx="6" cy="24" r="1.4"/>'),
+  shop: pic('<path d="M6 11h20l-2 15H8z"/><path d="M11 11V9a5 5 0 0 1 10 0v2"/>'),
+  lock: pic('<rect x="7" y="14" width="18" height="13" rx="3"/><path d="M11 14v-3a5 5 0 0 1 10 0v3"/>'),
+  mic: pic('<rect x="12" y="4" width="8" height="14" rx="4"/><path d="M8 15a8 8 0 0 0 16 0M16 23v5"/>'),
+  play: pic('<path d="M10 6l16 10-16 10z" fill="currentColor"/>'),
+  rec: pic('<circle cx="16" cy="16" r="8" fill="currentColor"/>'),
+};
+
+/* ---- romi/src/45-kbd.js ---- */
+/* ---------- keyboards inside the app. The iPhone keyboard "fixes" spelling by itself, and that ruins a dictation, so she never uses it here ----------
+   KB holds the open input: { lang, val, onEnter(val), onChange(val), tiles?: [letters], used: [tile indexes], word? } */
+let KB = null;
+const KB_EN = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+const KB_HE = ['קראטוןםפ', 'שדגכעיחלךף', 'זסבהנמצתץ'];
+function kbdHTML(lang, enterLbl = 'בדיקה') {
+  const rows = lang === 'he' ? KB_HE : KB_EN;
+  return `<div class="kbd ${lang}" dir="ltr">${rows.map((r, i) => `<div class="krow">${[...r].map(c => `<button class="key" data-k="${c}">${c}</button>`).join('')}${i === rows.length - 1 ? `<button class="key fn" data-k="bs" aria-label="מחיקה">${IC.bs}</button>` : ''}</div>`).join('')}
+  <div class="krow"><button class="key space" data-k=" " aria-label="רווח">רווח</button><button class="key enter" data-k="enter">${enterLbl}</button></div></div>`;
+}
+/* letter tiles: the letters of the word, mixed, plus a few extra letters when she is ready for it */
+function makeTiles(word, extra = 0) {
+  const ls = [...word.toLowerCase()].filter(c => c !== ' ');
+  const pool = 'aeiouyrstnlmbdgh'.split('').filter(c => !ls.includes(c));
+  for (let i = 0; i < extra && pool.length; i++) ls.push(pool.splice(Math.floor(R() * pool.length), 1)[0]);
+  let t = shuffle(ls); if (t.join('') === word.toLowerCase().replace(/ /g, '') && t.length > 2) t = shuffle(t);
+  return t;
+}
+const tilesHTML = tiles => `<div class="tiles" dir="ltr">${tiles.map((c, i) => `<button class="tile" data-ti="${i}">${c}</button>`).join('')}<button class="tile fn" data-k="bs" aria-label="מחיקה">${IC.bs}</button></div>`;
+/* what she typed so far. With tiles: slots in the shape of the word */
+function typedHTML() {
+  if (!KB) return '';
+  if (KB.word) { let j = 0; const v = KB.val.replace(/ /g, ''); return `<div class="slots" dir="ltr">${[...KB.word].map(c => c === ' ' ? '<span class="slot gap"></span>' : `<span class="slot ${v[j] ? 'full' : ''}">${esc(v[j++] || '')}</span>`).join('')}</div>`; }
+  return `<div class="typed ${KB.lang}" dir="${KB.lang === 'he' ? 'rtl' : 'ltr'}">${esc(KB.val)}<span class="caret"></span></div>`;
+}
+function kbRefresh() { const t = app.querySelector('#typed'); if (t) t.innerHTML = typedHTML(); if (KB && KB.onChange) KB.onChange(KB.val); }
+function kbPress(k) {
+  if (!KB || KB.lock) return;
+  if (k === 'enter') { if (KB.val.trim()) KB.onEnter(KB.val); return; }
+  if (k === 'bs') {
+    if (!KB.val) return;
+    KB.val = KB.val.slice(0, -1);
+    if (KB.tiles) { const i = KB.used.pop(); const b = app.querySelector(`[data-ti="${i}"]`); if (b) b.disabled = false; KB.val = KB.val.replace(/ +$/, ''); }
+    SFX.tap(); return kbRefresh();
+  }
+  if (k === ' ' && (!KB.val || KB.val.endsWith(' '))) return;
+  if (KB.val.length >= 24) return;
+  KB.val += k; SFX.tap(); kbRefresh();
+}
+function bindKbd(opts) {
+  KB = Object.assign({ val: '', used: [] }, opts);
+  app.querySelectorAll('.kbd [data-k], .tiles [data-k]').forEach(b => b.onclick = () => kbPress(b.dataset.k));
+  app.querySelectorAll('.tiles [data-ti]').forEach(b => b.onclick = () => {
+    if (!KB || KB.lock || b.disabled) return;
+    if (KB.onTile && KB.onTile(KB.tiles[+b.dataset.ti], b) === false) return;
+    b.disabled = true; KB.used.push(+b.dataset.ti); KB.val += KB.tiles[+b.dataset.ti]; SFX.tap();
+    /* the spaces of a two-word answer fill in by themselves */
+    if (KB.word) { const v = KB.val.replace(/ /g, ''); let out = '', j = 0; for (const c of KB.word) { if (j >= v.length) break; if (c === ' ') out += ' '; else out += v[j++]; } KB.val = out; }
+    kbRefresh();
+    if (KB.word && KB.val.replace(/ /g, '').length >= KB.word.replace(/ /g, '').length) KB.onEnter(KB.val);
+  });
+  kbRefresh();
+}
+/* a computer keyboard works too (for testing on a laptop) */
+addEventListener('keydown', e => {
+  if (!KB || e.metaKey || e.ctrlKey || e.altKey || document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === 'Enter') { e.preventDefault(); return kbPress('enter'); }
+  if (e.key === 'Backspace') { e.preventDefault(); return kbPress('bs'); }
+  if (KB.tiles) { const i = KB.tiles.findIndex((c, j) => c === e.key.toLowerCase() && !KB.used.includes(j)); if (i >= 0) { const b = app.querySelector(`[data-ti="${i}"]`); if (b) b.click(); } return; }
+  if (e.key.length === 1 && (KB.lang === 'he' ? /[א-ת ]/ : /[a-zA-Z ']/).test(e.key)) { e.preventDefault(); kbPress(e.key.toLowerCase()); }
+});
+
+/* ---- romi/src/50-home.js ---- */
+/* ---------- screens: router and home ---------- */
+const VIEWS = {};
+function render() {
+  clearTimers(); KB = null;
+  try { (VIEWS[S.view] || VIEWS.home)(); }
+  catch (e) {
+    console.error('render failed', e);
+    try { S.view = 'home'; save(); VIEWS.home(); }
+    catch (e2) { app.innerHTML = `<div class="page"><div class="card"><b>משהו השתבש</b><p class="small muted">${esc(String(e2 && e2.message || e2))}</p><button class="btn btn-main" onclick="location.reload()">לטעון מחדש</button></div></div>`; }
+  }
+  bindCommon();
+}
+function go(v) { S.view = v; save(); render(); window.scrollTo(0, 0); }
+function bindCommon() {
+  on('[data-go]', b => { SFX.tap(); go(b.dataset.go); });
+  on('[data-word]', b => wordCard(b.dataset.word, b.dataset.list));
+}
+const topBar = (title, back = 'home') => `<header class="bar"><button class="icon-btn" data-go="${back}" aria-label="חזרה">${IC.back}</button><h2>${title}</h2><span class="pill candy-pill">${CANDY(18)}${S.candy}</span></header>`;
+/* a word: its picture, the word in school letters, and 7 segments, one per step */
+function wordChip(w, l) {
+  const st = Math.min(stageOf(w), maxSt(l)), M = maxSt(l), star = st >= M;
+  return `<button class="wchip ${star ? 'star' : ''}" data-word="${esc(kOf(w))}" data-list="${l.id}"><span class="wem">${w.em || '🔤'}</span><span class="wtx"><span class="w">${EN(w.en)}</span><span class="segs" aria-label="שלב ${st} מתוך ${M}">${Array.from({ length: M }, (_, i) => `<i class="${i < st ? 'on' : ''}"></i>`).join('')}</span></span>${star ? `<span class="st">${IC.star}</span>` : ''}</button>`;
+}
+function daysStrip(l) {
+  const t = todayStr(), left = dayDiff(t, l.date); if (left < 0 || left > 10) return '';
+  const from = addDays(t, -Math.min(3, Math.max(0, 6 - left))), out = [];
+  for (let d = from; d <= l.date; d = addDays(d, 1)) {
+    const cls = d === l.date ? 'exam' : S.days[d] ? 'done' : d === t ? 'today' : d < t ? 'miss' : '';
+    out.push(`<span class="dd ${cls}"><b>${d === l.date ? '✎' : S.days[d] ? '✓' : +d.slice(8)}</b><small>${d === t ? 'היום' : d === l.date ? (l.kind === 'exam' ? 'מבחן' : 'הכתבה') : 'אבגדהוש'[new Date(d + 'T12:00').getDay()] + "'"}</small></span>`);
+  }
+  return `<div class="days">${out.join('')}</div>`;
+}
+function planLine(l) {
+  const n = l.words.length, st = listStars(l), left = l.date ? dayDiff(todayStr(), l.date) : 99;
+  if (st === n) return left >= 0 && left < 99 ? 'כל המילים בכוכב. עכשיו הכתבה לדוגמה, וחזרה קצרה כל יום עד ההכתבה.' : 'כל המילים בכוכב. אלופה!';
+  if (left === 0) return 'ההכתבה היום. אימון קצר לחימום, ובהצלחה!';
+  return 'אימון אחד ביום, בערך 10 דקות, מספיק כדי להגיע לכוכב בכל המילים.';
+}
+VIEWS.home = () => {
+  const l = curList(), t = todayStr(), left = l && l.date ? dayDiff(t, l.date) : null, did = !!S.days[t];
+  const last = l ? S.tests.filter(x => x.list === l.id).slice(-1)[0] : null, rv = reviewList();
+  const upcoming = left != null && left >= 0;
+  const floor = l ? `<section class="floor ${did ? 'did' : ''}"><div class="mat">
+    <div class="fl-txt"><div class="eyebrow">${l.kind === 'exam' ? (upcoming ? 'המבחן הבא' : 'המבחן האחרון') : upcoming ? 'ההכתבה הבאה' : 'ההכתבה האחרונה'}</div><div class="fl-date">${l.date ? dateHe(l.date) : esc(l.t)}</div>
+    ${upcoming ? `<div class="fl-count">${left === 0 ? '<b>היום</b>' : left === 1 ? '<b>מחר</b>' : `<b>${left}</b><span>ימים</span>`}</div>` : `<button class="chip on-mat" data-go="parent">אבא, יש רשימה חדשה?</button>`}</div>
+    <div class="fl-romi">${romiSVG()}</div></div>${upcoming && l.date ? daysStrip(l) : ''}</section>` : '';
+  const routine = l ? `<section class="routine"><div class="sec-h"><h2>המילים</h2><span class="tag">${listStars(l)}/${l.words.length} בכוכב</span></div>
+    <div class="wlist">${l.words.map(w => wordChip(w, l)).join('')}</div>
+    <button class="btn btn-main big" data-act="today">${did ? 'עוד אימון' : 'האימון של היום'}</button><p class="hint">${planLine(l)}</p></section>`
+    : `<section class="card"><p>עוד אין רשימת מילים. אבא מוסיף אותה באזור ההורים.</p></section>`;
+  const games = [['wand', 'שרביט ה-E', 'Magic E ותנועות ארוכות, כמו במבחן'], ['tramp', 'טרמפולינה', 'מרכיבים מילה, קופצים גבוה'], ['memory', 'ממתקיית הזיכרון', 'זוגות: מילה ופירוש'], ['rain', 'גשם היסודות', 'תופסים את האיות הנכון'], ['teach', 'המורה רומי', 'את מכתיבה לאבא'], ['duel', 'דו-קרב חברות', 'שתיים, טלפון אחד'], ...(SR ? [['speak', 'תגידי את זה', 'מדברים אנגלית, הטלפון מקשיב']] : [])];
+  app.innerHTML = `<div class="page home">
+  <header class="top"><button class="ava" data-go="shop" aria-label="הדמות שלי">${romiSVG({ head: 1 })}</button><div class="grow"><h1>היי ${NAME}</h1><div class="sub">${greet()}</div></div>
+  <div class="pills"><span class="pill" title="ימים ברצף">${IC.flame}${streak()}</span><button class="pill candy-pill" data-go="shop" aria-label="ממתקים">${CANDY(18)}${S.candy}</button></div></header>
+  ${bdayHTML()}${dadNoteHTML()}${floor}${routine}
+  ${l ? `<div class="duo"><button class="act" data-act="mock"><span class="act-ic">${GIC.paper}</span><span class="grow"><b>${l.kind === 'exam' ? 'בוחן לדוגמה' : 'הכתבה לדוגמה'}</b><span>כמו בכיתה, עם ציון</span></span>${last ? `<span class="grade ${last.score >= 90 ? 'good' : ''}">${last.score}</span>` : ''}</button>
+  <button class="act" data-act="review"><span class="act-ic">${GIC.loop}</span><span class="grow"><b>חזרה כללית</b><span>${rv.words.length} מילים מכל ההכתבות</span></span></button></div>` : ''}
+  <section class="block"><div class="sec-h"><h2>משחקים</h2></div>
+  <div class="games">${games.map(([k, n, d], i) => `<button class="game g${i % 6}" data-game="${k}"><span class="gic">${GIC[k]}</span><b>${n}</b><span class="gd">${d}</span>${S.best[k] != null ? `<span class="best">שיא ${S.best[k]}${BEST_LBL[k] ? ' ' + BEST_LBL[k] : ''}</span>` : ''}</button>`).join('')}</div></section>
+  <section class="block"><div class="sec-h"><h2>מעבר לכיתה</h2><span class="tag candy">ממתק כפול</span></div>
+  <div class="packs">${bonusLists().map(b => `<button class="pack" data-pack="${b.id}"><span class="pk-em">${b.words.slice(0, 3).map(w => w.em).join('')}</span><b>${esc(b.t)}</b><span class="bar2"><i style="width:${listPct(b)}%"></i></span></button>`).join('')}</div></section>
+  <nav class="foot"><button class="chip" data-go="lists">${GIC.list.replace('width="30" height="30"', 'width="18" height="18"')} כל הרשימות</button><button class="chip" data-go="shop">${GIC.shop.replace('width="30" height="30"', 'width="18" height="18"')} חנות</button><button class="chip" data-go="parent">${GIC.lock.replace('width="30" height="30"', 'width="18" height="18"')} הורים</button></nav>
+  </div>`;
+  on('[data-act="today"]', () => startPractice(l));
+  on('[data-act="mock"]', () => startTest(l));
+  on('[data-act="review"]', () => startPractice(reviewList()));
+  on('[data-game]', b => startGame(b.dataset.game));
+  on('[data-pack]', b => startPractice(listById(b.dataset.pack)));
+  on('[data-act="dadnote"]', () => { S.dadNote = null; save(); render(); });
+  if (isBday() && !(S.bday || {})[t.slice(0, 4)]) later(bdayGift, 500);
+  else if (!S.seen.welcome) later(welcome, 400);
+};
+function greet() {
+  const h = new Date().getHours(), s = streak();
+  if (s >= 3) return `${s} ימים ברצף. כמו באימונים: התמדה!`;
+  return h < 12 ? 'בוקר טוב!' : h < 17 ? 'צהריים טובים!' : 'ערב טוב!';
+}
+function dadNoteHTML() { return S.dadNote ? `<button class="note" data-act="dadnote"><span class="note-ic">${GIC.heart}</span><span class="grow"><b>מאבא</b><span>${esc(S.dadNote)}</span></span></button>` : ''; }
+function welcome() {
+  if (S.view !== 'home' || document.querySelector('.modal')) return;
+  S.seen.welcome = 1; save();
+  modal('ברוכה הבאה לסלטה', `<div class="center">${romiSVG()}</div><p>כאן מתאמנים על המילים באנגלית להכתבה, ועל עוד הרבה מילים.</p><p>כל מילה עוברת <b>7 שלבים</b> עד כוכב. על כל תשובה נכונה מקבלים ממתק, ובממתקים קונים בגדי התעמלות לדמות שלך.</p><p class="small muted">אם לא שומעים את המילים, בדקי שהצליל בטלפון פתוח.</p>`, [['יאללה!', () => say('Hello Romi! Let\'s practice!')]]);
+}
+/* tap a word: hear it, see it letter by letter, see the steps */
+function wordCard(k, lid) {
+  const l = listById(lid) || curList(), w = (l && l.words.find(x => kOf(x) === k)); if (!w) return;
+  const st = stageOf(w), M = maxSt(l);
+  const m = modal('', `<div class="wcard"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${letterSpans(w.en)}</div><div class="he">${w.he.map(esc).join(' / ')}</div>
+  <div class="row center"><button class="btn btn-ghost" data-s="say">${IC.sound} ${hasVoice(w) ? 'בקול של אבא' : 'שמיעה'}</button><button class="btn btn-ghost" data-s="spell">איות</button>${hasHeVoice() ? '<button class="btn btn-ghost" data-s="he">בעברית</button>' : ''}</div>
+  <div class="steps">${Array.from({ length: M }, (_, i) => `<span class="${i < st ? 'on' : ''}" title="${STEP_NAMES[i]}"></span>`).join('')}</div><div class="small muted center">${st >= M ? 'כוכב! המילה הזאת שלך.' : `שלב ${st + 1} מתוך ${M}: ${STEP_NAMES[st]}`}</div>
+  ${famOf(w.en).map(f => `<p class="tip">${esc(f.tip)}</p>`).join('')}</div>`, [['סגור']]);
+  const card = m.querySelector('.wcard');
+  m.querySelector('[data-s="say"]').onclick = e => { e.stopPropagation(); sayWord(w); };
+  m.querySelector('[data-s="spell"]').onclick = e => { e.stopPropagation(); spellOut(w.en, card.querySelector('.word')); };
+  const he = m.querySelector('[data-s="he"]'); if (he) he.onclick = e => { e.stopPropagation(); say(w.he[0], 'he'); };
+  sayWord(w);
+}
+
+/* ---- romi/src/55-practice.js ---- */
+/* ---------- practice session ---------- */
+let P = null;
+function startPractice(list) {
+  if (!list || !list.words || !list.words.length) return toast('אין מילים ברשימה הזאת');
+  const { q, n } = planSession(list);
+  P = { list, q, n, done: 0, ok: 0, candy: 0, words: new Set(), stars: [], last: null, wrongRun: 0, hardShown: false, bonus: list.src !== 'class' && list.id !== 'review' };
+  S.view = 'practice'; save(); nextItem();
+}
+function nextItem() {
+  if (!P) return go('home');
+  if (P.done >= P.n || !P.q.length) return finishPractice();
+  if (P.last && kOf(P.q[0]) === P.last && P.q.length > 1) P.q.push(P.q.shift());
+  const w = P.q[0], type = itemType(w, P.list), c = { w, type, phase: 'ask', hint: false };
+  if (type === 'pick') c.opts = shuffle([w.en.toLowerCase(), ...misspell(w.en)]);
+  if (type === 'meanEN' || type === 'meanHE') c.opts = shuffle([w, ...others(w, P.list, 3)]);
+  if (type === 'tiles') c.tiles = makeTiles(w.en, prog(w).bad > prog(w).ok ? 0 : 2);
+  P.cur = c; P.words.add(kOf(w)); render(); window.scrollTo(0, 0); autoSay(c);
+}
+function autoSay(c) {
+  if (['typeHE2EN', 'meanHE'].includes(c.type)) { if (hasHeVoice()) say(c.w.he[0], 'he'); return; }
+  sayWord(c.w);
+}
+const sayBtn = (lang = 'en', big) => `<button class="icon-btn say ${big ? 'big' : ''}" data-say="${lang}" aria-label="שמיעה">${IC.sound}</button>`;
+const slowBtn = () => `<button class="icon-btn say" data-say="slow" aria-label="לאט">${IC.slow}</button>`;
+function promptHTML(c) {
+  const w = c.w, he = w.he.map(esc).join(' / ');
+  switch (c.type) {
+    case 'learn': return `<div class="ask">מילה חדשה!</div><div class="learn"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${letterSpans(w.en)}</div><div class="he">${he}</div>
+      <div class="row center">${sayBtn()}${slowBtn()}<button class="btn btn-ghost" data-act="spell">איות</button></div>${famOf(w.en).map(f => `<p class="tip">${esc(f.tip)}</p>`).join('')}</div>`;
+    case 'meanEN': return `<div class="ask">מה הפירוש?</div><div class="prompt"><div class="word" dir="ltr">${esc(w.en)}</div>${sayBtn()}</div>`;
+    case 'meanHE': return `<div class="ask">איך אומרים באנגלית?</div><div class="prompt"><div class="he big">${he}</div>${hasHeVoice() ? sayBtn('he') : ''}</div>`;
+    case 'pick': return `<div class="ask">איך כותבים?</div><div class="prompt"><span class="em">${w.em}</span><div class="he">${he}</div>${sayBtn()}</div>`;
+    case 'tiles': return `<div class="ask">הרכיבי את המילה</div><div class="prompt"><span class="em">${w.em}</span><div class="he">${he}</div>${sayBtn()}${slowBtn()}</div>`;
+    case 'typeEN': return `<div class="ask">הקשיבי וכתבי באנגלית</div><div class="prompt">${sayBtn('en', 1)}${hasVoice(w) ? '<span class="dadv">בקול של אבא</span>' : ''}${slowBtn()}${c.hint ? `<span class="em">${w.em}</span><div class="he">${he}</div>` : '<button class="chip" data-act="hint">רמז</button>'}</div>`;
+    case 'typeHE2EN': return `<div class="ask">כתבי באנגלית</div><div class="prompt"><div class="he big">${he}</div>${hasHeVoice() ? sayBtn('he') : ''}${c.hint ? `<span class="em">${w.em}</span>` : '<button class="chip" data-act="hint">רמז</button>'}</div>`;
+    case 'writeHE': return `<div class="ask">כתבי את הפירוש בעברית</div><div class="prompt"><div class="word" dir="ltr">${esc(w.en)}</div>${sayBtn()}</div>`;
+  }
+  return '';
+}
+function answerHTML(c) {
+  if (c.type === 'learn') return `<button class="btn btn-main big" data-act="gotit">הבנתי!</button>`;
+  if (c.opts) return `<div class="opts ${c.type === 'meanEN' ? 'he' : 'en'}">${c.opts.map((o, i) => `<button class="opt" data-o="${i}" ${c.type === 'meanEN' ? '' : 'dir="ltr"'}>${c.type === 'pick' ? esc(o) : c.type === 'meanEN' ? esc(o.he[0]) : esc(o.en)}</button>`).join('')}</div>`;
+  if (c.type === 'tiles') return `<div id="typed"></div>${tilesHTML(c.tiles)}`;
+  return `<div id="typed"></div>${kbdHTML(c.type === 'writeHE' ? 'he' : 'en')}`;
+}
+VIEWS.practice = () => {
+  if (!P || !P.cur) { S.view = 'home'; return VIEWS.home(); }
+  const c = P.cur;
+  app.innerHTML = `<div class="page play ${c.opts || c.type === 'learn' ? '' : 'haskbd'}">
+  <header class="bar"><button class="icon-btn" data-act="quit" aria-label="יציאה">${IC.x}</button><div class="prog"><i style="width:${Math.round(P.done / P.n * 100)}%"></i></div><span class="pill">${CANDY(18)}${P.candy}</span></header>
+  <div class="mini-romi" id="mr">${romiSVG()}</div>
+  <section class="q">${promptHTML(c)}</section>
+  <div id="fb"></div>
+  <section class="ans">${answerHTML(c)}</section></div>`;
+  bindPractice();
+};
+function bindPractice() {
+  const c = P.cur, w = c.w;
+  on('[data-act="quit"]', () => modal('לצאת מהאימון?', 'מה שכבר עשית נשמר.', [['להמשיך להתאמן'], ['לצאת', () => { P = null; go('home'); }]]));
+  on('[data-say]', b => b.dataset.say === 'he' ? say(w.he[0], 'he') : sayWord(w, b.dataset.say === 'slow' ? .5 : undefined));
+  on('[data-act="spell"]', () => spellOut(w.en, app.querySelector('.learn .word')));
+  on('[data-act="hint"]', () => { c.hint = true; const keep = KB && KB.val; render(); if (KB && keep) { KB.val = keep; kbRefresh(); } });
+  on('[data-act="gotit"]', () => { grade(w, P.list, 'learn', true); P.q.push(P.q.shift()); P.last = kOf(w); P.done += .5; SFX.ok(); nextItem(); });
+  on('[data-o]', b => choose(+b.dataset.o, b));
+  if (c.type === 'tiles') bindKbd({ lang: 'en', tiles: c.tiles, word: w.en.toLowerCase(), onEnter: v => typed(v) });
+  else if (!c.opts && c.type !== 'learn') bindKbd({ lang: c.type === 'writeHE' ? 'he' : 'en', onEnter: v => typed(v) });
+}
+function choose(i, b) {
+  const c = P.cur, o = c.opts[i];
+  const ok = c.type === 'pick' ? o === c.w.en.toLowerCase() : kOf(o) === kOf(c.w);
+  if (c.phase === 'fix') { if (ok) { b.classList.add('good'); sayWord(c.w); later(() => advance(false), 700); } else { b.classList.add('shake'); later(() => b.classList.remove('shake'), 400); } return; }
+  if (ok) { b.classList.add('good'); if (c.type === 'meanHE') sayWord(c.w); return success(); }
+  b.classList.add('bad'); b.disabled = true;
+  fail(c.type === 'pick' ? o : null);
+  c.phase = 'fix';
+  app.querySelectorAll('[data-o]').forEach((x, j) => { const oj = c.opts[j]; if (c.type === 'pick' ? oj === c.w.en.toLowerCase() : kOf(oj) === kOf(c.w)) x.classList.add('show'); });
+  const he = c.w.he.map(esc).join(' / ');
+  fb(`<div class="fb fb-bad">${c.type === 'pick' ? `הנכון: <b dir="ltr">${esc(c.w.en.toLowerCase())}</b>` : `<b dir="ltr">${esc(c.w.en)}</b> = ${he}`}<div class="small">לחצי על התשובה הנכונה כדי להמשיך</div></div>`);
+  sayWord(c.w);
+}
+function typed(v) {
+  const c = P.cur, w = c.w, he = c.type === 'writeHE';
+  const ok = he ? checkHe(w, v) : checkEn(w, v);
+  if (c.phase === 'copy') {
+    if (ok) { KB.lock = true; SFX.ok(); hop(); fb(`<div class="fb fb-good">יפה! עכשיו זה נכון.</div>`); later(() => advance(false), 800); }
+    else { SFX.soft(); shakeTyped(); later(() => { KB.val = ''; if (KB.tiles) { KB.used = []; app.querySelectorAll('[data-ti]').forEach(b => b.disabled = false); } kbRefresh(); }, 500); }
+    return;
+  }
+  if (ok) { KB.lock = true; const note = he ? finalNote(v) : ''; return success(note); }
+  fail(v);
+  c.phase = 'copy'; const pg = app.querySelector('.page'); if (pg) pg.classList.add('fixing');
+  const right = he ? w.he[0] : w.en;
+  const a = he ? null : align(v, right);
+  fb(`<div class="fb fb-bad">${he ? `כתבת: <b>${esc(v)}</b><br>הנכון: <b class="big">${w.he.map(esc).join(' / ')}</b>` : `<div class="cmp"><span class="lbl">כתבת</span><span class="mine" dir="ltr">${alignHTML(a.mine)}</span></div><div class="cmp"><span class="lbl">נכון</span><span class="right" dir="ltr">${alignHTML(a.right)}</span></div>`}
+  <div class="small">עכשיו כתבי שוב, נכון. ככה המוח זוכר.</div></div>`);
+  sayWord(w);
+  later(() => { if (!KB) return; KB.val = ''; if (KB.tiles) { KB.used = []; app.querySelectorAll('[data-ti]').forEach(b => b.disabled = false); } kbRefresh(); }, 600);
+}
+function fb(html) { const e = document.getElementById('fb'); if (e) e.innerHTML = html; }
+function shakeTyped() { const t = app.querySelector('#typed'); if (t) { t.classList.add('shake'); later(() => t.classList.remove('shake'), 400); } }
+function hop(cls = 'hop') { const m = document.getElementById('mr'); if (!m) return; m.classList.remove('hop', 'flip', 'wobble'); void m.offsetWidth; m.classList.add(cls); }
+function success(note) {
+  const c = P.cur, r = grade(c.w, P.list, c.type, true);
+  const add = P.bonus ? 2 : 1; addCandy(add); P.candy += add; P.ok++; P.wrongRun = 0;
+  SFX.ok(); hop(r === 'star' ? 'flip' : 'hop');
+  if (r === 'star') { P.stars.push(c.w.en); SFX.combo(); }
+  fb(`<div class="fb fb-good">${pick(['מעולה!', 'יפה!', 'בול!', 'אלופה!', 'Great!', 'Perfect!'])} <span class="plus">+${add} ${CANDY(18)}</span>${r === 'star' ? `<div>⭐ <b dir="ltr">${esc(c.w.en)}</b> קיבלה כוכב!</div>` : ''}${note ? `<div class="small">${note}</div>` : ''}</div>`);
+  app.querySelectorAll('[data-o]').forEach(b => b.disabled = true);
+  save(); later(() => advance(true), r === 'star' ? 1500 : 900);
+}
+function fail(attempt) {
+  const c = P.cur; grade(c.w, P.list, c.type, false, attempt); SFX.no(); hop('wobble');
+  c.failed = true; P.wrongRun++;
+  if (P.wrongRun >= 3 && !P.hardShown) { P.hardShown = true; later(() => toast(`❤️ ${esc(dadLine(true))}`, 4500), 900); }
+  save();
+}
+/* finish the item: move the word in the queue */
+function advance(ok) {
+  if (!P) return;
+  const c = P.cur, w = P.q.shift(); P.last = kOf(c.w); P.done++;
+  if (c.failed) P.q.splice(Math.min(2, P.q.length), 0, w);
+  else if (!mastered(w, P.list)) P.q.push(w);
+  nextItem();
+}
+function finishPractice() {
+  const p = P; if (!p) return go('home');
+  const bonus = p.bonus ? 6 : 3; addCandy(bonus); p.candy += bonus;
+  markDay(); S.sessions = (S.sessions || 0) + 1;
+  const low = p.ok < p.done * .6, line = (S.sessions % 3 === 1 || low) ? dadLine(low) : '';
+  save(); P = null;
+  S.view = 'pdone'; S.last = { list: p.list.id, candy: p.candy, words: [...p.words], stars: p.stars, line, ok: p.ok }; render(); SFX.win();
+}
+VIEWS.pdone = () => {
+  const r = S.last; if (!r) { S.view = 'home'; return VIEWS.home(); }
+  const l = listById(r.list) || curList(), ws = l.words.filter(w => r.words.includes(kOf(w)));
+  app.innerHTML = `<div class="page done">
+  <div class="big-romi flip">${romiSVG()}</div>
+  <h1 class="center">סיימת את האימון!</h1>
+  <div class="center earned">+${r.candy} ${CANDY(28)}</div>
+  ${r.stars.length ? `<p class="center">⭐ כוכבים חדשים: <b dir="ltr">${r.stars.map(esc).join(', ')}</b></p>` : ''}
+  <div class="wchips">${ws.map(w => wordChip(w, l)).join('')}</div>
+  ${r.line ? `<div class="note static"><span class="note-ic">${GIC.heart}</span><span class="grow"><b>מאבא</b><span>${esc(r.line)}</span></span></div>` : ''}
+  <div class="stack"><button class="btn btn-main big" data-act="again">עוד סיבוב</button><button class="btn btn-ghost" data-go="home">למסך הבית</button></div></div>`;
+  on('[data-act="again"]', () => startPractice(l));
+};
+
+/* ---- romi/src/60-test.js ---- */
+/* ---------- mock dictation: like in class. No help during it, a grade at the end ---------- */
+let T = null;
+function startTest(l) {
+  if (!l) return;
+  T = { l, items: shuffle(l.words).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en' };
+  S.view = 'test'; save(); render(); testSay();
+}
+function testSay() { const it = T && T.items[T.i]; if (!it) return; if (it.mode === 'he') { if (hasHeVoice()) say(it.w.he[0], 'he'); } else sayWord(it.w); }
+VIEWS.test = () => {
+  if (!T) { S.view = 'home'; return VIEWS.home(); }
+  const it = T.items[T.i], n = T.items.length, he = T.step === 'he';
+  const lines = T.items.slice(0, T.i).map((x, j) => `<li><span dir="ltr">${esc(x.en)}</span>${x.he ? ` <span class="muted">· ${esc(x.he)}</span>` : ''}</li>`).join('');
+  app.innerHTML = `<div class="page play haskbd">
+  <header class="bar"><button class="icon-btn" data-act="quit" aria-label="יציאה">${IC.x}</button><h2>הכתבה לדוגמה</h2><span class="pill">${T.i + 1}/${n}</span></header>
+  <div class="paper"><ol>${lines}<li class="now"><span class="muted">${he ? esc(it.en) + ' · ...' : '...'}</span></li></ol></div>
+  <section class="q">${he ? `<div class="ask">ועכשיו: מה הפירוש בעברית?</div><div class="prompt"><div class="word" dir="ltr">${esc(it.w.en)}</div></div>` : it.mode === 'he' ? `<div class="ask">כתבי באנגלית</div><div class="prompt"><div class="he big">${it.w.he.map(esc).join(' / ')}</div>${hasHeVoice() ? sayBtn('he') : ''}</div>` : `<div class="ask">הקשיבי וכתבי באנגלית</div><div class="prompt">${sayBtn('en', 1)}${slowBtn()}</div>`}</section>
+  <section class="ans"><div id="typed"></div>${kbdHTML(he ? 'he' : 'en', 'הבא')}</section></div>`;
+  on('[data-act="quit"]', () => modal('לצאת מההכתבה?', 'ההכתבה לא תיבדק.', [['להמשיך'], ['לצאת', () => { T = null; go('home'); }]]));
+  on('[data-say]', b => b.dataset.say === 'he' ? say(it.w.he[0], 'he') : sayWord(it.w, b.dataset.say === 'slow' ? .5 : undefined));
+  bindKbd({ lang: he ? 'he' : 'en', onEnter: v => {
+    if (he) { it.he = v; T.step = 'en'; T.i++; }
+    else { it.en = v; if (it.mode === 'en' && T.l.he) T.step = 'he'; else T.i++; }
+    SFX.tap();
+    if (T.i >= n) return finishTest();
+    render(); if (T.step === 'en') testSay();
+  } });
+};
+function finishTest() {
+  const t = T, l = t.l; let pts = 0, tot = 0;
+  t.items.forEach(x => {
+    x.enOk = checkEn(x.w, x.en); tot++; if (x.enOk) pts++;
+    if (x.mode === 'en' && l.he) { x.heOk = checkHe(x.w, x.he); tot++; if (x.heOk) pts++; }
+    const q = prog(x.w), M = maxSt(l);
+    if (x.enOk) { if (q.st < 5) q.st = 5; else if (q.st >= M) { q.r = (q.r || 0) + 1; q.due = addDays(todayStr(), 2); } }
+    else grade(x.w, l, 'typeEN', false, x.en);
+    if (x.heOk && q.st === 6) { q.st = 7; q.r = 0; q.due = addDays(todayStr(), 1); }
+    if (x.heOk === false && q.st >= 7) q.st = 6;
+  });
+  const score = Math.round(pts / tot * 100), candy = Math.round(score / 10) + (score === 100 ? 10 : 0);
+  addCandy(candy); markDay();
+  S.tests.push({ list: l.id, d: todayStr(), score, wrong: t.items.filter(x => !x.enOk || x.heOk === false).map(x => x.w.en) }); S.tests = S.tests.slice(-40);
+  let sticker = false; if (score === 100 && !S.stickers.some(s => s.id === l.id)) { S.stickers.push({ id: l.id, em: l.words[0].em || '⭐', t: l.t, d: todayStr() }); sticker = true; }
+  S.last = { test: 1, list: l.id, score, candy, sticker, items: t.items.map(x => ({ en: x.w.en, he: x.w.he, a: x.en, b: x.he, eo: x.enOk, ho: x.heOk, m: x.mode })) };
+  T = null; S.view = 'tdone'; save(); render(); score >= 90 ? SFX.win() : SFX.ok();
+}
+VIEWS.tdone = () => {
+  const r = S.last; if (!r || !r.test) { S.view = 'home'; return VIEWS.home(); }
+  const l = listById(r.list);
+  const msg = r.score === 100 ? 'מאה! מושלם!' : r.score >= 90 ? 'כמעט מושלם!' : r.score >= 70 ? 'יפה מאוד! עוד קצת אימון על המילים האדומות.' : 'זה בדיוק בשביל זה מתאמנים. המילים האדומות ייכנסו לאימון הבא.';
+  app.innerHTML = `<div class="page done">
+  <div class="paper result"><div class="grade-big ${r.score >= 90 ? 'good' : ''}">${r.score}</div><h2>${msg}</h2>
+  <ol>${r.items.map(x => `<li><div class="ln"><span dir="ltr" class="${x.eo ? 'ok' : 'no'}">${esc(x.a || '—')}</span>${x.eo ? ' ✓' : ` <span class="fix" dir="ltr">${esc(x.en)}</span>`}</div>
+  ${x.ho == null ? `<div class="small muted">${x.m === 'he' ? 'שמעת: ' + x.he.map(esc).join(' / ') : ''}</div>` : `<div class="ln"><span class="${x.ho ? 'ok' : 'no'}">${esc(x.b || '—')}</span>${x.ho ? ' ✓' : ` <span class="fix">${x.he.map(esc).join(' / ')}</span>`}</div>`}</li>`).join('')}</ol></div>
+  <div class="center earned">+${r.candy} ${CANDY(28)}</div>
+  ${r.sticker ? `<p class="center">קיבלת מדבקה חדשה לאלבום! <span class="sticker">${r.sticker ? esc(l ? (l.words[0].em || '⭐') : '⭐') : ''}</span></p>` : ''}
+  <div class="stack"><button class="btn btn-main big" data-go="home">למסך הבית</button>${r.score < 100 && l ? '<button class="btn btn-ghost" data-act="train">אימון על המילים שטעיתי</button>' : ''}</div></div>`;
+  on('[data-act="train"]', () => startPractice(l));
+};
+
+/* ---- romi/src/65-games.js ---- */
+/* ---------- games ---------- */
+let G = null, RAF = 0;
+const BEST_LOW = { memory: 1 };   /* lower is better */
+const BEST_LBL = { memory: 'מהלכים' };
+function gameWords(n) {
+  const cur = curList(), out = [], seen = new Set();
+  const pool = [...shuffle(cur ? cur.words : []), ...shuffle(allClass().filter(l => l !== cur).flatMap(l => l.words)), ...shuffle(PACKS.flatMap(p => p.words))];
+  for (const w of pool) { if (seen.has(kOf(w))) continue; seen.add(kOf(w)); out.push(w); if (out.length >= n) break; }
+  return out;
+}
+function setBest(k, v) { const b = S.best[k]; const better = b == null || (BEST_LOW[k] ? v < b : v > b); if (better) S.best[k] = v; return better; }
+function startGame(k) { G = GAMES[k].init(); G.k = k; S.view = 'game'; save(); render(); if (GAMES[k].start) GAMES[k].start(); }
+VIEWS.game = () => { if (!G || G.over) { G = null; S.view = 'home'; return VIEWS.home(); } GAMES[G.k].view(); on('[data-act="gquit"]', () => { G = null; go('home'); }); };
+const gBar = (t, right) => `<header class="bar"><button class="icon-btn" data-act="gquit" aria-label="יציאה">${IC.x}</button><h2>${t}</h2><span class="pill">${right}</span></header>`;
+function gameOver(title, html, candy, again) {
+  if (G) G.over = 1; clearTimers(); KB = null;
+  addCandy(candy); markDay(); save();
+  modal(title, `${html}<div class="center earned">+${candy} ${CANDY(26)}</div>`, [['עוד פעם', again], ['למסך הבית', () => { G = null; go('home'); }]]);
+}
+const GAMES = {};
+/* 1. trampoline: tap the letters in order; every right letter = a higher jump, a full word = a flip */
+GAMES.tramp = {
+  init: () => ({ ws: gameWords(6), i: 0, score: 0, combo: 0, miss: 0, pos: 0 }),
+  start: () => sayWord(G.ws[0]),
+  view() {
+    const w = G.ws[G.i]; G.tiles = G.tiles && G.tw === w ? G.tiles : makeTiles(w.en, 2); G.tw = w;
+    app.innerHTML = `<div class="page play">${gBar('טרמפולינה', `${G.score} נק׳`)}
+    <div class="scene"><div class="trail" dir="ltr">${esc(w.en.toLowerCase().slice(0, G.pos))}</div><div class="tr-romi" id="tr">${romiSVG()}</div><div class="tramp"></div></div>
+    <div class="prompt rp">${w.em ? `<span class="em">${w.em}</span>` : ''}<div class="he">${w.he.map(esc).join(' / ')}</div>${sayBtn()}<span class="small muted">מילה ${G.i + 1}/${G.ws.length}${G.combo > 2 ? ` · רצף ${G.combo}!` : ''}</span></div>
+    <section class="ans"><div id="typed"></div>${tilesHTML(G.tiles)}</section></div>`;
+    on('[data-say]', () => sayWord(w));
+    const target = w.en.toLowerCase().replace(/ /g, '');
+    bindKbd({ lang: 'en', tiles: G.tiles, word: w.en.toLowerCase(), onEnter: () => {
+      KB.lock = true; G.score += 20 + G.combo * 2; SFX.combo(); jump(true); sayWord(w);
+      later(() => { G.i++; G.pos = 0; G.miss = 0; G.tiles = null; if (G.i >= G.ws.length) return GAMES.tramp.end(); render(); sayWord(G.ws[G.i]); }, 1400);
+    }, onTile: (c, b) => {
+      if (c !== target[G.pos]) { G.combo = 0; G.miss++; SFX.no(); b.classList.add('shake'); later(() => b.classList.remove('shake'), 400); jump(false);
+        if (G.miss >= 2) app.querySelectorAll('[data-ti]').forEach(x => { if (!x.disabled && G.tiles[+x.dataset.ti] === target[G.pos]) x.classList.add('glow'); });
+        return false; }
+      G.pos++; G.combo++; G.miss = 0; G.score += 5 * Math.min(G.combo, 6); app.querySelectorAll('.glow').forEach(x => x.classList.remove('glow'));
+      jump(); const tr = app.querySelector('.trail'); if (tr) tr.textContent = target.slice(0, G.pos); const sc = app.querySelector('.bar .pill'); if (sc) sc.textContent = `${G.score} נק׳`;
+      return true;
+    } });
+  },
+  end() { const nb = setBest('tramp', G.score); gameOver('איזה קפיצות!', `<p class="center">${G.score} נקודות${nb ? ' · שיא חדש! 🏆' : ''}</p>`, 2 + Math.floor(G.score / 60), () => startGame('tramp')); },
+};
+function jump(flip) {
+  const r = document.getElementById('tr'); if (!r) return;
+  if (flip === false) { r.classList.remove('boing', 'tflip', 'wobble'); void r.offsetWidth; r.classList.add('wobble'); return; }
+  r.style.setProperty('--h', `${Math.min(150, 30 + G.pos * 14)}px`);
+  r.classList.remove('boing', 'tflip', 'wobble'); void r.offsetWidth; r.classList.add(flip ? 'tflip' : 'boing');
+}
+/* 2. candy memory: pairs of English word and its meaning */
+GAMES.memory = {
+  init: () => { const ws = gameWords(6); return { cards: shuffle(ws.flatMap((w, i) => [{ i, en: 1, w }, { i, en: 0, w }])), open: [], got: [], moves: 0 }; },
+  view() {
+    const cols = ['#FF5FA2', '#FFC845', '#2EC4B6', '#9B5DE5', '#3A86FF', '#FF7A3D'];
+    app.innerHTML = `<div class="page play">${gBar('ממתקיית הזיכרון', `${G.moves} מהלכים`)}
+    <p class="center small muted">מצאי זוגות: מילה באנגלית והפירוש שלה</p>
+    <div class="mem">${G.cards.map((c, j) => { const up = G.open.includes(j) || G.got.includes(c.i); return `<button class="mcard ${up ? 'up' : ''} ${G.got.includes(c.i) ? 'got' : ''}" data-mc="${j}"><span class="back">${candySVG(cols[j % 6], 44)}</span><span class="face">${c.en ? `<b dir="ltr">${esc(c.w.en)}</b>` : `<span class="em">${c.w.em}</span><span>${esc(c.w.he[0])}</span>`}</span></button>`; }).join('')}</div></div>`;
+    on('[data-mc]', b => {
+      const j = +b.dataset.mc, c = G.cards[j];
+      if (G.open.length >= 2 || G.open.includes(j) || G.got.includes(c.i)) return;
+      G.open.push(j); b.classList.add('up'); if (c.en) sayWord(c.w); else SFX.tap();
+      if (G.open.length < 2) return;
+      G.moves++; const [a, d] = G.open.map(x => G.cards[x]);
+      if (a.i === d.i) { G.got.push(a.i); G.open = []; SFX.coin(); later(() => { render(); if (G.got.length === 6) GAMES.memory.end(); }, 350); }
+      else later(() => { G.open = []; render(); }, 950);
+      const sc = app.querySelector('.bar .pill'); if (sc) sc.textContent = `${G.moves} מהלכים`;
+    });
+  },
+  end() { const nb = setBest('memory', G.moves); gameOver('כל הזוגות!', `<p class="center">${G.moves} מהלכים${nb ? ' · שיא חדש! 🏆' : ''}</p>`, G.moves <= 9 ? 6 : G.moves <= 13 ? 4 : 3, () => startGame('memory')); },
+};
+/* 3. element rain: three orbs fall, tap the one that is spelled right (or that means the word) */
+GAMES.rain = {
+  init: () => ({ ws: gameWords(12), wave: 0, lives: 3, score: 0, speed: 38 }),
+  start: () => GAMES.rain.next(),
+  view() {
+    app.innerHTML = `<div class="page play">${gBar('גשם היסודות', `${G.score} נק׳`)}
+    <div class="rain" id="rain"><div class="lives">${'❤️'.repeat(G.lives)}${'🤍'.repeat(3 - G.lives)}</div></div>
+    <div class="prompt rp" id="rp"></div></div>`;
+  },
+  next() {
+    if (!G || G.k !== 'rain') return;
+    if (G.lives <= 0 || G.wave >= 15) return GAMES.rain.end();
+    const w = G.ws[G.wave % G.ws.length], spell = G.wave % 2 === 0; G.wave++;
+    const wrong = spell ? misspell(w.en, 2) : others(w, curList() || LIST0, 2).map(x => x.en.toLowerCase());
+    const opts = shuffle([{ t: w.en.toLowerCase(), ok: 1 }, ...wrong.map(t => ({ t, ok: 0 }))]);
+    const box = document.getElementById('rain'); if (!box) return;
+    box.querySelectorAll('.orb').forEach(o => o.remove());
+    const ks = shuffle(Object.keys(ELEMS));
+    G.orbs = opts.map((o, i) => { const el = document.createElement('button'); el.className = 'orb'; el.style.setProperty('--c', ELEMS[ks[i]].c); el.style.left = `${6 + i * 32}%`; el.innerHTML = `${elemSVG(ks[i], 22)}<b dir="ltr">${esc(o.t)}</b>`; box.appendChild(el); const ob = { ...o, el, y: -70 - i * 26, dead: 0 }; el.onclick = () => GAMES.rain.tap(ob); return ob; });
+    document.getElementById('rp').innerHTML = `${w.em ? `<span class="em">${w.em}</span>` : ''}<div class="he">${w.he.map(esc).join(' / ')}</div><span class="small muted">${spell ? 'איזה איות נכון?' : 'איזו מילה זאת?'}</span>${spell ? sayBtn() : ''}`;
+    on('#rp [data-say]', () => sayWord(w)); if (spell) sayWord(w);
+    G.w = w; G.t0 = performance.now(); G.H = box.clientHeight; let prev = performance.now();
+    cancelAnimationFrame(RAF);
+    const step = now => {
+      if (!G || G.k !== 'rain' || !document.getElementById('rain')) return;
+      const dt = Math.min(.05, (now - prev) / 1000); prev = now;
+      for (const o of G.orbs) { if (o.dead) continue; o.y += G.speed * dt; o.el.style.transform = `translateY(${o.y}px)`; if (o.y > G.H - 70) { if (o.ok) return GAMES.rain.miss(o); o.dead = 1; o.el.classList.add('gone'); } }
+      RAF = requestAnimationFrame(step);
+    };
+    RAF = requestAnimationFrame(step);
+  },
+  tap(o) {
+    if (!G || o.dead) return;
+    if (o.ok) { o.dead = 1; o.el.classList.add('burst'); G.score += 10 + Math.round(G.speed / 4); G.speed = Math.min(120, G.speed + 6); SFX.coin(); sayWord(G.w); cancelAnimationFrame(RAF); GAMES.rain.hud(); later(() => GAMES.rain.next(), 650); }
+    else { o.dead = 1; o.el.classList.add('wrong'); G.lives--; SFX.no(); GAMES.rain.hud(); if (G.lives <= 0) { cancelAnimationFrame(RAF); later(() => GAMES.rain.end(), 700); } }
+  },
+  miss(o) { o.dead = 1; o.el.classList.add('show'); G.lives--; SFX.soft(); sayWord(G.w); cancelAnimationFrame(RAF); GAMES.rain.hud(); later(() => GAMES.rain.next(), 1300); },
+  hud() { const l = app.querySelector('.lives'); if (l) l.textContent = '❤️'.repeat(Math.max(0, G.lives)) + '🤍'.repeat(3 - Math.max(0, G.lives)); const sc = app.querySelector('.bar .pill'); if (sc) sc.textContent = `${G.score} נק׳`; },
+  end() { if (!G || G.over) return; cancelAnimationFrame(RAF); const nb = setBest('rain', G.score); gameOver(G.lives > 0 ? 'שלטת ביסודות!' : 'נגמרו הלבבות', `<p class="center">${G.score} נקודות${nb ? ' · שיא חדש! 🏆' : ''}</p>`, 2 + Math.floor(G.score / 50), () => startGame('rain')); },
+};
+/* 4. teacher Romi: she reads the words to dad, dad writes on paper, then she checks him */
+GAMES.teach = {
+  init: () => { const l = curList() || LIST0; return { l, ws: shuffle(l.words), i: 0, ph: 'intro', mode: 'en', marks: {} }; },
+  view() {
+    const l = G.l;
+    if (G.ph === 'intro') {
+      app.innerHTML = `<div class="page play">${gBar('המורה רומי', '👩‍🏫')}<section class="card stack center"><div class="big-romi">${romiSVG()}</div>
+      <h2>היום את המורה!</h2><p>אבא מביא דף ועט. את מקריאה לו את המילים אחת-אחת, והוא כותב. בסוף את בודקת אותו ונותנת לו ציון.</p>
+      <button class="btn btn-main big" data-m="en">להקריא באנגלית</button><button class="btn btn-ghost big" data-m="he">להקריא בעברית (אבא כותב באנגלית)</button></section></div>`;
+      on('[data-m]', b => { G.mode = b.dataset.m; G.ph = 'read'; render(); });
+      return;
+    }
+    if (G.ph === 'read') {
+      const w = G.ws[G.i];
+      app.innerHTML = `<div class="page play">${gBar('המורה רומי', `${G.i + 1}/${G.ws.length}`)}<section class="card stack center teach">
+      <div class="small muted">תקריאי לאבא:</div>${G.mode === 'en' ? `<div class="word huge" dir="ltr">${esc(w.en)}</div><div class="row center">${sayBtn()}<span class="small muted">איך אומרים את זה</span></div>` : `<div class="he huge">${esc(w.he[0])}</div>`}
+      <button class="btn btn-main big" data-act="nx">${G.i + 1 < G.ws.length ? 'המילה הבאה' : 'סיימנו! לבדיקה'}</button></section></div>`;
+      on('[data-say]', () => sayWord(w));
+      on('[data-act="nx"]', () => { SFX.tap(); if (++G.i >= G.ws.length) G.ph = 'check'; render(); });
+      return;
+    }
+    const n = G.ws.length, good = Object.values(G.marks).filter(Boolean).length, all = Object.keys(G.marks).length === n;
+    app.innerHTML = `<div class="page play">${gBar('בדיקה של אבא', `${good}/${n}`)}<p class="center small muted">השווי למה שאבא כתב. סמני ✓ או ✗ לכל מילה.</p>
+    <div class="paper check"><ol>${G.ws.map((w, j) => `<li><span class="grow"><b dir="ltr">${esc(w.en)}</b> · ${esc(w.he[0])}</span><button class="mk ${G.marks[j] === true ? 'on ok' : ''}" data-mk="${j}" data-v="1">✓</button><button class="mk ${G.marks[j] === false ? 'on no' : ''}" data-mk="${j}" data-v="0">✗</button></li>`).join('')}</ol></div>
+    <button class="btn btn-main big" data-act="grade" ${all ? '' : 'disabled'}>ציון לאבא</button></div>`;
+    on('[data-mk]', b => { G.marks[+b.dataset.mk] = b.dataset.v === '1'; render(); });
+    on('[data-act="grade"]', () => { const sc = Math.round(good / n * 100); SFX.win(); gameOver(`אבא קיבל ${sc}!`, `<p class="center">${sc === 100 ? 'אבא כתב הכל נכון. מורה טובה עושה תלמיד טוב!' : 'אבא צריך עוד קצת להתאמן 😄 את יכולה להסביר לו איפה טעה.'}</p>`, 5, () => startGame('teach')); });
+  },
+};
+/* 5. friends duel: two players, one phone, five words each */
+GAMES.duel = {
+  init: () => ({ ph: 'setup', names: [NAME, 'חברה'], ws: gameWords(10), r: 0, turn: 0, sc: [0, 0], rounds: 5 }),
+  view() {
+    if (G.ph === 'setup') {
+      app.innerHTML = `<div class="page play">${gBar('דו-קרב חברות', '👭')}<section class="card stack"><h2 class="center">מי משחקת?</h2>
+      <label class="small">שחקנית 1<input class="txt" id="n0" value="${esc(G.names[0])}" maxlength="14"></label><label class="small">שחקנית 2<input class="txt" id="n1" value="${esc(G.names[1])}" maxlength="14" placeholder="השם של החברה"></label>
+      <p class="small muted">כל אחת שומעת מילה וכותבת אותה. 5 מילים לכל אחת. מעבירים את הטלפון בין התורות.</p><button class="btn btn-main big" data-act="go">מתחילות!</button></section></div>`;
+      on('[data-act="go"]', () => { G.names = [0, 1].map(i => (document.getElementById('n' + i).value || '').trim() || ['שחקנית 1', 'שחקנית 2'][i]); G.ph = 'pass'; render(); });
+      return;
+    }
+    if (G.ph === 'pass') {
+      app.innerHTML = `<div class="page play">${gBar('דו-קרב חברות', `${G.sc[0]} : ${G.sc[1]}`)}<section class="card stack center"><div class="small muted">סיבוב ${G.r + 1} מתוך ${G.rounds}</div><h2>התור של ${esc(G.names[G.turn])}!</h2><p>${G.turn ? 'תני לה את הטלפון 📱' : ''}</p><button class="btn btn-main big" data-act="ready">מוכנה!</button></section></div>`;
+      on('[data-act="ready"]', () => { G.ph = 'play'; render(); sayWord(G.ws[G.r * 2 + G.turn]); });
+      return;
+    }
+    const w = G.ws[G.r * 2 + G.turn];
+    app.innerHTML = `<div class="page play haskbd">${gBar(esc(G.names[G.turn]), `${G.sc[0]} : ${G.sc[1]}`)}<section class="q"><div class="ask">הקשיבי וכתבי</div><div class="prompt">${sayBtn('en', 1)}${slowBtn()}<span class="em">${w.em}</span></div></section><div id="fb"></div>
+    <section class="ans"><div id="typed"></div>${kbdHTML('en')}</section></div>`;
+    on('[data-say]', b => sayWord(w, b.dataset.say === 'slow' ? .5 : undefined));
+    bindKbd({ lang: 'en', onEnter: v => {
+      KB.lock = true; const ok = checkEn(w, v); if (ok) { G.sc[G.turn] += 10; SFX.ok(); } else SFX.soft();
+      fb(`<div class="fb ${ok ? 'fb-good' : 'fb-bad'}">${ok ? 'נכון! +10' : `הנכון: <b dir="ltr">${esc(w.en.toLowerCase())}</b>`}</div>`);
+      later(() => { if (G.turn === 1) G.r++; G.turn = 1 - G.turn; if (G.r >= G.rounds) return GAMES.duel.end(); G.ph = 'pass'; render(); }, 1400);
+    } });
+  },
+  end() {
+    const [a, b] = G.sc, win = a === b ? -1 : a > b ? 0 : 1;
+    gameOver(win < 0 ? 'תיקו! חברות אמיתיות' : `${esc(G.names[win])} ניצחה!`, `<p class="center">${esc(G.names[0])} ${a} · ${esc(G.names[1])} ${b}</p>`, 4, () => { const nm = G.names; startGame('duel'); G.names = nm; render(); });
+  },
+};
+
+/* ---- romi/src/66-wand.js ---- */
+/* ---------- the Magic E wand: practice for the test on 23.11. Three kinds of rounds, like the test tasks:
+   listen and circle (cap or cape?), the right spelling of a long vowel, and complete the sentence ---------- */
+GAMES.wand = {
+  init() {
+    const rounds = shuffle([
+      ...shuffle(MAGIC).slice(0, 5).map(p => { const long = R() < .6; return { k: 'magic', p, say: long ? p[1] : p[0], ans: long ? p[1] : p[0], opts: [p[0], p[1]] }; }),
+      ...shuffle(VOWEL_TEAMS).slice(0, 4).map(([w, bad]) => ({ k: 'team', say: w, ans: w, opts: shuffle([w, ...bad]) })),
+      ...shuffle(SENTENCES).slice(0, 4).map(([s, w]) => ({ k: 'sent', s, ans: w, opts: shuffle([w, ...shuffle(SENT_WORDS().filter(x => x !== w)).slice(0, 2)]) })),
+    ]);
+    return { rounds, i: 0, score: 0, miss: 0 };
+  },
+  start: () => GAMES.wand.speak(),
+  speak() { const r = G && G.rounds[G.i]; if (!r) return; if (r.k === 'sent') return; const w = [...LIST_EXAM.words, ...LIST_1104.words].find(x => x.en.toLowerCase() === r.say); w ? sayWord(w) : say(r.say); },
+  view() {
+    const r = G.rounds[G.i], n = G.rounds.length;
+    const ask = r.k === 'magic' ? 'איזו מילה שמעת?' : r.k === 'team' ? 'איך כותבים את מה ששמעת?' : 'השלימי את המשפט';
+    const prompt = r.k === 'sent' ? `<div class="sent" dir="ltr">${esc(r.s).replace('___', '<span class="blank">____</span>')}</div>` : `${sayBtn('en', 1)}`;
+    app.innerHTML = `<div class="page play">${gBar('שרביט ה-E', `${G.score} נק׳`)}
+    <div class="prog"><i style="width:${Math.round(G.i / n * 100)}%"></i></div>
+    <section class="q"><div class="ask">${ask}</div><div class="prompt">${prompt}</div></section><div id="fb"></div>
+    <section class="ans"><div class="opts ${r.opts.length === 2 ? 'two' : ''}">${r.opts.map((o, j) => `<button class="opt" data-w="${j}" dir="ltr">${esc(o)}</button>`).join('')}</div></section>
+    ${r.k === 'magic' ? '<p class="small muted center">ה-E בסוף לא נשמעת, אבל היא גורמת לתנועה להגיד את השם שלה: a, i, o, u.</p>' : ''}</div>`;
+    on('[data-say]', () => GAMES.wand.speak());
+    on('[data-w]', b => GAMES.wand.pick(r, r.opts[+b.dataset.w], b));
+  },
+  pick(r, o, b) {
+    if (r.done) return;
+    if (o !== r.ans) { b.classList.add('bad'); b.disabled = true; SFX.no(); r.tries = (r.tries || 0) + 1; if (r.k !== 'sent') GAMES.wand.speak(); return; }
+    r.done = 1; b.classList.add('good'); const pts = r.tries ? 4 : 10; G.score += pts; SFX.ok();
+    let msg = '';
+    if (r.k === 'magic') { const [a, c, ha, hc] = r.p; msg = `<span dir="ltr"><b>${a}</b> + e = <b>${c}</b></span><div class="small">${a} = ${ha} · ${c} = ${hc}</div>`; say(r.ans); }
+    else if (r.k === 'sent') { const full = r.s.replace('___', r.ans); msg = `<span dir="ltr">${esc(full)}</span>`; say(full, 'en', .8); }
+    else { const w = LIST_EXAM.words.find(x => x.en === r.ans); msg = `<b dir="ltr">${esc(r.ans)}</b>${w ? ` = ${esc(w.he[0])}` : ''}`; }
+    fb(`<div class="fb fb-good">+${pts} · ${msg}</div>`);
+    later(() => { G.i++; if (G.i >= G.rounds.length) return GAMES.wand.end(); render(); GAMES.wand.speak(); }, r.k === 'sent' ? 2600 : 1700);
+  },
+  end() { const nb = setBest('wand', G.score); gameOver('קסם!', `<p class="center">${G.score} נקודות${nb ? ' · שיא חדש!' : ''}</p>`, 2 + Math.floor(G.score / 25), () => startGame('wand')); },
+};
+GIC.wand = pic('<path d="M5 27L20 12"/><path d="M23 4l1.4 3.6L28 9l-3.6 1.4L23 14l-1.4-3.6L18 9l3.6-1.4z"/><path d="M9 6l.7 1.8L11.5 8.5 9.7 9.2 9 11l-.7-1.8L6.5 8.5l1.8-.7z"/>');
+
+/* ---- romi/src/70-more.js ---- */
+/* ---------- all lists, and the shop (leotards, ribbons) with the sticker album ---------- */
+VIEWS.lists = () => {
+  const cls = allClass().slice().sort((a, b) => (a.date || '') < (b.date || '') ? 1 : -1);
+  const block = (l, cls2) => `<section class="card stack ${cls2 || ''}"><div class="row"><span class="gem">${l.em || '📒'}</span><div class="grow"><b>${esc(l.t)}</b><div class="small muted">${l.date ? dateHe(l.date) + ' · ' : ''}${l.words.length} מילים · ${listStars(l)} כוכבים</div></div></div>
+  <div class="wchips">${l.words.map(w => wordChip(w, l)).join('')}</div><div class="row"><button class="btn btn-main" data-pr="${l.id}">אימון</button>${l.src === 'class' ? `<button class="btn btn-ghost" data-ts="${l.id}">הכתבה לדוגמה</button>` : ''}</div></section>`;
+  app.innerHTML = `<div class="page">${topBar('כל הרשימות')}
+  <h3 class="sec">מהכיתה</h3>${cls.map(l => block(l)).join('') || '<p class="muted">עוד אין.</p>'}
+  <h3 class="sec">מעבר לכיתה</h3>${bonusLists().map(l => block(l, 'bonus')).join('')}</div>`;
+  on('[data-pr]', b => startPractice(listById(b.dataset.pr)));
+  on('[data-ts]', b => startTest(listById(b.dataset.ts)));
+};
+VIEWS.shop = () => {
+  const jar = Math.min(100, Math.round((S.candyAll || 0) % 100));
+  const item = (kind, k, o) => { const own = S.own[kind].includes(k), cur = S[kind] === k; return `<button class="shopit ${cur ? 'cur' : ''}" data-buy="${kind}:${k}"><span class="sw" style="background:${kind === 'leo' ? `linear-gradient(135deg,${o.c.join(',')})` : o.c}"></span><b>${o.t}</b><span class="small">${cur ? 'עכשיו' : own ? 'שלך' : `${o.price} ${CANDY(14)}`}</span></button>`; };
+  app.innerHTML = `<div class="page">${topBar('החנות של רומי')}
+  <section class="card shoptop"><div class="big-romi">${romiSVG()}</div><div class="grow"><div class="jar"><i style="height:${jar}%"></i><span>${S.candy}</span></div><div class="small muted center">ממתקים לבזבז</div></div></section>
+  <h3 class="sec">בגד התעמלות</h3><div class="shopgrid">${Object.entries(LEOS).filter(([k, o]) => !o.gift || S.own.leo.includes(k)).map(([k, o]) => item('leo', k, o)).join('')}</div>
+  <h3 class="sec">סרט לשיער</h3><div class="shopgrid">${Object.entries(RIBS).map(([k, o]) => item('rib', k, o)).join('')}</div>
+  <h3 class="sec">אלבום מדבקות</h3><section class="card"><div class="album">${S.stickers.map(s => `<span class="sticker" title="${esc(s.t)}">${esc(s.em)}<small>${esc(s.t)}</small></span>`).join('') || '<p class="small muted">מקבלים מדבקה על 100 בהכתבה לדוגמה.</p>'}</div></section></div>`;
+  on('[data-buy]', b => {
+    const [kind, k] = b.dataset.buy.split(':'), o = (kind === 'leo' ? LEOS : RIBS)[k];
+    if (S.own[kind].includes(k)) { S[kind] = k; save(); SFX.tap(); return render(); }
+    if (S.candy < o.price) return toast(`חסרים עוד ${o.price - S.candy} ממתקים`);
+    modal(`לקנות ${o.t}?`, `זה עולה ${o.price} ממתקים.`, [['קנייה', () => { S.candy -= o.price; S.own[kind].push(k); S[kind] = k; save(); SFX.win(); render(); }], ['לא עכשיו']]);
+  });
+};
+
+/* ---- romi/src/75-extras.js ---- */
+/* ---------- extras: birthday, general review, the speaking game, confetti, self-update ---------- */
+/* Romi was born on 3 April 2017 */
+const BDAY = { m: 4, d: 3, y: 2017 };
+const isBday = (t = todayStr()) => +t.slice(5, 7) === BDAY.m && +t.slice(8) === BDAY.d;
+const ageOn = (t = todayStr()) => +t.slice(0, 4) - BDAY.y;
+function daysToBday() { const t = todayStr(), y = +t.slice(0, 4), md = `-0${BDAY.m}-0${BDAY.d}`; let b = y + md; if (dayDiff(t, b) < 0) b = (y + 1) + md; return dayDiff(t, b); }
+function bdayHTML() {
+  if (isBday()) return `<section class="bday"><span class="bd-ic">${GIC.cake}</span><div class="grow"><b>יום הולדת ${ageOn()} שמח, ${NAME}!</b><span>המתנה שלך: 50 ממתקים ובגד התעמלות של יום הולדת.</span></div></section>`;
+  const n = daysToBday();
+  return n <= 14 ? `<div class="soon">${GIC.cake.replace('width="30" height="30"', 'width="20" height="20"')}<span>${n === 1 ? 'מחר יום ההולדת שלך!' : `עוד ${n} ימים ליום ההולדת שלך`}</span></div>` : '';
+}
+function bdayGift() {
+  const t = todayStr(), y = t.slice(0, 4); if (!isBday() || (S.bday || {})[y] || S.view !== 'home') return;
+  S.bday = S.bday || {}; S.bday[y] = 1; addCandy(50); if (!S.own.leo.includes('bday')) S.own.leo.push('bday'); S.leo = 'bday'; S.seen.welcome = 1; save();
+  confetti(); SFX.win(); say(`Happy birthday Romi! You are ${ageOn()}!`);
+  modal(`יום הולדת ${ageOn()} שמח!`, `<div class="center">${romiSVG({ leo: 'bday' })}</div><p class="center">רומי, מזל טוב! קיבלת <b>50 ממתקים</b> ובגד התעמלות מיוחד של יום הולדת. הוא כבר עלייך.</p>`, [['תודה!', () => render()]]);
+}
+/* general review: every word of every class list, the ones that need it first */
+function reviewList() {
+  const seen = new Set(), words = [];
+  for (const l of allClass()) for (const w of l.words) { const k = kOf(w); if (seen.has(k)) continue; seen.add(k); words.push(w); }
+  return { id: 'review', t: 'חזרה כללית', src: 'review', he: true, words };
+}
+function reviewPlan(list) {
+  const t = todayStr(), need = w => { const q = S.p[kOf(w)] || {}; return (q.due && q.due <= t ? 100 : 0) + (q.st >= maxSt(list) ? 0 : 50) + ((q.bad || 0) - (q.ok || 0)) * 3 + (q.last ? Math.min(30, dayDiff(q.last, t)) : 40); };
+  const q = list.words.slice().sort((a, b) => need(b) - need(a)).slice(0, 8);
+  return { q: shuffle(q), n: 12 };
+}
+/* ---------- the speaking game (only where the phone can listen) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+let SRI = null;
+GAMES.speak = {
+  init: () => ({ ws: gameWords(8), i: 0, score: 0, tries: 0, heard: '' }),
+  view() {
+    const w = G.ws[G.i];
+    app.innerHTML = `<div class="page play">${gBar('תגידי את זה', `${G.score} נק׳`)}
+    <section class="q speak"><div class="ask">אמרי באנגלית</div><div class="em big">${w.em}</div><div class="word" dir="ltr">${esc(w.en)}</div><div class="he">${w.he.map(esc).join(' / ')}</div>
+    <div class="row center"><button class="btn btn-ghost" data-act="hear">${IC.sound} איך אומרים</button></div>
+    <button class="micbtn" data-act="mic" aria-label="להקשיב">${GIC.mic}</button><div class="small muted" id="heard">${G.heard ? `שמעתי: <b dir="ltr">${esc(G.heard)}</b>` : 'לחצי על המיקרופון ותגידי את המילה'}</div></section>
+    <div id="fb"></div><p class="small muted center">מילה ${G.i + 1} מתוך ${G.ws.length}</p></div>`;
+    on('[data-act="hear"]', () => sayWord(w));
+    on('[data-act="mic"]', b => GAMES.speak.listen(w, b));
+  },
+  listen(w, b) {
+    if (SRI) { try { SRI.abort(); } catch (e) { } SRI = null; b.classList.remove('on'); return; }
+    try { if (TTS) TTS.cancel(); } catch (e) { }
+    const r = new SR(); SRI = r; r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 5; b.classList.add('on');
+    r.onresult = e => {
+      const alts = [...e.results[0]].map(a => normEn(a.transcript)), target = normEn(w.en);
+      const ok = alts.some(a => a === target || a.split(' ').includes(target) || (target.includes(' ') && a.includes(target)));
+      G.heard = alts[0] || '';
+      if (ok) { G.score += G.tries ? 5 : 10; SFX.ok(); fb(`<div class="fb fb-good">מעולה! הטלפון הבין: <b dir="ltr">${esc(w.en)}</b></div>`); later(() => GAMES.speak.next(), 1300); }
+      else { G.tries++; SFX.soft(); const h = document.getElementById('heard'); if (h) h.innerHTML = `שמעתי: <b dir="ltr">${esc(G.heard || '...')}</b>`; fb(`<div class="fb fb-bad">${G.tries >= 3 ? 'לא נורא, ממשיכים.' : 'עוד פעם? אפשר לשמוע איך אומרים.'}</div>`); if (G.tries >= 3) later(() => GAMES.speak.next(), 1300); }
+    };
+    r.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('צריך לאשר מיקרופון וזיהוי דיבור (הגדרות ← ספארי)', 4500); else if (e.error === 'no-speech') toast('לא שמעתי. נסי שוב, קרוב לטלפון.'); };
+    r.onend = () => { SRI = null; b.classList.remove('on'); };
+    try { r.start(); } catch (e) { SRI = null; b.classList.remove('on'); }
+  },
+  next() { if (!G || G.k !== 'speak') return; G.i++; G.tries = 0; G.heard = ''; if (G.i >= G.ws.length) return gameOver('כל הכבוד!', `<p class="center">${G.score} נקודות${setBest('speak', G.score) ? ' · שיא חדש!' : ''}</p>`, 2 + Math.floor(G.score / 20), () => startGame('speak')); render(); },
+};
+/* ---------- confetti (a short burst, skipped when the phone asks for less motion) ---------- */
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = document.createElement('canvas'); cv.className = 'confetti'; document.body.appendChild(cv);
+  const dpr = devicePixelRatio || 1, W = innerWidth, H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; const x = cv.getContext('2d'); x.scale(dpr, dpr);
+  const cols = ['#FF3D8B', '#FFC229', '#2D5BFF', '#13B98A', '#9B5DE5'];
+  const ps = Array.from({ length: 140 }, () => ({ x: W / 2 + (R() - .5) * 80, y: H * .35, vx: (R() - .5) * 9, vy: -R() * 11 - 4, r: R() * 6.28, vr: (R() - .5) * .3, c: pick(cols), s: 5 + R() * 6 }));
+  const t0 = performance.now();
+  const step = now => { const dt = now - t0; x.clearRect(0, 0, W, H); for (const p of ps) { p.vy += .32; p.x += p.vx; p.y += p.vy; p.r += p.vr; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore(); } if (dt < 2800) requestAnimationFrame(step); else cv.remove(); };
+  requestAnimationFrame(step);
+}
+/* ---------- the app updates itself: when a new version is on the site, reload on the home screen ---------- */
+async function autoUpdate() {
+  try {
+    const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
+    const v = String((await r.json()).v); if (v === APP_VER) return;
+    let tried = ''; try { tried = sessionStorage.getItem('salta-upd') || ''; } catch (e) { }
+    if (tried === v || !['home', 'lists', 'shop'].includes(S.view) || document.querySelector('.modal')) return;
+    try { sessionStorage.setItem('salta-upd', v); } catch (e) { }
+    save(); toast('מעדכנת לגרסה חדשה...');
+    try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); } catch (e) { }
+    setTimeout(() => location.reload(), 600);
+  } catch (e) { }
+}
+
+/* ---- romi/src/80-parent.js ---- */
+/* ---------- parent area (PIN). On Romi's phone it changes her data directly. On dad's phone (cloud, role dad) it sends changes through the cloud ---------- */
+let PARENT_OK = false, DRAFT = null;
+VIEWS.parent = () => {
+  if (!PARENT_OK) return pinGate();
+  if (isDad() && !PDOC) { PDOC = {}; dadLoad().then(() => { if (S.view === 'parent') render(); }); }
+  const dad = isDad(), D = dad ? (RKID || { lists: [], p: {}, tests: [], days: {} }) : S;
+  const lists = arr(D.lists).filter(l => l.src === 'class').sort((a, b) => (a.date || '') < (b.date || '') ? 1 : -1);
+  app.innerHTML = `<div class="page parent">${topBar(dad ? 'הטלפון של אבא' : 'אזור הורים')}
+  ${dad ? `<section class="card small">${RKID ? `נתונים מהטלפון של רומי, ${agoTxt(Date.parse(RKID._at))}.` : 'עוד לא נטענו נתונים מהענן.'} <button class="chip" data-act="reload">רענן</button></section>` : ''}
+  <section class="card stack newlist"><h3>רשימה חדשה</h3>
+  <ol class="howto"><li>בוואטסאפ: לחיצה ארוכה על ההודעה של המורה ← העתקה.</li><li>כאן: "הדבקה מהוואטסאפ". המילים, התרגום, התמונות והתאריך נקראים לבד.</li><li>בודקים ושומרים. רומי רואה את הרשימה מיד.</li></ol>
+  <button class="btn btn-main big" data-act="clip">הדבקה מהוואטסאפ</button>
+  <details class="small"><summary class="muted">או להדביק או לכתוב כאן</summary><textarea class="txt" id="paste" rows="5" placeholder="1. Neighbor – שכן / שכנה 🏡&#10;2. Flower – פרח 🌷"></textarea><button class="btn btn-ghost" data-act="parse">קריאת הרשימה</button></details>
+  <div id="draft">${draftHTML()}</div></section>
+  <section class="card stack"><h3>הרשימות</h3>${lists.map(l => { const t = arr(D.tests).filter(x => x.list === l.id).slice(-1)[0]; return `<div class="lrow"><div class="grow"><b>${esc(l.t)}</b><div class="small muted">${l.date ? dateHe(l.date) + ' · ' : ''}${l.words.length} מילים · ${pctWith(D, l)}% מוכן${t ? ` · הכתבה לדוגמה: ${t.score}` : ''}</div></div><button class="chip" data-edit="${l.id}">עריכה</button><button class="chip" data-del="${l.id}">מחיקה</button></div>`; }).join('') || '<p class="small muted">אין רשימות.</p>'}</section>
+  ${progressHTML(D, lists[0] && lists.find(l => l.id === (curListOf(D) || {}).id) || lists[0])}
+  ${voiceHTML(lists.find(l => l.id === (curListOf(D) || {}).id) || lists[0])}
+  <section class="card stack"><h3>הודעה לרומי</h3><p class="small muted">מופיעה פעם אחת במסך הבית שלה.</p><input class="txt" id="note" maxlength="140" placeholder="רומי, ראיתי שהתאמנת היום. כל הכבוד!"><button class="btn btn-ghost" data-act="note">שלח</button></section>
+  <section class="card stack"><h3>הודעות מאבא</h3><p class="small muted">מופיעות מדי פעם בסוף אימון, ופעם אחת כשיש רצף טעויות. שורה לכל הודעה.</p><textarea class="txt" id="dadmsgs" rows="6">${esc(((dad ? arr((PDOC || {}).dadMsgs) : S.dadMsgs) || DAD_DEF).join('\n'))}</textarea><button class="btn btn-ghost" data-act="dadsave">שמור</button></section>
+  ${dad ? '' : settingsHTML()}
+  ${cloudSection()}
+  <p class="small muted center">סלטה · גרסה ${APP_VER}</p></div>`;
+  bindParent();
+};
+function pinGate() {
+  const set = !S.pin;
+  app.innerHTML = `<div class="page">${topBar('אזור הורים')}<section class="card stack center"><h3>${set ? 'בחר קוד של 4 ספרות' : 'קוד הורים'}</h3><p class="small muted">${set ? 'הקוד שומר שרק אבא נכנס לכאן.' : ''}</p>
+  <input class="txt pin" id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off"><button class="btn btn-main" data-act="pin">${set ? 'שמירה' : 'כניסה'}</button></section></div>`;
+  const inp = document.getElementById('pin'); setTimeout(() => inp && inp.focus(), 100);
+  const go2 = () => { const v = inp.value.trim(); if (!/^\d{4}$/.test(v)) return toast('4 ספרות'); if (set) { S.pin = v; save(); } else if (v !== S.pin) { inp.value = ''; return toast('קוד לא נכון'); } PARENT_OK = true; render(); };
+  on('[data-act="pin"]', go2); inp.onkeydown = e => { if (e.key === 'Enter') go2(); };
+}
+const curListOf = D => { const t = todayStr(), c = arr(D.lists).filter(l => l.src === 'class'); return c.filter(l => l.date && l.date >= t).sort((a, b) => a.date < b.date ? -1 : 1)[0] || c[c.length - 1]; };
+function pctWith(D, l) { const M = maxSt(l); return Math.round(l.words.reduce((a, w) => a + Math.min(1, ((D.p || {})[kOf(w)] || {}).st / M || 0), 0) / (l.words.length || 1) * 100); }
+function progressHTML(D, l) {
+  if (!l) return '';
+  const M = maxSt(l), wk = Object.keys(D.days || {}).filter(d => dayDiff(d, todayStr()) < 7).length;
+  return `<section class="card stack"><h3>ההתקדמות: ${esc(l.t)}</h3><p class="small muted">${wk} ימי אימון השבוע. השלבים: פירוש ← זיהוי ← הרכבה ← הכתבה ← מעברית ← פירוש בכתב ← כוכב.</p>
+  <table class="ptab"><tr><th>מילה</th><th>שלב</th><th>טעויות</th><th>מה כתבה</th></tr>${l.words.map(w => { const q = (D.p || {})[kOf(w)] || {}; return `<tr><td dir="ltr">${esc(w.en)}</td><td>${Math.min(q.st || 0, M)}/${M}${(q.st || 0) >= M ? ' ⭐' : ''}</td><td>${q.bad || 0}</td><td dir="ltr" class="small">${arr(q.wr).map(esc).join(', ')}</td></tr>`; }).join('')}</table></section>`;
+}
+function draftHTML() {
+  if (!DRAFT) return '';
+  return `<div class="stack draft"><div class="row"><input class="txt grow" id="dt" value="${esc(DRAFT.t)}" placeholder="שם הרשימה"><input class="txt" id="dd" type="date" value="${DRAFT.date || ''}"></div>
+  ${DRAFT.words.map((w, i) => `<div class="drow"><input class="txt em" data-f="em" data-i="${i}" value="${esc(w.em)}"><input class="txt" dir="ltr" data-f="en" data-i="${i}" value="${esc(w.en)}"><input class="txt" data-f="he" data-i="${i}" value="${esc(w.he.join(' / '))}" placeholder="פירוש"><button class="chip" data-rm="${i}">✕</button></div>`).join('')}
+  <div class="row"><button class="chip" data-act="addrow">+ מילה</button><span class="grow"></span><span class="small muted">${DRAFT.words.length} מילים</span></div>
+  <label class="small row"><input type="checkbox" id="dhe" ${DRAFT.he ? 'checked' : ''}> צריך לכתוב גם את הפירוש בעברית</label>
+  <button class="btn btn-main" data-act="savelist">שמירת הרשימה</button></div>`;
+}
+function readDraft() {
+  if (!DRAFT) return;
+  DRAFT.t = (document.getElementById('dt') || {}).value || DRAFT.t; DRAFT.date = (document.getElementById('dd') || {}).value || ''; DRAFT.he = !!(document.getElementById('dhe') || {}).checked;
+  app.querySelectorAll('.drow [data-f]').forEach(x => { const w = DRAFT.words[+x.dataset.i]; if (!w) return; if (x.dataset.f === 'he') w.he = x.value.split(/[\/,]/).map(s => s.trim()).filter(Boolean); else w[x.dataset.f] = x.value.trim(); });
+}
+function bindParent() {
+  const dad = isDad();
+  on('[data-act="reload"]', async () => { await dadLoad(); render(); });
+  on('[data-act="clip"]', async () => {
+    let t = ''; try { t = await navigator.clipboard.readText(); } catch (e) { }
+    if (!t || !parseList(t).words.length) { const d = app.querySelector('.newlist details'); if (d) d.open = true; const p = document.getElementById('paste'); if (p) p.focus(); return toast(t ? 'בהודעה שהועתקה אין מילים באנגלית. אפשר להדביק כאן.' : 'לחיצה ארוכה בתיבה ← הדבקה', 3500); }
+    document.getElementById('paste').value = t; readPaste();
+  });
+  const pa = document.getElementById('paste'); if (pa) pa.addEventListener('paste', () => setTimeout(readPaste, 60));
+  bindVoice();
+  on('[data-act="parse"]', () => readPaste());
+  function readPaste() {
+    const r = parseList(document.getElementById('paste').value);
+    if (!r.words.length) return toast('לא מצאתי מילים. נסה שורה לכל מילה: Flower – פרח');
+    DRAFT = { id: null, t: r.date ? `הכתבה ${+r.date.slice(8)}.${+r.date.slice(5, 7)}` : 'רשימה חדשה', date: r.date, he: true, words: r.words };
+    document.getElementById('draft').innerHTML = draftHTML(); bindParent(); const d = document.getElementById('draft'); if (d && d.scrollIntoView) d.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+  on('[data-edit]', b => { const D = dad ? RKID : S, l = arr(D.lists).find(x => x.id === b.dataset.edit); if (!l) return; DRAFT = JSON.parse(JSON.stringify(l)); render(); later(() => { const d = document.getElementById('draft'); if (d) d.scrollIntoView({ block: 'start' }); }, 50); });
+  on('[data-del]', b => modal('למחוק את הרשימה?', 'ההתקדמות במילים נשמרת.', [['מחיקה', () => removeList(b.dataset.del), 'btn-danger'], ['ביטול']]));
+  on('[data-rm]', b => { readDraft(); DRAFT.words.splice(+b.dataset.rm, 1); document.getElementById('draft').innerHTML = draftHTML(); bindParent(); });
+  on('[data-act="addrow"]', () => { readDraft(); DRAFT.words.push({ en: '', he: [], em: '' }); document.getElementById('draft').innerHTML = draftHTML(); bindParent(); });
+  on('[data-act="savelist"]', async () => {
+    readDraft(); DRAFT.words = DRAFT.words.filter(w => w.en);
+    const bad = DRAFT.words.filter(w => !/^[A-Za-z]+(?:[ '\-][A-Za-z]+)*$/.test(w.en) || !w.he.length);
+    if (!DRAFT.words.length) return toast('אין מילים');
+    if (bad.length) return toast(`חסר פירוש או שיש תו לא באנגלית: ${bad.map(w => esc(w.en)).join(', ')}`, 4000);
+    const l = { id: DRAFT.id || 'c-' + (DRAFT.date || todayStr()) + '-' + Math.random().toString(36).slice(2, 6), t: DRAFT.t || 'רשימה', date: DRAFT.date || '', src: 'class', he: DRAFT.he, words: DRAFT.words.map(w => ({ en: w.en, he: w.he, em: w.em || '' })) };
+    const ok = await upsertList(l); if (!ok) return toast('לא הצלחתי לשמור לענן');
+    DRAFT = null; toast(dad ? 'נשלח לטלפון של רומי' : 'הרשימה נשמרה'); render();
+  });
+  on('[data-act="note"]', async () => { const t = document.getElementById('note').value.trim(); if (!t) return; if (dad) { PDOC.note = { id: Date.now(), t }; if (!await pPut(cloudCfg(), PDOC)) return toast('השליחה נכשלה'); } else { S.dadNote = t; save(); } toast('נשלח'); document.getElementById('note').value = ''; });
+  on('[data-act="dadsave"]', async () => { const l = document.getElementById('dadmsgs').value.split('\n').map(s => s.trim()).filter(Boolean); if (dad) { PDOC.dadMsgs = l; PDOC.mv = Date.now(); if (!await pPut(cloudCfg(), PDOC)) return toast('השמירה נכשלה'); } else S.dadMsgs = l.length ? l : null; save(); toast('נשמר'); });
+  on('[data-act="dv"]', () => { S.dadVoice = S.dadVoice === 0 ? 1 : 0; save(); render(); });
+  on('[data-act="snd"]', () => { S.sound = S.sound ? 0 : 1; save(); render(); });
+  on('[data-rate]', b => { S.rate = +b.dataset.rate; save(); say('Neighbor, flower, mountain'); render(); });
+  on('[data-act="ten"]', () => say('Hello Romi! This is how I say mountain.'));
+  on('[data-act="the"]', () => say('שלום רומי, ככה אני אומרת הר', 'he'));
+  on('[data-act="upd"]', checkUpdate);
+  bindCloud();
+}
+async function upsertList(l) {
+  if (isDad()) { PDOC.lists = arr(PDOC.lists).filter(x => x.id !== l.id).concat([l]); PDOC.lv = Date.now(); PDOC.del = arr(PDOC.del).filter(x => x !== l.id); return pPut(cloudCfg(), PDOC); }
+  S.lists = S.lists.filter(x => x.id !== l.id).concat([l]); save(); return true;
+}
+async function removeList(id) {
+  if (isDad()) { PDOC.del = [...new Set([...arr(PDOC.del), id])]; PDOC.lists = arr(PDOC.lists).filter(x => x.id !== id); PDOC.lv = Date.now(); if (!await pPut(cloudCfg(), PDOC)) toast('לא הצלחתי למחוק'); }
+  else { S.lists = S.lists.filter(x => x.id !== id); save(); }
+  render();
+}
+function settingsHTML() {
+  const ve = voiceFor('en'), vh = voiceFor('he');
+  return `<section class="card stack"><h3>צליל ודיבור</h3>
+  <div class="row"><span class="grow">צלילים</span><button class="chip" data-act="snd">${S.sound ? 'פועלים' : 'כבויים'}</button></div>
+  <div class="row"><span class="grow">הקול של אבא במקום קול הטלפון</span><button class="chip" data-act="dv">${S.dadVoice === 0 ? 'כבוי' : 'פועל'}</button></div>
+  <div class="row"><span class="grow">מהירות הקראה</span>${[[.7, 'איטית'], [.85, 'רגילה'], [1, 'מהירה']].map(([r, t]) => `<button class="chip ${S.rate === r ? 'on' : ''}" data-rate="${r}">${t}</button>`).join('')}</div>
+  <div class="row"><button class="chip" data-act="ten">בדיקה באנגלית</button><button class="chip" data-act="the">בדיקה בעברית</button></div>
+  <p class="small muted">קול באנגלית: ${ve ? esc(ve.name) : 'לא נמצא'} · בעברית: ${vh ? esc(vh.name) : 'לא נמצא (אז העברית מוצגת בכתב)'}.<br>באייפון: הגדרות ← נגישות ← תוכן מוקרא ← קולות, אפשר להוריד קול איכותי יותר (Enhanced).</p></section>
+  <section class="card stack"><h3>התקנה באייפון של רומי</h3><ol class="small" style="margin:0;padding-inline-start:18px;line-height:1.8"><li>פותחים בספארי: <span dir="ltr">${APP_URL}</span></li><li>כפתור השיתוף ← "הוספה למסך הבית".</li><li>פותחים מהאייקון "סלטה". ככה הנתונים נשמרים, וכדאי לחבר גם ענן לגיבוי.</li></ol>
+  <button class="chip" data-act="upd">בדיקת עדכון</button></section>`;
+}
+async function checkUpdate() {
+  try { const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' }); const v = (await r.json()).v; if (String(v) === APP_VER) return toast(`זו הגרסה הכי חדשה (${APP_VER})`); toast('מעדכן...'); const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.filter(k => k.startsWith('salta-')).map(k => caches.delete(k))); } location.reload(); }
+  catch (e) { toast('אין חיבור כרגע'); }
+}
+
+/* dad's voice: record every word once (about 2 seconds each) */
+function voiceHTML(l) {
+  if (!l) return '';
+  const n = l.words.filter(w => VOICE[kOf(w)]).length;
+  return `<section class="card stack"><h3>הקול של אבא</h3><p class="small muted">רומי שומעת את המילים בקול שלך באימון ובהכתבה לדוגמה. הכי מהיר: הקלטה אחת של כל הרשימה. העיגול ליד מילה מקליט רק אותה מחדש.</p>
+  <button class="btn btn-main" data-act="vrall" data-l="${l.id}">${GIC.mic.replace('width="30" height="30"', 'width="20" height="20"')} הקלטה של כל הרשימה</button>
+  <div class="vlist">${l.words.map(w => { const k = kOf(w), has = !!VOICE[k], rec = REC && REC.k === k; return `<div class="vrow ${has ? 'has' : ''}"><span class="vw" dir="ltr">${esc(w.en)}</span><button class="vbtn rec ${rec ? 'on' : ''}" data-rec="${esc(k)}" aria-label="הקלטה">${GIC.rec.replace('width="30" height="30"', 'width="18" height="18"')}</button><button class="vbtn" data-play="${esc(k)}" ${has ? '' : 'disabled'} aria-label="השמעה">${GIC.play.replace('width="30" height="30"', 'width="16" height="16"')}</button><button class="vbtn" data-vdel="${esc(k)}" ${has ? '' : 'disabled'} aria-label="מחיקה">${IC.x}</button></div>`; }).join('')}</div>
+  <div class="small muted">${n}/${l.words.length} מילים מוקלטות</div></section>`;
+}
+function bindVoice() {
+  on('[data-act="vrall"]', b => startVrec(arr((isDad() ? RKID : S).lists).find(x => x.id === b.dataset.l) || curList()));
+  on('[data-rec]', b => recStart(b.dataset.rec, started => { if (started) b.classList.add('on'); else render(); }));
+  on('[data-play]', b => playVoice(b.dataset.play));
+  on('[data-vdel]', b => { voiceDel(b.dataset.vdel); render(); });
+}
+
+/* ---- romi/src/82-vrec.js ---- */
+/* ---------- record a whole list in one take ----------
+   The words appear one by one. Dad says a word, then taps for the next one. The taps mark where each word ends;
+   each piece is trimmed to the voice (energy above a threshold), made louder to a fixed peak, and kept as a small WAV (12 kHz, mono). */
+let VR = null;
+const VR_SR = 12000;
+function startVrec(l) { if (!l) return; VR = { l, i: 0, marks: [], ph: 'ready', clips: {} }; go('vrec'); }
+VIEWS.vrec = () => {
+  if (!VR) { S.view = 'parent'; return VIEWS.parent(); }
+  const l = VR.l, n = l.words.length, w = l.words[VR.i];
+  const bar = `<header class="bar"><button class="icon-btn" data-act="vrx" aria-label="יציאה">${IC.x}</button><h2>הקלטה של ${esc(l.t)}</h2></header>`;
+  if (VR.ph === 'ready') {
+    app.innerHTML = `<div class="page">${bar}<section class="card stack"><h3>הקול של אבא, בהקלטה אחת</h3>
+    <ol class="howto"><li>המילים מופיעות אחת אחרי השנייה.</li><li>אומרים את המילה, ואז נוגעים בכפתור הגדול למילה הבאה.</li><li>בסוף שומעים כל מילה ושומרים. מילה שלא יצאה טוב אפשר להקליט שוב לבד.</li></ol>
+    <p class="small muted">${n} מילים, בערך ${Math.ceil(n * 2.5)} שניות. כדאי מקום שקט.</p>
+    <button class="btn btn-main big" data-act="vrgo">להתחיל להקליט</button></section></div>`;
+    on('[data-act="vrgo"]', vrBegin);
+  } else if (VR.ph === 'rec') {
+    app.innerHTML = `<div class="page vrec">${bar}<div class="recdot"><i></i>מקליט · ${VR.i + 1}/${n}</div>
+    <div class="vr-word"><span class="em">${w.em || ''}</span><span class="word" dir="ltr">${esc(w.en)}</span><span class="muted">${l.words[VR.i + 1] ? 'הבאה: <b dir="ltr">' + esc(l.words[VR.i + 1].en) + '</b>' : 'המילה האחרונה'}</span></div>
+    <button class="vr-next" data-act="vrnext">${VR.i + 1 < n ? 'אמרתי. למילה הבאה' : 'אמרתי. סיום'}</button></div>`;
+    on('[data-act="vrnext"]', vrNext);
+  } else if (VR.ph === 'proc') {
+    app.innerHTML = `<div class="page">${bar}<section class="card center"><p>חותך את ההקלטה למילים...</p></section></div>`;
+  } else {
+    const ok = l.words.filter(x => VR.clips[kOf(x)]).length;
+    app.innerHTML = `<div class="page">${bar}<section class="card stack"><h3>${ok === n ? 'כל המילים מוכנות' : `${ok} מתוך ${n} מילים מוכנות`}</h3><p class="small muted">לחיצה על מילה משמיעה אותה.</p>
+    <div class="vlist">${l.words.map(x => { const k = kOf(x), c = VR.clips[k]; return `<div class="vrow ${c ? 'has' : ''}"><span class="vw" dir="ltr">${esc(x.en)}</span>${c ? `<button class="vbtn" data-vp="${esc(k)}" aria-label="השמעה">${GIC.play.replace('width="30" height="30"', 'width="16" height="16"')}</button>` : '<span class="small bad">לא נשמע</span>'}</div>`; }).join('')}</div>
+    <button class="btn btn-main big" data-act="vrsave" ${ok ? '' : 'disabled'}>שמירה</button><button class="btn btn-ghost" data-act="vragain">להקליט שוב</button></section></div>`;
+    on('[data-vp]', b => playClip(VR.clips[b.dataset.vp]));
+    on('[data-act="vrsave"]', vrSave);
+    on('[data-act="vragain"]', () => { VR = { l, i: 0, marks: [], ph: 'ready', clips: {} }; render(); });
+  }
+  on('[data-act="vrx"]', () => { vrAbort(); VR = null; go('parent'); });
+};
+async function vrBegin() {
+  if (!recOK()) return toast('הטלפון הזה לא מאפשר הקלטה כאן');
+  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); } catch (e) { return toast('צריך לאשר גישה למיקרופון (הגדרות ← ספארי ← מיקרופון)', 4500); }
+  const type = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+  const mr = new MediaRecorder(stream, type ? { mimeType: type } : {}), parts = [];
+  mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
+  mr.onstart = () => { VR.t0 = performance.now(); };
+  mr.onstop = () => { stream.getTracks().forEach(t => t.stop()); if (VR && VR.ph === 'proc') vrSplit(new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' })); };
+  Object.assign(VR, { mr, stream, ph: 'rec', i: 0, marks: [], t0: performance.now() }); mr.start(); render();
+}
+function vrNext() {
+  if (!VR || VR.ph !== 'rec') return;
+  VR.marks.push((performance.now() - VR.t0) / 1000); SFX.tap();
+  if (VR.i + 1 < VR.l.words.length) { VR.i++; return render(); }
+  VR.ph = 'proc'; render(); setTimeout(() => { try { VR.mr.stop(); } catch (e) { } }, 250);
+}
+function vrAbort() { if (VR && VR.mr && VR.mr.state !== 'inactive') { VR.ph = 'off'; try { VR.mr.stop(); } catch (e) { } } }
+async function vrSplit(blob) {
+  try {
+    const a = ac(); const ab = await blob.arrayBuffer();
+    const buf = await new Promise((res, rej) => a.decodeAudioData(ab, res, rej));
+    VR.clips = splitByMarks(buf.getChannelData(0), buf.sampleRate, VR.marks, VR.l.words.map(kOf));
+  } catch (e) { console.error(e); toast('לא הצלחתי לקרוא את ההקלטה. נסה שוב.'); VR.clips = {}; }
+  VR.ph = 'review'; if (S.view === 'vrec') render();
+}
+/* the pure part: samples, rate, the tap times (seconds), the word keys -> { key: wav data URL } */
+function splitByMarks(ch, sr, marks, keys) {
+  const out = {}, fr = Math.round(sr * .01);
+  keys.forEach((k, i) => {
+    const s = Math.max(0, Math.floor(((i ? marks[i - 1] : 0) - .05) * sr)), e = Math.min(ch.length, Math.floor((marks[i] + .15) * sr));
+    if (e - s < fr * 5) return;
+    const nf = Math.floor((e - s) / fr), rms = new Float32Array(nf); let top = 0;
+    for (let f = 0; f < nf; f++) { let a = 0; for (let j = s + f * fr, z = j + fr; j < z; j++) a += ch[j] * ch[j]; rms[f] = Math.sqrt(a / fr); if (rms[f] > top) top = rms[f]; }
+    if (top < .008) return;
+    const thr = Math.max(.006, top * .12); let f0 = 0, f1 = nf - 1;
+    while (f0 < nf && rms[f0] < thr) f0++; while (f1 > f0 && rms[f1] < thr) f1--;
+    const a0 = Math.max(s, s + (f0 - 8) * fr), a1 = Math.min(e, s + (f1 + 12) * fr);
+    if (a1 - a0 < sr * .12) return;
+    out[k] = wavURL(resample(ch.subarray(a0, a1), sr, VR_SR), VR_SR);
+  });
+  return out;
+}
+function resample(x, from, to) {
+  if (from === to) return Float32Array.from(x);
+  const n = Math.floor(x.length * to / from), y = new Float32Array(n), r = from / to;
+  for (let i = 0; i < n; i++) { const p = i * r, j = Math.floor(p), t = p - j; y[i] = x[j] * (1 - t) + (x[j + 1] || 0) * t; }
+  return y;
+}
+function wavURL(x, sr) {
+  const n = x.length, b = new ArrayBuffer(44 + n * 2), v = new DataView(b), wr = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  let peak = 0; for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(x[i])); const g = peak ? Math.min(6, .9 / peak) : 1, fade = Math.min(n >> 1, Math.round(sr * .012));
+  wr(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); wr(8, 'WAVE'); wr(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); wr(36, 'data'); v.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) { const f = Math.min(1, i / fade, (n - 1 - i) / fade); v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, x[i] * g * f)) * 32767, true); }
+  const u = new Uint8Array(b); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+  return 'data:audio/wav;base64,' + btoa(s);
+}
+async function playClip(url) { const k = '__clip'; VOICE[k] = url; delete VBUF[k]; await playVoice(k); delete VOICE[k]; delete VBUF[k]; }
+async function vrSave() {
+  const ks = Object.keys(VR.clips);
+  ks.forEach(k => { VOICE[k] = VR.clips[k]; delete VBUF[k]; }); saveVoice();
+  toast(`נשמרו ${ks.length} מילים בקול שלך`); const l = VR.l; VR = null; go('parent');
+  for (const k of ks) await voicePush(k);
+}
+
+/* ---- romi/src/85-cloud.js ---- */
+/* ---------- cloud (optional): the same Firebase Realtime Database as מעבדת המוח, its own family code.
+   Romi's phone writes her state to brainlab/<code>.json. Dad's phone writes only to brainlab/<code>-p.json (new lists, messages, a note, candies);
+   Romi's phone reads that node and applies it. ---------- */
+const CLOUD_KEY = 'salta-cloud';
+const cloudCfg = () => { try { return JSON.parse(localStorage.getItem(CLOUD_KEY)) || {}; } catch (e) { return {}; } };
+const cloudSet = c => { try { localStorage.setItem(CLOUD_KEY, JSON.stringify(c)); } catch (e) { } };
+const isDad = () => { const c = cloudCfg(); return c.role === 'dad' && !!c.code; };
+const isKidCloud = () => { const c = cloudCfg(); return c.role === 'kid' && !!c.code; };
+let RKID = null, PDOC = null, CT = null, PULL_AT = 0;
+const cPath = (c, s = '') => `${c.url.replace(/\/+$/, '')}/brainlab/${c.code}${s}.json`;
+const agoTxt = t => { if (!t) return 'עוד לא'; const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'עכשיו' : m < 60 ? `לפני ${m} דק׳` : m < 1440 ? `לפני ${Math.round(m / 60)} שע׳` : `לפני ${Math.round(m / 1440)} ימים`; };
+async function fetchT(u, o = {}) { const ac = window.AbortController ? new AbortController() : null; if (ac) setTimeout(() => ac.abort(), 9000); return fetch(u, Object.assign({ cache: 'no-store' }, o, ac ? { signal: ac.signal } : {})); }
+async function cGet(c, s) { try { const r = await fetchT(cPath(c, s) + '?t=' + Date.now()); if (!r.ok) return { err: 'שגיאה ' + r.status }; return { data: await r.json() }; } catch (e) { return { err: 'אין חיבור' }; } }
+async function pPut(c, P) { try { const r = await fetchT(cPath(c, '-p'), { method: 'PUT', body: JSON.stringify(P) }); return r.ok; } catch (e) { return false; } }
+function cloudSoon() { if (!isKidCloud()) return; clearTimeout(CT); CT = setTimeout(cloudPut, 5000); }
+async function cloudPut() {
+  const c = cloudCfg(); if (c.role !== 'kid' || !c.code) return false;
+  const o = JSON.parse(JSON.stringify(S)); delete o.pin; o.view = 'home'; o._at = new Date().toISOString(); o._app = 'salta'; o._ver = APP_VER;
+  try { const r = await fetchT(cPath(c), { method: 'PUT', body: JSON.stringify(o) }); c.err = r.ok ? null : 'שגיאה ' + r.status; if (r.ok) c.last = Date.now(); }
+  catch (e) { c.err = 'אין חיבור'; }
+  cloudSet(c); return !c.err;
+}
+/* Romi's phone: apply what dad sent */
+async function kidPull(force) {
+  const c = cloudCfg(); if (c.role !== 'kid' || !c.code) return;
+  if (!force && Date.now() - PULL_AT < 30000) return; PULL_AT = Date.now();
+  const g = await cGet(c, '-p'); if (!g.data) return;
+  const P = g.data, msgs = []; let ch = false;
+  if (P.lv && P.lv !== S.plv) {
+    const del = arr(P.del); S.lists = S.lists.filter(l => !del.includes(l.id));
+    arr(P.lists).forEach(l => { l.words = arr(l.words).map(w => (w.he = arr(w.he), w)); const had = S.lists.some(x => x.id === l.id); S.lists = S.lists.filter(x => x.id !== l.id).concat([l]); if (!had) msgs.push(`רשימה חדשה מאבא: ${esc(l.t)}`); });
+    S.plv = P.lv; ch = true;
+  }
+  if (P.mv && P.mv !== S.pmv) { S.dadMsgs = arr(P.dadMsgs); if (!S.dadMsgs.length) S.dadMsgs = null; S.pmv = P.mv; ch = true; }
+  if (P.note && P.note.id !== S.noteId) { S.noteId = P.note.id; S.dadNote = P.note.t; ch = true; }
+  if (P.vv && P.vv !== S.pvv) { S.pvv = P.vv; ch = true; voicePull(); }
+  if (P.gift && P.gift.id !== S.giftId) { S.giftId = P.gift.id; addCandy(P.gift.n | 0); msgs.push(`אבא שלח לך ${P.gift.n} ממתקים!`); ch = true; }
+  if (ch) { save(); if (['home', 'lists', 'shop'].includes(S.view) && !document.querySelector('.modal')) render(); }
+  if (msgs.length) toast(msgs.join('<br>'), 4500);
+}
+/* dad's phone: read Romi's state and the parent node */
+async function dadLoad() {
+  const c = cloudCfg(); if (!isDad()) return;
+  const [a, b] = await Promise.all([cGet(c), cGet(c, '-p')]);
+  if (a.data) { RKID = a.data; RKID.lists = arr(RKID.lists).map(l => (l.words = arr(l.words).map(w => (w.he = arr(w.he), w)), l)); RKID.tests = arr(RKID.tests); RKID.p = RKID.p || {}; RKID.days = RKID.days || {}; }
+  PDOC = b.data || PDOC || {};
+  if (a.err) toast('לא הצלחתי לקרוא מהענן: ' + a.err);
+}
+const newCode = () => { const a = new Uint8Array(15); crypto.getRandomValues(a); return Array.from(a, b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join(''); };
+async function findDb(id) {
+  for (const r of ['', 'europe-west1', 'us-central1', 'asia-southeast1']) {
+    const u = r ? `https://${id}-default-rtdb.${r}.firebasedatabase.app` : `https://${id}-default-rtdb.firebaseio.com`;
+    try { const res = await fetchT(`${u}/brainlab/probe_000000000000000.json`); if (res.status === 200 || res.status === 401) return u; } catch (e) { }
+  }
+  return null;
+}
+function cloudSection() {
+  const c = cloudCfg();
+  if (c.code) return `<section class="card stack"><h3>ענן</h3><div class="small">${c.role === 'kid' ? `הטלפון של רומי · גיבוי ${agoTxt(c.last)}` : 'הטלפון של אבא'}${c.err ? ` · <b class="bad">${esc(c.err)}</b>` : ''}</div>
+  <div class="small muted">קוד משפחה: <b dir="ltr" class="sel">${esc(c.code)}</b></div>
+  <div class="row">${c.role === 'kid' ? '<button class="chip" data-act="csync">גבה עכשיו</button>' : '<button class="chip" data-act="gift">שלח 10 ממתקים</button>'}<button class="chip" data-act="coff">נתק</button></div></section>`;
+  return `<section class="card stack"><h3>ענן (לא חובה)</h3><p class="small muted">גיבוי, ואפשרות להוסיף רשימות ולראות התקדמות מהטלפון של אבא. אותו Firebase של מעבדת המוח, עם קוד משפחה חדש לרומי.</p>
+  <input class="txt" id="curl" dir="ltr" value="brainlab-yonatan" placeholder="Firebase project id"><input class="txt" id="ccode" dir="ltr" placeholder="קוד משפחה (ריק = קוד חדש)">
+  <div class="row"><button class="btn btn-main grow" data-act="ckid">זה הטלפון של רומי</button><button class="btn btn-ghost grow" data-act="cdad">זה הטלפון של אבא</button></div><p class="small bad" id="cmsg"></p></section>`;
+}
+function bindCloud() {
+  const msg = t => { const m = document.getElementById('cmsg'); if (m) m.textContent = t; };
+  const connect = async role => {
+    let url = document.getElementById('curl').value.trim(); const typed = document.getElementById('ccode').value.trim();
+    if (/^[a-z0-9-]+$/.test(url)) { msg('מחפש את מסד הנתונים...'); url = await findDb(url); if (!url) return msg('לא מצאתי Realtime Database בפרויקט הזה.'); }
+    if (!/^https:\/\/[^ ]+\.(firebaseio\.com|firebasedatabase\.app)\/?$/.test(url)) return msg('צריך מזהה פרויקט או כתובת של Firebase Realtime Database.');
+    const code = typed || (role === 'kid' ? newCode() : ''); if (code.length < 15) return msg(role === 'kid' ? 'קוד קצר מדי.' : 'צריך את קוד המשפחה מהטלפון של רומי.');
+    const c = { url, code, role };
+    const g = await cGet(c); if (g.err) return msg('לא הצלחתי לקרוא: ' + g.err);
+    if (g.data && g.data._app && g.data._app !== 'salta') return msg('הקוד הזה שייך למעבדת המוח. לסלטה צריך קוד משלה.');
+    if (role === 'kid') {
+      if (g.data && typed && (g.data.sessions || 0) > (S.sessions || 0)) {
+        return modal('בענן כבר יש התקדמות', `שמורים שם ${g.data.sessions} אימונים. לטעון אותם לטלפון הזה?`, [['לטעון', () => { const pin = S.pin; S = norm(g.data); S.pin = pin; S.view = 'parent'; cloudSet(c); save(); render(); }], ['להחליף את מה שבענן', async () => { cloudSet(c); await cloudPut(); render(); }]]);
+      }
+      cloudSet(c); if (!await cloudPut()) { cloudSet({}); return msg('לא הצלחתי לשמור. בדוק את הכתובת ואת הכללים.'); }
+    } else { if (!g.data) return msg('אין עדיין נתונים בקוד הזה.'); cloudSet(c); await dadLoad(); }
+    toast('מחובר לענן'); render();
+  };
+  on('[data-act="ckid"]', () => connect('kid')); on('[data-act="cdad"]', () => connect('dad'));
+  on('[data-act="coff"]', () => modal('לנתק מהענן?', 'שום דבר לא נמחק.', [['נתק', () => { cloudSet({}); RKID = null; PDOC = null; render(); }], ['ביטול']]));
+  on('[data-act="csync"]', async () => { toast(await cloudPut() ? 'גובה' : 'הגיבוי נכשל'); render(); });
+  on('[data-act="gift"]', async () => { PDOC = PDOC || {}; PDOC.gift = { id: Date.now(), n: 10 }; toast(await pPut(cloudCfg(), PDOC) ? 'נשלח! רומי תקבל כשתפתח את האפליקציה' : 'השליחה נכשלה'); });
+}
+
+/* ---- romi/src/99-main.js ---- */
+/* ---------- start-up ---------- */
+function boot() {
+  if (!['home', 'lists', 'shop'].includes(S.view)) S.view = 'home';   /* a session is not resumed after the app closes */
+  render();
+  kidPull(true); if (isKidCloud() && !Object.keys(VOICE).length) voicePull();
+  if (isDad()) dadLoad();
+  later(autoUpdate, 1500);
+  /* iPhone: sound and speech start only after a touch; unlock both on the first one */
+  const unlock = () => { try { ac(); if (TTS) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; TTS.speak(u); } } catch (e) { } removeEventListener('pointerdown', unlock, true); };
+  addEventListener('pointerdown', unlock, true);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { save(); if (isKidCloud()) cloudPut(); return; }
+    kidPull(); autoUpdate(); if (S.view === 'home' && !document.querySelector('.modal')) render();
+  });
+}
+
+boot();
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body></html>
