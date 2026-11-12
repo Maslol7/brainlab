@@ -299,6 +299,12 @@ label.small.row{flex-direction:row}
 .album{display:flex;flex-wrap:wrap;gap:10px}
 .sticker{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:76px;height:76px;border-radius:50%;background:radial-gradient(circle,#FFF6DA,#FFC63D);color:#3A2600;font-size:2rem;box-shadow:0 3px 0 #C99A1E;transform:rotate(-6deg)}
 .sticker small{font-size:.6rem;font-weight:700}
+/* look, cover, build */
+.timer{width:70%;height:6px;border-radius:9px;background:var(--surface-2);overflow:hidden}
+.timer i{display:block;height:100%;background:var(--floor);animation:shrink linear forwards;transform-origin:right}
+@keyframes shrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.wchip.lit{border-color:var(--floor);box-shadow:0 0 0 3px color-mix(in srgb,var(--floor) 25%,transparent)}
+.wlist.ov .wtx .small{line-height:1.2}
 /* the Magic E wand */
 .sent{font-family:var(--f-word);font-size:1.6rem;font-weight:700;line-height:1.4;text-align:center;padding:8px 4px}
 .sent .blank{color:var(--floor);letter-spacing:.1em}

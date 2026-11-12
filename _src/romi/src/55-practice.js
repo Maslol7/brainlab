@@ -2,6 +2,8 @@
 let P = null;
 function startPractice(list) {
   if (!list || !list.words || !list.words.length) return toast('אין מילים ברשימה הזאת');
+  /* a new class list starts with a short look at all its words, once (to know what the week holds, not to memorise) */
+  if (list.src === 'class' && !S.seen['ov_' + list.id] && list.words.filter(w => stageOf(w) === 0).length * 2 >= list.words.length) { OV = list; S.view = 'overview'; return render(); }
   const { q, n } = planSession(list);
   P = { list, q, n, done: 0, ok: 0, candy: 0, words: new Set(), stars: [], last: null, wrongRun: 0, hardShown: false, bonus: list.src !== 'class' && list.id !== 'review' };
   S.view = 'practice'; save(); nextItem();
@@ -25,7 +27,10 @@ const slowBtn = () => `<button class="icon-btn say" data-say="slow" aria-label="
 function promptHTML(c) {
   const w = c.w, he = w.he.map(esc).join(' / ');
   switch (c.type) {
-    case 'learn': return `<div class="ask">מילה חדשה!</div><div class="learn"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${letterSpans(w.en)}</div><div class="he">${he}</div>
+    case 'learn':
+      if (c.cover === 'look') return `<div class="ask">תסתכלי טוב ותזכרי</div><div class="learn"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${esc(w.en)}</div><div class="timer"><i style="animation-duration:${c.peekMs}ms"></i></div></div>`;
+      if (c.cover === 'build') return `<div class="ask">עכשיו מהזיכרון!</div><div class="prompt"><span class="em">${w.em}</span><div class="he">${he}</div>${sayBtn()}<button class="chip" data-act="peek">להציץ שוב</button></div>`;
+      return `<div class="ask">מילה חדשה!</div><div class="learn"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${letterSpans(w.en)}</div><div class="he">${he}</div>
       <div class="row center">${sayBtn()}${slowBtn()}<button class="btn btn-ghost" data-act="spell">איות</button></div>${famOf(w.en).map(f => `<p class="tip">${esc(f.tip)}</p>`).join('')}</div>`;
     case 'meanEN': return `<div class="ask">מה הפירוש?</div><div class="prompt"><div class="word" dir="ltr">${esc(w.en)}</div>${sayBtn()}</div>`;
     case 'meanHE': return `<div class="ask">איך אומרים באנגלית?</div><div class="prompt"><div class="he big">${he}</div>${hasHeVoice() ? sayBtn('he') : ''}</div>`;
@@ -38,7 +43,7 @@ function promptHTML(c) {
   return '';
 }
 function answerHTML(c) {
-  if (c.type === 'learn') return `<button class="btn btn-main big" data-act="gotit">הבנתי!</button>`;
+  if (c.type === 'learn') return c.cover === 'build' ? `<div id="typed"></div>${tilesHTML(c.tiles)}` : c.cover ? '' : `<button class="btn btn-main big" data-act="gotit">הבנתי!</button>`;
   if (c.opts) return `<div class="opts ${c.type === 'meanEN' ? 'he' : 'en'}">${c.opts.map((o, i) => `<button class="opt" data-o="${i}" ${c.type === 'meanEN' ? '' : 'dir="ltr"'}>${c.type === 'pick' ? esc(o) : c.type === 'meanEN' ? esc(o.he[0]) : esc(o.en)}</button>`).join('')}</div>`;
   if (c.type === 'tiles') return `<div id="typed"></div>${tilesHTML(c.tiles)}`;
   return `<div id="typed"></div>${kbdHTML(c.type === 'writeHE' ? 'he' : 'en')}`;
@@ -46,7 +51,7 @@ function answerHTML(c) {
 VIEWS.practice = () => {
   if (!P || !P.cur) { S.view = 'home'; return VIEWS.home(); }
   const c = P.cur;
-  app.innerHTML = `<div class="page play ${c.opts || c.type === 'learn' ? '' : 'haskbd'}">
+  app.innerHTML = `<div class="page play ${c.opts || (c.type === 'learn' && c.cover !== 'build') ? '' : 'haskbd'}">
   <header class="bar"><button class="icon-btn" data-act="quit" aria-label="יציאה">${IC.x}</button><div class="prog"><i style="width:${Math.round(P.done / P.n * 100)}%"></i></div><span class="pill">${CANDY(18)}${P.candy}</span></header>
   <div class="mini-romi" id="mr">${romiSVG()}</div>
   <section class="q">${promptHTML(c)}</section>
@@ -60,9 +65,11 @@ function bindPractice() {
   on('[data-say]', b => b.dataset.say === 'he' ? say(w.he[0], 'he') : sayWord(w, b.dataset.say === 'slow' ? .5 : undefined));
   on('[data-act="spell"]', () => spellOut(w.en, app.querySelector('.learn .word')));
   on('[data-act="hint"]', () => { c.hint = true; const keep = KB && KB.val; render(); if (KB && keep) { KB.val = keep; kbRefresh(); } });
-  on('[data-act="gotit"]', () => { grade(w, P.list, 'learn', true); P.q.push(P.q.shift()); P.last = kOf(w); P.done += .5; SFX.ok(); nextItem(); });
+  on('[data-act="gotit"]', () => { SFX.tap(); c.tiles = makeTiles(w.en, 0); c.peeks = 0; coverLook(3000); sayWord(w); });
+  on('[data-act="peek"]', () => { c.peeks++; coverLook(2000); });
   on('[data-o]', b => choose(+b.dataset.o, b));
-  if (c.type === 'tiles') bindKbd({ lang: 'en', tiles: c.tiles, word: w.en.toLowerCase(), onEnter: v => typed(v) });
+  if (c.type === 'learn' && c.cover === 'build') bindKbd({ lang: 'en', tiles: c.tiles, word: w.en.toLowerCase(), onEnter: v => coverDone(v) });
+  else if (c.type === 'tiles') bindKbd({ lang: 'en', tiles: c.tiles, word: w.en.toLowerCase(), onEnter: v => typed(v) });
   else if (!c.opts && c.type !== 'learn') bindKbd({ lang: c.type === 'writeHE' ? 'he' : 'en', onEnter: v => typed(v) });
 }
 function choose(i, b) {
@@ -95,6 +102,18 @@ function typed(v) {
   <div class="small">עכשיו כתבי שוב, נכון. ככה המוח זוכר.</div></div>`);
   sayWord(w);
   later(() => { if (!KB) return; KB.val = ''; if (KB.tiles) { KB.used = []; app.querySelectorAll('[data-ti]').forEach(b => b.disabled = false); } kbRefresh(); }, 600);
+}
+/* look, cover, build: right after a new word, the word shows for a few seconds, hides, and she builds it from memory */
+function coverLook(ms) { const c = P.cur; c.cover = 'look'; c.peekMs = ms; render(); later(() => { if (P && P.cur === c) { c.cover = 'build'; render(); } }, ms); }
+function coverDone(v) {
+  const c = P.cur, w = c.w;
+  if (checkEn(w, v)) {
+    KB.lock = true; grade(w, P.list, 'learn', true); const add = c.peeks ? 0 : 1; if (add) { addCandy(add); P.candy += add; }
+    SFX.ok(); hop(); fb(`<div class="fb fb-good">${c.peeks ? 'יפה!' : 'זכרת!'}${add ? ` <span class="plus">+1 ${CANDY(18)}</span>` : ''}</div>`); save();
+    return later(() => { P.q.push(P.q.shift()); P.last = kOf(w); P.done++; nextItem(); }, 900);
+  }
+  SFX.soft(); shakeTyped(); fb(`<div class="fb fb-bad">כמעט. עוד מבט אחד.</div>`); c.peeks++;
+  later(() => coverLook(2000), 800);
 }
 function fb(html) { const e = document.getElementById('fb'); if (e) e.innerHTML = html; }
 function shakeTyped() { const t = app.querySelector('#typed'); if (t) { t.classList.add('shake'); later(() => t.classList.remove('shake'), 400); } }
@@ -142,4 +161,18 @@ VIEWS.pdone = () => {
   ${r.line ? `<div class="note static"><span class="note-ic">${GIC.heart}</span><span class="grow"><b>מאבא</b><span>${esc(r.line)}</span></span></div>` : ''}
   <div class="stack"><button class="btn btn-main big" data-act="again">עוד סיבוב</button><button class="btn btn-ghost" data-go="home">למסך הבית</button></div></div>`;
   on('[data-act="again"]', () => startPractice(l));
+};
+
+/* ---------- the first look at a new list: all words, pictures and sound, about 20 seconds ---------- */
+let OV = null;
+VIEWS.overview = () => {
+  const l = OV; if (!l) { S.view = 'home'; return VIEWS.home(); }
+  app.innerHTML = `<div class="page">${topBar(esc(l.t))}
+  <section class="stack"><h2>${l.kind === 'exam' ? 'המילים של המבחן' : 'המילים של ההכתבה'}</h2><p class="muted">מסתכלים ושומעים פעם אחת. לא צריך לזכור הכל עכשיו: האימון מלמד מילה אחרי מילה.</p></section>
+  <div class="wlist ov">${l.words.map((w, i) => `<button class="wchip" data-ov="${i}"><span class="wem">${w.em || '🔤'}</span><span class="wtx"><span class="w">${EN(w.en)}</span><span class="small muted">${esc(w.he[0])}</span></span></button>`).join('')}</div>
+  <button class="btn btn-ghost" data-act="ovall">${IC.sound} להשמיע את כולן</button>
+  <button class="btn btn-main big" data-act="ovgo">בואי נתחיל</button></div>`;
+  on('[data-ov]', b => sayWord(l.words[+b.dataset.ov]));
+  on('[data-act="ovall"]', () => l.words.forEach((w, i) => later(() => { const b = app.querySelector(`[data-ov="${i}"]`); app.querySelectorAll('.wchip.lit').forEach(x => x.classList.remove('lit')); if (b) { b.classList.add('lit'); b.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } sayWord(w); }, i * 1500)));
+  on('[data-act="ovgo"]', () => { S.seen['ov_' + l.id] = 1; OV = null; save(); startPractice(l); });
 };

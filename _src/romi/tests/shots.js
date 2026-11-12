@@ -12,7 +12,7 @@ const { chromium, devices } = require('playwright');
   await shot('01-home');
   await p.screenshot({ path: `${out}/01-home-full.png`, fullPage: true });
   // practice: walk through every step type
-  await p.evaluate(() => startPractice(curList())); await shot('10-learn');
+  await p.evaluate(() => { S.seen['ov_' + curList().id] = 1; startPractice(curList()); }); await shot('10-learn');
   const types = ['meanEN', 'meanHE', 'pick', 'tiles', 'typeEN', 'typeHE2EN', 'writeHE'];
   for (const t of types) {
     await p.evaluate(t => { const c = P.cur; c.type = t; delete c.opts; delete c.tiles; const w = c.w;

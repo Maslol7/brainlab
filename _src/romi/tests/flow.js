@@ -9,11 +9,19 @@ const { chromium, devices } = require('playwright');
   await p.click('.modal [data-mi]');
   // a practice session, answered right by tapping
   await p.click('[data-act="today"]');
+  ok(await p.evaluate(() => S.view === 'overview' && document.querySelectorAll('[data-ov]').length === curList().words.length), 'a new list opens with the overview');
+  await p.click('[data-act="ovgo"]');
   let n = 0;
   while (n++ < 60) {
     const st = await p.evaluate(() => ({ v: S.view, t: P && P.cur && P.cur.type, en: P && P.cur && P.cur.w.en, he: P && P.cur && P.cur.w.he[0] }));
     if (st.v !== 'practice') break;
-    if (st.t === 'learn') { await p.click('[data-act="gotit"]'); continue; }
+    if (st.t === 'learn') {
+      await p.click('[data-act="gotit"]');
+      ok(await p.evaluate(() => P.cur.cover === 'look' && !!document.querySelector('.timer')), 'look: the word shows with a timer');
+      await p.waitForFunction(() => P.cur.cover === 'build', null, { timeout: 5000 });
+      for (const ch of st.en.toLowerCase().replace(/ /g, '')) { const i = await p.evaluate(c => KB.tiles.findIndex((x, j) => x === c && !KB.used.includes(j)), ch); await p.click(`[data-ti="${i}"]`); }
+      await p.waitForTimeout(1100); continue;
+    }
     if (['meanEN', 'meanHE', 'pick'].includes(st.t)) {
       const i = await p.evaluate(() => P.cur.opts.findIndex(o => P.cur.type === 'pick' ? o === P.cur.w.en.toLowerCase() : kOf(o) === kOf(P.cur.w)));
       await p.click(`[data-o="${i}"]`); await p.waitForTimeout(1000); continue;
