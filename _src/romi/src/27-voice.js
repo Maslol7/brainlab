@@ -5,7 +5,11 @@ const VKEY = 'salta-voice';
 let VOICE = (() => { try { return JSON.parse(localStorage.getItem(VKEY)) || {}; } catch (e) { return {}; } })();
 const VBUF = {};
 function saveVoice() { try { localStorage.setItem(VKEY, JSON.stringify(VOICE)); } catch (e) { toast('אין מקום לשמור עוד הקלטות בטלפון'); } }
-const hasVoice = w => !!(w && VOICE[kOf(w)]) && S.dadVoice !== 0;
+/* who says the English words: 'dad' everywhere, 'native' (the phone's English voice) everywhere,
+   or 'mix': dad on the new-word card, word cards and the mock dictation; the English voice in drills and games */
+const vmode = () => S.vmode || (S.dadVoice === 0 ? 'native' : 'dad');
+function voiceCtx() { if (S.view === 'test') return 'test'; if (S.view === 'practice') return P && P.cur && P.cur.type === 'learn' ? 'learn' : 'drill'; if (S.view === 'game') return 'drill'; return 'learn'; }
+const hasVoice = w => { if (!(w && VOICE[kOf(w)])) return false; const m = vmode(); return m === 'dad' || (m === 'mix' && voiceCtx() !== 'drill'); };
 /* iPhone: let the sound play even when the side switch is on silent */
 const audioMode = t => { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) { } };
 audioMode('playback');
@@ -20,17 +24,51 @@ async function getMic() {
     return null;
   }
 }
-async function playVoice(k) {
-  const a = ac(); const src = VOICE[k]; if (!a || !src) return false;
-  try {
-    if (!VBUF[k]) { const bin = atob(src.split(',')[1]); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); VBUF[k] = await new Promise((res, rej) => a.decodeAudioData(u8.buffer, res, rej)); }
-    const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1.6; n.buffer = VBUF[k]; n.connect(g); g.connect(a.destination); n.start(); return true;
-  } catch (e) { return false; }
+/* Playing dad's voice. Before v39 a failed play fell back to the phone voice without a trace, and that happened often. Now:
+   1. the audio context is resumed, and made again when the iPhone left it "interrupted" (after a call or a locked screen);
+   2. recordings are kept as WAV (the iPhone's own recorder makes MP4 pieces that Web Audio does not always decode);
+   3. if Web Audio still fails, an <audio> element plays the file; only then the phone voice speaks;
+   every fallback is written to the usage log with its reason. */
+const b64buf = src => { const bin = atob(src.split(',')[1]); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return u8.buffer; };
+const decodeIn = (a, src) => new Promise((res, rej) => { try { const p = a.decodeAudioData(b64buf(src), res, rej); if (p && p.catch) p.catch(rej); } catch (e) { rej(e); } });
+async function liveAC() {
+  let a = ac(); if (!a) return null;
+  if (a.state !== 'running') { try { await Promise.race([a.resume(), new Promise(r => setTimeout(r, 400))]); } catch (e) { } }
+  if (a.state === 'interrupted' || a.state === 'closed') { if (a.state !== 'closed') { try { const c = a.close(); if (c && c.catch) c.catch(() => { }); } catch (e) { } } AC = null; a = ac(); try { await Promise.race([a.resume(), new Promise(r => setTimeout(r, 400))]); } catch (e) { } }
+  return a;
 }
-/* say an English word: dad's recording when there is one, else the phone's voice */
+const VFAIL = {};
+function vfail(k, why) { const t = Date.now(); if (VFAIL[k] && t - VFAIL[k] < 5000) return; VFAIL[k] = t; track('vf', { w: k, why: String(why).slice(0, 60), st: (AC && AC.state) || 'none' }); save(); }
+async function playVoice(k, rate) {
+  const src = VOICE[k]; if (!src) return false;
+  if (!rate) {
+    try {
+      const a = await liveAC();
+      if (a && a.state === 'running') {
+        if (!VBUF[k]) VBUF[k] = await decodeIn(a, src);
+        const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1.6; n.buffer = VBUF[k]; n.connect(g); g.connect(a.destination); n.start();
+        if (!/^data:audio\/wav/.test(src)) toWav(k, VBUF[k]);
+        return true;
+      }
+      vfail(k, 'webaudio ' + (a ? a.state : 'none'));
+    } catch (e) { vfail(k, 'webaudio ' + (e && (e.name || e.message) || e)); }
+  }
+  try { const el = new Audio(src); el.preservesPitch = true; el.webkitPreservesPitch = true; if (rate) el.playbackRate = rate; await el.play(); return true; }
+  catch (e) { vfail(k, 'audio ' + (e && (e.name || e.message) || e)); return false; }
+}
+/* turn a decoded recording into a small WAV, once */
+function toWav(k, buf) { try { VOICE[k] = wavURL(resample(buf.getChannelData(0), buf.sampleRate, VR_SR), VR_SR); saveVoice(); voicePush(k); } catch (e) { } }
+/* at start: convert older MP4 recordings without waiting for a touch (an offline context decodes without sound) */
+async function wavAll() {
+  const ks = Object.keys(VOICE).filter(k => !/^data:audio\/wav/.test(VOICE[k])); if (!ks.length) return;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OAC) return;
+  for (const k of ks) { try { const o = new OAC(1, 1, 44100); const buf = await decodeIn(o, VOICE[k]); VOICE[k] = wavURL(resample(buf.getChannelData(0), buf.sampleRate, VR_SR), VR_SR); delete VBUF[k]; } catch (e) { vfail(k, 'convert ' + (e && (e.name || e.message) || e)); } }
+  saveVoice();
+}
+/* say an English word: dad's recording when there is one (slow = his recording at 70%, same pitch), else the phone's voice */
 function sayWord(w, rate) {
   if (!w) return;
-  if (!rate && hasVoice(w)) { try { if (TTS) TTS.cancel(); } catch (e) { } playVoice(kOf(w)).then(ok => { if (!ok) say(w.en); }); return; }
+  if (hasVoice(w)) { try { if (TTS) TTS.cancel(); } catch (e) { } playVoice(kOf(w), rate ? .7 : 0).then(ok => { if (!ok) say(w.en, 'en', rate); }); return; }
   say(w.en, 'en', rate);
 }
 /* ---------- recording (parent area) ---------- */
@@ -45,7 +83,11 @@ async function recStart(k, onDone) {
   mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
   mr.onstop = () => {
     stream.getTracks().forEach(t => t.stop()); audioMode('playback'); const b = new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' });
-    const fr = new FileReader(); fr.onload = () => { VOICE[k] = fr.result; delete VBUF[k]; saveVoice(); voicePush(k); REC = null; onDone && onDone(); playVoice(k); }; fr.readAsDataURL(b);
+    const fr = new FileReader(); fr.onload = async () => {
+      VOICE[k] = fr.result; delete VBUF[k];
+      try { const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; const buf = await decodeIn(new OAC(1, 1, 44100), fr.result); VOICE[k] = splitByMarks(buf.getChannelData(0), buf.sampleRate, [buf.duration], [k])[k] || VOICE[k]; } catch (e) { vfail(k, 'convert ' + (e && e.name || e)); }
+      saveVoice(); voicePush(k); track('rec', { n: 1 }); REC = null; onDone && onDone(); playVoice(k);
+    }; fr.readAsDataURL(b);
   };
   REC = { mr, k, t: setTimeout(recStop, 2600) }; mr.start(); SFX.beep && SFX.beep(); onDone && onDone(true);
 }

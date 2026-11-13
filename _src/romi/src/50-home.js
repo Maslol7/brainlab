@@ -18,8 +18,8 @@ function bindCommon() {
 const topBar = (title, back = 'home') => `<header class="bar"><button class="icon-btn" data-go="${back}" aria-label="חזרה">${IC.back}</button><h2>${title}</h2><span class="pill candy-pill">${CANDY(18)}${S.candy}</span></header>`;
 /* a word: its picture, the word in school letters, and 7 segments, one per step */
 function wordChip(w, l) {
-  const st = Math.min(stageOf(w), maxSt(l)), M = maxSt(l), star = st >= M;
-  return `<button class="wchip ${star ? 'star' : ''}" data-word="${esc(kOf(w))}" data-list="${l.id}"><span class="wem">${w.em || '🔤'}</span><span class="wtx"><span class="w">${EN(w.en)}</span><span class="segs" aria-label="שלב ${st} מתוך ${M}">${Array.from({ length: M }, (_, i) => `<i class="${i < st ? 'on' : ''}"></i>`).join('')}</span></span>${star ? `<span class="st">${IC.star}</span>` : ''}</button>`;
+  const st = Math.min(stageOf(w, l), maxSt(l)), M = maxSt(l), star = st >= M, sp = isSpell(l) && !star && spells(w), wait = waitsTomorrow(w, l);
+  return `<button class="wchip ${star ? 'star' : sp ? 'spelled' : ''}" data-word="${esc(kOf(w))}" data-list="${l.id}"><span class="wem">${w.em || '🔤'}</span><span class="wtx"><span class="w">${EN(w.en)}</span><span class="segs" aria-label="שלב ${st} מתוך ${M}">${Array.from({ length: M }, (_, i) => `<i class="${i < st ? 'on' : ''}"></i>`).join('')}</span></span>${star ? `<span class="st">${IC.star}</span>` : sp ? '<span class="st ok" title="שולטת בכתיב">✓</span>' : wait ? '<span class="st wait" title="בדיקה מחר">⏳</span>' : ''}</button>`;
 }
 function daysStrip(l) {
   const t = todayStr(), left = dayDiff(t, l.date); if (left < 0 || left > 10) return '';
@@ -32,6 +32,11 @@ function daysStrip(l) {
 }
 function planLine(l) {
   const n = l.words.length, st = listStars(l), left = l.date ? dayDiff(todayStr(), l.date) : 99;
+  if (isSpell(l)) {
+    const sp = l.words.filter(spells).length, wait = l.words.filter(w => waitsTomorrow(w, l)).length;
+    if (sp === n) return st === n ? 'כל המילים בכוכב. אלופה!' : 'את שולטת בכתיב של כל המילים! נשאר רק הפירוש בכתב.';
+    return `שולטת בכתיב: ${sp} מתוך ${n}.${wait ? ` ${wait} מחכות לבדיקה של מחר.` : ''} כל אימון מתמקד ב-3 מילים, עד שהכתיב שלהן נשאר.`;
+  }
   if (st === n) return left >= 0 && left < 99 ? 'כל המילים בכוכב. עכשיו הכתבה לדוגמה, וחזרה קצרה כל יום עד ההכתבה.' : 'כל המילים בכוכב. אלופה!';
   if (left === 0) return 'ההכתבה היום. אימון קצר לחימום, ובהצלחה!';
   return 'אימון אחד ביום, בערך 10 דקות, מספיק כדי להגיע לכוכב בכל המילים.';
@@ -43,7 +48,7 @@ VIEWS.home = () => {
   const floor = l ? `<section class="floor ${did ? 'did' : ''}"><div class="mat">
     <div class="fl-txt"><div class="eyebrow">${l.kind === 'exam' ? (upcoming ? 'המבחן הבא' : 'המבחן האחרון') : upcoming ? 'ההכתבה הבאה' : 'ההכתבה האחרונה'}</div><div class="fl-date">${l.date ? dateHe(l.date) : esc(l.t)}</div>
     ${upcoming ? `<div class="fl-count">${left === 0 ? '<b>היום</b>' : left === 1 ? '<b>מחר</b>' : `<b>${left}</b><span>ימים</span>`}</div>` : `<button class="chip on-mat" data-go="parent">אבא, יש רשימה חדשה?</button>`}</div>
-    <div class="fl-romi">${romiSVG()}</div></div>${upcoming && l.date ? daysStrip(l) : ''}</section>` : '';
+    <div class="fl-romi">${romiSVG()}${petHTML()}</div></div>${upcoming && l.date ? daysStrip(l) : ''}</section>` : '';
   const routine = l ? `<section class="routine"><div class="sec-h"><h2>המילים</h2><span class="tag">${listStars(l)}/${l.words.length} בכוכב</span></div>
     <div class="wlist">${l.words.map(w => wordChip(w, l)).join('')}</div>
     <button class="btn btn-main big" data-act="today">${did ? 'עוד אימון' : 'האימון של היום'}</button><p class="hint">${planLine(l)}</p></section>`
@@ -84,10 +89,10 @@ function welcome() {
 /* tap a word: hear it, see it letter by letter, see the steps */
 function wordCard(k, lid) {
   const l = listById(lid) || curList(), w = (l && l.words.find(x => kOf(x) === k)); if (!w) return;
-  const st = stageOf(w), M = maxSt(l);
+  const st = stageOf(w, l), M = maxSt(l), names = stepNames(l);
   const m = modal('', `<div class="wcard"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${letterSpans(w.en)}</div><div class="he">${w.he.map(esc).join(' / ')}</div>
   <div class="row center"><button class="btn btn-ghost" data-s="say">${IC.sound} ${hasVoice(w) ? 'בקול של אבא' : 'שמיעה'}</button><button class="btn btn-ghost" data-s="spell">איות</button>${hasHeVoice() ? '<button class="btn btn-ghost" data-s="he">בעברית</button>' : ''}</div>
-  <div class="steps">${Array.from({ length: M }, (_, i) => `<span class="${i < st ? 'on' : ''}" title="${STEP_NAMES[i]}"></span>`).join('')}</div><div class="small muted center">${st >= M ? 'כוכב! המילה הזאת שלך.' : `שלב ${st + 1} מתוך ${M}: ${STEP_NAMES[st]}`}</div>
+  <div class="steps">${Array.from({ length: M }, (_, i) => `<span class="${i < st ? 'on' : ''}" title="${names[i]}"></span>`).join('')}</div><div class="small muted center">${st >= M ? 'כוכב! המילה הזאת שלך.' : `שלב ${st + 1} מתוך ${M}: ${names[st]}${isSpell(l) && spells(w) ? ' · שולטת בכתיב ✓' : ''}`}</div>
   ${famOf(w.en).map(f => `<p class="tip">${esc(f.tip)}</p>`).join('')}</div>`, [['סגור']]);
   const card = m.querySelector('.wcard');
   m.querySelector('[data-s="say"]').onclick = e => { e.stopPropagation(); sayWord(w); };

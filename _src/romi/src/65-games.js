@@ -9,11 +9,11 @@ function gameWords(n) {
   return out;
 }
 function setBest(k, v) { const b = S.best[k]; const better = b == null || (BEST_LOW[k] ? v < b : v > b); if (better) S.best[k] = v; return better; }
-function startGame(k) { G = GAMES[k].init(); G.k = k; S.view = 'game'; save(); render(); if (GAMES[k].start) GAMES[k].start(); }
+function startGame(k) { G = GAMES[k].init(); G.k = k; G.t0 = Date.now(); S.view = 'game'; save(); render(); if (GAMES[k].start) GAMES[k].start(); }
 VIEWS.game = () => { if (!G || G.over) { G = null; S.view = 'home'; return VIEWS.home(); } GAMES[G.k].view(); on('[data-act="gquit"]', () => { G = null; go('home'); }); };
 const gBar = (t, right) => `<header class="bar"><button class="icon-btn" data-act="gquit" aria-label="יציאה">${IC.x}</button><h2>${t}</h2><span class="pill">${right}</span></header>`;
 function gameOver(title, html, candy, again) {
-  if (G) G.over = 1; clearTimers(); KB = null;
+  if (G) { G.over = 1; track('g', { g: G.k, sc: G.k === 'memory' ? G.moves : (G.score != null ? G.score : (G.sc || null)), dur: Math.round((Date.now() - G.t0) / 1000) }); } clearTimers(); KB = null;
   addCandy(candy); markDay(); save();
   modal(title, `${html}<div class="center earned">+${candy} ${CANDY(26)}</div>`, [['עוד פעם', again], ['למסך הבית', () => { G = null; go('home'); }]]);
 }

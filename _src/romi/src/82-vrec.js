@@ -91,7 +91,7 @@ function wavURL(x, sr) {
 async function playClip(url) { const k = '__clip'; VOICE[k] = url; delete VBUF[k]; await playVoice(k); delete VOICE[k]; delete VBUF[k]; }
 async function vrSave() {
   const ks = Object.keys(VR.clips);
-  ks.forEach(k => { VOICE[k] = VR.clips[k]; delete VBUF[k]; }); saveVoice();
+  ks.forEach(k => { VOICE[k] = VR.clips[k]; delete VBUF[k]; }); saveVoice(); track('rec', { n: ks.length, of: VR.l.words.length }); save();
   toast(`נשמרו ${ks.length} מילים בקול שלך`); const l = VR.l; VR = null; go('parent');
   for (const k of ks) await voicePush(k);
 }

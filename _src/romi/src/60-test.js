@@ -2,7 +2,7 @@
 let T = null;
 function startTest(l) {
   if (!l) return;
-  T = { l, items: shuffle(l.words).slice(0, l.kind === 'exam' ? 10 : 99).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en' };
+  T = { l, items: shuffle(l.words).slice(0, l.kind === 'exam' ? 10 : 99).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en', t0: Date.now() };
   S.view = 'test'; save(); render(); testSay();
 }
 function testSay() { const it = T && T.items[T.i]; if (!it) return; if (it.mode === 'he') { if (hasHeVoice()) say(it.w.he[0], 'he'); } else sayWord(it.w); }
@@ -30,13 +30,21 @@ function finishTest() {
   t.items.forEach(x => {
     x.enOk = checkEn(x.w, x.en); tot++; if (x.enOk) pts++;
     if (x.mode === 'en' && l.he) { x.heOk = checkHe(x.w, x.he); tot++; if (x.heOk) pts++; }
-    const q = prog(x.w), M = maxSt(l);
-    if (x.enOk) { if (q.st < 5) q.st = 5; else if (q.st >= M) { q.r = (q.r || 0) + 1; q.due = addDays(todayStr(), 2); } }
+    const q = prog(x.w), M = maxSt(l), t0 = todayStr();
+    if (isSpell(l)) {
+      /* the mock dictation is a real check of the spelling: right = written from memory; on another day it also counts as the next-day check */
+      q.sp = q.sp || 0;
+      if (x.enOk) { if (q.sp < 6) { q.sp = 6; q.rd = t0; } else if (q.sp === 6 && q.rd !== t0) q.sp = 7; else if (q.sp >= M) { q.r = (q.r || 0) + 1; q.due = addDays(t0, 2); } }
+      else grade(x.w, l, 'typeEN', false, x.en);
+      if (x.heOk && q.sp === 7) { q.sp = 8; q.r = 0; q.due = addDays(t0, 1); }
+      return;
+    }
+    if (x.enOk) { if (q.st < 5) q.st = 5; else if (q.st >= M) { q.r = (q.r || 0) + 1; q.due = addDays(t0, 2); } }
     else grade(x.w, l, 'typeEN', false, x.en);
-    if (x.heOk && q.st === 6) { q.st = 7; q.r = 0; q.due = addDays(todayStr(), 1); }
+    if (x.heOk && q.st === 6) { q.st = 7; q.r = 0; q.due = addDays(t0, 1); }
     if (x.heOk === false && q.st >= 7) q.st = 6;
   });
-  const score = Math.round(pts / tot * 100), candy = Math.round(score / 10) + (score === 100 ? 10 : 0);
+  const score = Math.round(pts / tot * 100); track('t', { l: l.id, sc: score, n: t.items.length, dur: Math.round((Date.now() - t.t0) / 1000) }); const candy = Math.round(score / 10) + (score === 100 ? 10 : 0);
   addCandy(candy); markDay();
   S.tests.push({ list: l.id, d: todayStr(), score, wrong: t.items.filter(x => !x.enOk || x.heOk === false).map(x => x.w.en) }); S.tests = S.tests.slice(-40);
   let sticker = false; if (score === 100 && !S.stickers.some(s => s.id === l.id)) { S.stickers.push({ id: l.id, em: l.words[0].em || '⭐', t: l.t, d: todayStr() }); sticker = true; }

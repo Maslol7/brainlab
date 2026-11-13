@@ -20,7 +20,8 @@ function romiSVG(o = {}) {
   <path d="M47.5 37.5 l3 -1.6 M72.5 37.5 l-3 -1.6" stroke="${HAIR2}" stroke-width="1.4" stroke-linecap="round"/>
   <ellipse cx="46.5" cy="51" rx="3.6" ry="2.1" fill="#FF9EB5" opacity=".75"/><ellipse cx="73.5" cy="51" rx="3.6" ry="2.1" fill="#FF9EB5" opacity=".75"/>
   <path d="M54 53 Q60 59 66 53" stroke="#C2185B" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-  if (o.head) return `<svg class="romi head" viewBox="30 6 72 64" aria-hidden="true">${head}</svg>`;
+  const acc = ACC[o.acc !== undefined ? o.acc : S.acc], accHead = acc && !acc.body ? acc.d : '', accBody = acc && acc.body ? acc.d : '';
+  if (o.head) return `<svg class="romi head" viewBox="30 4 72 66" aria-hidden="true">${head}${accHead}</svg>`;
   return `<svg class="romi" viewBox="0 0 120 200" aria-hidden="true"><defs><linearGradient id="lg${n}" x1="0" y1="0" x2="1" y2="1">${stops}</linearGradient></defs>
   <path d="M47 76 L27 30 M73 76 L93 30" stroke="${SKIN}" stroke-width="9" stroke-linecap="round"/><circle cx="26" cy="27" r="6" fill="${SKIN}"/><circle cx="94" cy="27" r="6" fill="${SKIN}"/>
   <path d="M53 126 L49 181 M67 126 L71 181" stroke="${SKIN}" stroke-width="11" stroke-linecap="round"/><ellipse cx="46" cy="186" rx="8" ry="4.5" fill="${SKIN}"/><ellipse cx="74" cy="186" rx="8" ry="4.5" fill="${SKIN}"/>
@@ -28,7 +29,7 @@ function romiSVG(o = {}) {
   <path d="M43 71 Q60 64 77 71 L75 104 Q73 120 68 131 L60 123 L52 131 Q47 120 45 104 Z" fill="url(#lg${n})"/>
   <circle cx="46" cy="75" r="6.5" fill="url(#lg${n})"/><circle cx="74" cy="75" r="6.5" fill="url(#lg${n})"/>
   <path d="M55 86 l1.4 3 3 1.4 -3 1.4 -1.4 3 -1.4 -3 -3 -1.4 3 -1.4z M67 100 l1 2 2 1 -2 1 -1 2 -1 -2 -2 -1 2 -1z" fill="#fff" opacity=".9"/>
-  ${head}</svg>`;
+  ${accBody}${head}${accHead}</svg>`;
 }
 function candySVG(c = '#FF5FA2', s = 22) {
   return `<svg class="candy" width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><path d="M9 20 L1 12 L3 28 Z M31 20 L39 12 L37 28 Z" fill="${c}" opacity=".8"/><ellipse cx="20" cy="20" rx="12" ry="10" fill="${c}"/><path d="M12 15 Q20 22 28 15 M12 24 Q20 30 28 24" stroke="#fff" stroke-width="2.4" fill="none" opacity=".75"/><ellipse cx="15" cy="16" rx="3" ry="2" fill="#fff" opacity=".6"/></svg>`;
@@ -71,3 +72,20 @@ const GIC = {
   play: pic('<path d="M10 6l16 10-16 10z" fill="currentColor"/>'),
   rec: pic('<circle cx="16" cy="16" r="8" fill="currentColor"/>'),
 };
+
+/* ---------- the shop: things for Romi to wear, a pet, the mat colour, her celebration trick ---------- */
+const ACC = {
+  none: { t: 'בלי', price: 0, d: '' },
+  clips: { t: 'סיכות כוכב', price: 25, d: '<path d="M42 27l1.3 2.7 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4z M78 25l1.3 2.7 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4z" fill="#FFC229" stroke="#D99A00" stroke-width=".7"/>' },
+  band: { t: 'קשת לשיער', price: 30, d: '<path d="M40 33 C42 15 78 13 81 33" fill="none" stroke="#FF3D8B" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="16.5" r="2.2" fill="#fff"/>' },
+  medal: { t: 'מדליית זהב', price: 40, body: 1, d: '<path d="M53 64 L58 84 M67 64 L62 84" stroke="#2D5BFF" stroke-width="3.5"/><circle cx="60" cy="88" r="6.5" fill="#FFC229" stroke="#D99A00" stroke-width="1.2"/><path d="M60 84.5l1 2.2 2.4.3-1.8 1.6.5 2.4-2.1-1.2-2.1 1.2.5-2.4-1.8-1.6 2.4-.3z" fill="#fff"/>' },
+  shades: { t: 'משקפי שמש', price: 45, d: '<rect x="45" y="38" width="12" height="9" rx="3.5" fill="#1E293B"/><rect x="63" y="38" width="12" height="9" rx="3.5" fill="#1E293B"/><path d="M57 41.5h6" stroke="#1E293B" stroke-width="1.6"/><path d="M47 40.5l3-1.3M65 40.5l3-1.3" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>' },
+  flowers: { t: 'זר פרחים', price: 55, d: '<g stroke="#fff" stroke-width=".6">' + [[43, 26, '#FF5FA2'], [50, 19, '#FFC229'], [60, 16, '#7B61FF'], [70, 19, '#2EC4B6'], [77, 26, '#FF5FA2']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="3.6" fill="${c}"/><circle cx="${x}" cy="${y}" r="1.3" fill="#FFF3B0"/>`).join('') + '</g>' },
+  crown: { t: 'כתר', price: 80, d: '<path d="M45 22 L48 9 L54.5 17 L60 6 L65.5 17 L72 9 L75 22 Z" fill="#FFC229" stroke="#D99A00" stroke-width="1.2" stroke-linejoin="round"/><circle cx="60" cy="16" r="2" fill="#FF3D8B"/><circle cx="51" cy="18.5" r="1.4" fill="#2D5BFF"/><circle cx="69" cy="18.5" r="1.4" fill="#2D5BFF"/>' },
+};
+const PETS = { none: { t: 'בלי', e: '', price: 0 }, bunny: { t: 'ארנבונית', e: '🐰', price: 50 }, kitten: { t: 'חתלתולה', e: '🐱', price: 60 }, puppy: { t: 'כלבלב', e: '🐶', price: 60 }, penguin: { t: 'פינגווין', e: '🐧', price: 70 }, owl: { t: 'ינשוף חכם', e: '🦉', price: 80 }, unicorn: { t: 'חד-קרן', e: '🦄', price: 150 } };
+const MATS = { blue: { t: 'כחול', c: ['#2D5BFF', '#1F44D6'], price: 0 }, pink: { t: 'ורוד', c: ['#F0357F', '#C81E64'], price: 40 }, purple: { t: 'סגול', c: ['#7B61FF', '#5A3FE0'], price: 40 }, teal: { t: 'טורקיז', c: ['#0E9AA7', '#0A7A85'], price: 40 }, sunset: { t: 'שקיעה', c: ['#F2643A', '#D93B6E'], price: 70 }, night: { t: 'לילה', c: ['#2A3570', '#151B45'], price: 70 } };
+const TRICKS = { flip: { t: 'סלטה', price: 0 }, cartwheel: { t: 'גלגלון', price: 50 }, handstand: { t: 'עמידת ידיים', price: 50 }, twist: { t: 'סיבוב באוויר', price: 70 }, double: { t: 'סלטה כפולה', price: 100 } };
+const trickCls = () => 'trick-' + (TRICKS[S.trick] ? S.trick : 'flip');
+const petHTML = (cls = '') => { const p = PETS[S.pet]; return p && p.e ? `<span class="pet ${cls}" aria-hidden="true">${p.e}</span>` : ''; };
+function applyMat() { const m = MATS[S.mat] || MATS.blue, r = document.documentElement.style; r.setProperty('--floor', m.c[0]); r.setProperty('--floor-2', m.c[1]); }

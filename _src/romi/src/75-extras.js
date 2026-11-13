@@ -22,7 +22,7 @@ function reviewList() {
   return { id: 'review', t: 'חזרה כללית', src: 'review', he: true, words };
 }
 function reviewPlan(list) {
-  const t = todayStr(), need = w => { const q = S.p[kOf(w)] || {}; return (q.due && q.due <= t ? 100 : 0) + (q.st >= maxSt(list) ? 0 : 50) + ((q.bad || 0) - (q.ok || 0)) * 3 + (q.last ? Math.min(30, dayDiff(q.last, t)) : 40); };
+  const t = todayStr(), need = w => { const q = S.p[kOf(w)] || {}; return (q.due && q.due <= t ? 100 : 0) + (stageOf(w, list) >= maxSt(list) ? 0 : 50) + ((q.bad || 0) - (q.ok || 0)) * 3 + (q.last ? Math.min(30, dayDiff(q.last, t)) : 40); };
   const q = list.words.slice().sort((a, b) => need(b) - need(a)).slice(0, 8);
   return { q: shuffle(q), n: 12 };
 }

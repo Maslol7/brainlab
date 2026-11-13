@@ -1,13 +1,19 @@
 /* ---------- speech: the phone reads words aloud (iPhone: works only after the first tap, so every first call comes from a tap) ---------- */
 const TTS = window.speechSynthesis || null;
 let VOICES = [];
-function loadVoices() { try { VOICES = TTS ? TTS.getVoices() : []; } catch (e) { VOICES = []; } }
+function loadVoices() { try { VOICES = TTS ? TTS.getVoices() : []; } catch (e) { VOICES = []; } const sel = VOICES.length && document.getElementById('envoice'); if (sel && typeof voiceOptions === 'function') sel.innerHTML = voiceOptions(); }
 if (TTS) { loadVoices(); try { TTS.addEventListener('voiceschanged', loadVoices); } catch (e) { TTS.onvoiceschanged = loadVoices; } }
 const EN_PREF = ['Samantha', 'Karen', 'Moira', 'Tessa', 'Daniel', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny'];
 function voiceFor(lang) {
   if (!VOICES.length) loadVoices();
   const vs = VOICES.filter(v => (v.lang || '').toLowerCase().startsWith(lang));
-  if (lang === 'en') { for (const n of EN_PREF) { const v = vs.find(x => x.name.startsWith(n)); if (v) return v; } return vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null; }
+  if (lang === 'en') {
+    const chosen = S.enVoice && vs.find(v => v.name === S.enVoice); if (chosen) return chosen;
+    /* the best voice on the phone: a downloaded Premium or Enhanced one, American then British */
+    for (const re of [/en[-_]US/i, /en[-_]GB/i]) { const v = vs.find(x => re.test(x.lang) && /premium|enhanced|neural|natural/i.test(x.name)); if (v) return v; }
+    for (const n of EN_PREF) { const v = vs.find(x => x.name.startsWith(n)); if (v) return v; }
+    return vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+  }
   return vs[0] || null;
 }
 const hasHeVoice = () => !!voiceFor('he');

@@ -323,6 +323,58 @@ label.small.row{flex-direction:row}
 .album{display:flex;flex-wrap:wrap;gap:10px}
 .sticker{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:76px;height:76px;border-radius:50%;background:radial-gradient(circle,#FFF6DA,#FFC63D);color:#3A2600;font-size:2rem;box-shadow:0 3px 0 #C99A1E;transform:rotate(-6deg)}
 .sticker small{font-size:.6rem;font-weight:700}
+/* celebration tricks (bought in the shop) */
+.trick-flip{animation:flip 1s ease-in-out}
+.trick-cartwheel{animation:cartwheel 1.1s ease-in-out}
+.trick-handstand{animation:handstand 1.4s ease-in-out}
+.trick-twist{animation:twist 1.1s ease-in-out}
+.trick-double{animation:double 1.3s ease-in-out}
+.big-romi.twice{animation-delay:.2s;animation-iteration-count:2}
+@keyframes cartwheel{0%{transform:none}50%{transform:translate(-34px,-14px) rotate(-180deg)}100%{transform:rotate(-360deg)}}
+@keyframes handstand{0%{transform:none}30%,70%{transform:translateY(-6px) rotate(180deg)}100%{transform:none}}
+@keyframes twist{0%{transform:none}50%{transform:translateY(-44px) rotateY(360deg)}100%{transform:rotateY(720deg)}}
+@keyframes double{0%{transform:none}50%{transform:translateY(-60px) rotate(-360deg)}100%{transform:rotate(-720deg)}}
+/* the pet beside Romi */
+.fl-romi,.big-romi{position:relative}
+.pet{position:absolute;bottom:-2px;inset-inline-end:-26px;font-size:1.9rem;line-height:1;animation:petbob 2.4s ease-in-out infinite}
+.big-romi .pet{font-size:2.4rem;inset-inline-end:-36px}
+.fl-romi .pet{inset-inline-end:-12px;font-size:1.7rem}
+@keyframes petbob{50%{transform:translateY(-5px)}}
+/* shop */
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-inline:max(16px,env(safe-area-inset-right,0px))}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 14px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-weight:700;font-size:.92rem;white-space:nowrap}
+.tab.on{background:var(--ink);color:var(--chalk);border-color:transparent}
+.tab .dot{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--leo);color:#fff;font-size:.72rem;padding:0 4px}
+.shopit .sw.face{background:var(--leo-soft);overflow:hidden;display:grid;place-items:center}
+.shopit .sw.face .romi{width:46px;height:46px;margin-top:4px}
+.shopit .sw.pe{display:grid;place-items:center;font-size:1.7rem;background:var(--surface-2);box-shadow:none}
+.shopit .sw.msw{display:block;border-radius:10px;width:50px;height:34px;flex:none;box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
+.shopit .sw.tr{display:grid;place-items:center;background:color-mix(in srgb,var(--floor) 14%,var(--surface));color:var(--floor);box-shadow:none}
+.rewards{display:flex;flex-direction:column;gap:8px}
+.reward{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.reward b{display:block}
+.reward .small{display:inline-flex;align-items:center;gap:4px;color:var(--ink-2)}
+.reward .btn{min-height:42px;padding:6px 16px;font-size:.98rem}
+.reward.wait{background:var(--candy-soft);border-color:transparent}
+/* parent: report */
+.card.hi{border:2px solid var(--leo)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.kpis div{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:12px;background:var(--surface-2);text-align:center}
+.kpis b{font-family:var(--f-display);font-weight:400;font-size:1.35rem;font-variant-numeric:tabular-nums}
+.kpis span{font-size:.72rem;color:var(--ink-2);line-height:1.2}
+.tscroll{overflow-x:auto}
+.ptab td,.ptab th{font-variant-numeric:tabular-nums}
+/* spelling steps */
+.word.sp .lt.tr,.learn .word .lt.tr{color:var(--leo);text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px}
+.slot.given{background:transparent;border-color:transparent;color:var(--ink-3)}
+.slot.blank{border-bottom-color:var(--leo);background:var(--leo-soft)}
+.slot.blank.full{background:color-mix(in srgb,var(--floor) 10%,var(--surface));border-bottom-color:var(--floor)}
+.typed.strict{border-color:var(--floor)}
+.key.glow{background:var(--candy);box-shadow:0 0 0 3px color-mix(in srgb,var(--candy) 40%,transparent)}
+.wchip.spelled{border-color:color-mix(in srgb,var(--good) 55%,transparent);background:color-mix(in srgb,var(--good) 8%,var(--surface))}
+.wchip .st.ok{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--good);color:#fff;font-size:.7rem;font-weight:800}
+.wchip .st.wait{font-size:.8rem}
 /* look, cover, build */
 .timer{width:70%;height:6px;border-radius:9px;background:var(--surface-2);overflow:hidden}
 .timer i{display:block;height:100%;background:var(--floor);animation:shrink linear forwards;transform-origin:right}
@@ -421,7 +473,7 @@ function buzz(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e
 /* ---------- סלטה: Romi's English words app. Base: page, small helpers, toast and modal ---------- */
 document.documentElement.setAttribute('dir', 'rtl');
 document.documentElement.setAttribute('lang', 'he');
-const APP_VER = '38';
+const APP_VER = '41';
 const APP_URL = 'https://maslol7.github.io/brainlab/romi/';
 const app = document.getElementById('app');
 const NAME = 'רומי';
@@ -534,19 +586,23 @@ const SENT_WORDS = () => [...new Set([...PACKS[0].words, ...LIST_1104.words].map
 const KEY = 'salta-romi-v1';
 const DAD_DEF = ['רומי, אבא אוהב אותך.', 'אבא גאה בך. לא בגלל הציון, בגלל שאת מתאמנת.', 'כמו באקרובטיקה: עוד אימון ועוד אימון, ופתאום זה קל. אבא איתך.', 'טעות היא חלק מהאימון. אבא סומך עלייך.', 'אבא אוהב אותך. עכשיו לכי לשתות מים ולעשות גלגלון.', 'כל מילה שלמדת היא שלך לתמיד. אבא גאה בך.'];
 const DAD_HARD = ['קשה? זה בסדר. אבא אוהב אותך, וזה לא תלוי בציון.', 'נשימה עמוקה. גם באימון לא כל קפיצה יוצאת בפעם הראשונה. אבא איתך.'];
+/* real rewards from dad: what she can buy with candies; dad approves each one when it happens */
+const REWARDS_DEF = [{ t: 'ממתק לבחירתי', p: 80 }, { t: 'חצי שעה מסך נוסף', p: 120 }, { t: 'אבא עושה איתי אימון אקרובטיקה', p: 120 }, { t: 'גלידה עם אבא', p: 150 }, { t: 'ערב סרט שאני בוחרת', p: 200 }];
 function fresh() {
-  return { v: 1, start: todayStr(), lists: [JSON.parse(JSON.stringify(LIST_1104)), JSON.parse(JSON.stringify(LIST0)), JSON.parse(JSON.stringify(LIST_EXAM))], p: {}, candy: 0, candyAll: 0, days: {}, sessions: 0, tests: [], stickers: [], own: { leo: ['violet'], rib: ['pink'] }, leo: 'violet', rib: 'pink', best: {}, dadMsgs: null, dadI: 0, sound: 1, rate: .85, pin: '', seen: { pin36: 1 }, view: 'home', pv: '' };
+  return { v: 1, start: todayStr(), lists: [JSON.parse(JSON.stringify(LIST_1104)), JSON.parse(JSON.stringify(LIST0)), JSON.parse(JSON.stringify(LIST_EXAM))], p: {}, candy: 0, candyAll: 0, days: {}, sessions: 0, tests: [], stickers: [], own: { leo: ['violet'], rib: ['pink'], acc: ['none'], pet: ['none'], mat: ['blue'], trick: ['flip'] }, leo: 'violet', rib: 'pink', acc: 'none', pet: 'none', mat: 'blue', trick: 'flip', rewards: REWARDS_DEF.slice(), vouchers: [], log: [], best: {}, dadMsgs: null, dadI: 0, sound: 1, rate: .85, pin: '', seen: { pin36: 1, sp41: 1 }, view: 'home', pv: '' };
 }
 function norm(o) {
   const f = fresh();
   for (const k in f) if (o[k] == null) o[k] = f[k];
   o.lists = arr(o.lists).map(l => (l.words = arr(l.words).map(w => (w.he = arr(w.he), w)), l));
-  o.tests = arr(o.tests); o.stickers = arr(o.stickers); o.own.leo = arr(o.own.leo); o.own.rib = arr(o.own.rib);
+  o.tests = arr(o.tests); o.stickers = arr(o.stickers); ['leo', 'rib', 'acc', 'pet', 'mat', 'trick'].forEach(k => { o.own[k] = arr(o.own[k]); if (!o.own[k].length) o.own[k] = f.own[k].slice(); }); o.rewards = arr(o.rewards); o.vouchers = arr(o.vouchers); o.log = arr(o.log);
   if (o.dadMsgs) o.dadMsgs = arr(o.dadMsgs);
   for (const k in o.p) { const q = o.p[k]; q.wr = arr(q.wr); }
   /* lists that ship with a version are added once, also to a phone that already has data */
   o.seen = o.seen || {};
   if (!o.seen.pin36) { o.seen.pin36 = 1; o.pin = ''; }   /* v36: dad chooses the parent code again (one was typed wrong) */
+  /* v41: spelling gets its own progress. Start it from the old one, carefully: a word she could spell from memory starts at "write from the sound" again */
+  if (!o.seen.sp41) { o.seen.sp41 = 1; for (const k in o.p) { const q = o.p[k], st = q.st || 0; if (q.sp == null) q.sp = st >= 6 ? 4 : st >= 4 ? 2 : st >= 1 ? 1 : 0; } }
   if (!o.seen.exam1123b) { o.seen.exam1123 = o.seen.exam1123b = 1; [LIST_1104, LIST_EXAM].forEach(L => { o.lists = o.lists.filter(l => l.id !== L.id || L === LIST_1104); if (!o.lists.some(l => l.id === L.id)) o.lists.push(JSON.parse(JSON.stringify(L))); }); }
   return o;
 }
@@ -570,17 +626,27 @@ function markDay(n = 1) { const t = todayStr(); S.days[t] = (S.days[t] || 0) + n
 function streak() { let n = 0, d = todayStr(); if (!S.days[d]) d = addDays(d, -1); while (S.days[d]) { n++; d = addDays(d, -1); } return n; }
 function dadLine(hard) { const l = (S.dadMsgs && S.dadMsgs.length) ? S.dadMsgs : hard ? DAD_HARD : DAD_DEF; S.dadI = ((S.dadI || 0) + 1) % l.length; return l[S.dadI]; }
 
+/* ---------- tracking: a short log of what she does, for the usage report (kept to the last 500 events) ----------
+   kinds: open, s (practice session), q (quit a session), t (mock test), g (game), buy, vf (dad's voice did not play), rec (dad recorded) */
+function track(k, d) { (S.log = S.log || []).push(Object.assign({ t: Date.now(), k }, d || {})); if (S.log.length > 500) S.log = S.log.slice(-500); }
+
 /* ---- romi/src/25-speech.js ---- */
 /* ---------- speech: the phone reads words aloud (iPhone: works only after the first tap, so every first call comes from a tap) ---------- */
 const TTS = window.speechSynthesis || null;
 let VOICES = [];
-function loadVoices() { try { VOICES = TTS ? TTS.getVoices() : []; } catch (e) { VOICES = []; } }
+function loadVoices() { try { VOICES = TTS ? TTS.getVoices() : []; } catch (e) { VOICES = []; } const sel = VOICES.length && document.getElementById('envoice'); if (sel && typeof voiceOptions === 'function') sel.innerHTML = voiceOptions(); }
 if (TTS) { loadVoices(); try { TTS.addEventListener('voiceschanged', loadVoices); } catch (e) { TTS.onvoiceschanged = loadVoices; } }
 const EN_PREF = ['Samantha', 'Karen', 'Moira', 'Tessa', 'Daniel', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny'];
 function voiceFor(lang) {
   if (!VOICES.length) loadVoices();
   const vs = VOICES.filter(v => (v.lang || '').toLowerCase().startsWith(lang));
-  if (lang === 'en') { for (const n of EN_PREF) { const v = vs.find(x => x.name.startsWith(n)); if (v) return v; } return vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null; }
+  if (lang === 'en') {
+    const chosen = S.enVoice && vs.find(v => v.name === S.enVoice); if (chosen) return chosen;
+    /* the best voice on the phone: a downloaded Premium or Enhanced one, American then British */
+    for (const re of [/en[-_]US/i, /en[-_]GB/i]) { const v = vs.find(x => re.test(x.lang) && /premium|enhanced|neural|natural/i.test(x.name)); if (v) return v; }
+    for (const n of EN_PREF) { const v = vs.find(x => x.name.startsWith(n)); if (v) return v; }
+    return vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+  }
   return vs[0] || null;
 }
 const hasHeVoice = () => !!voiceFor('he');
@@ -613,7 +679,11 @@ const VKEY = 'salta-voice';
 let VOICE = (() => { try { return JSON.parse(localStorage.getItem(VKEY)) || {}; } catch (e) { return {}; } })();
 const VBUF = {};
 function saveVoice() { try { localStorage.setItem(VKEY, JSON.stringify(VOICE)); } catch (e) { toast('אין מקום לשמור עוד הקלטות בטלפון'); } }
-const hasVoice = w => !!(w && VOICE[kOf(w)]) && S.dadVoice !== 0;
+/* who says the English words: 'dad' everywhere, 'native' (the phone's English voice) everywhere,
+   or 'mix': dad on the new-word card, word cards and the mock dictation; the English voice in drills and games */
+const vmode = () => S.vmode || (S.dadVoice === 0 ? 'native' : 'dad');
+function voiceCtx() { if (S.view === 'test') return 'test'; if (S.view === 'practice') return P && P.cur && P.cur.type === 'learn' ? 'learn' : 'drill'; if (S.view === 'game') return 'drill'; return 'learn'; }
+const hasVoice = w => { if (!(w && VOICE[kOf(w)])) return false; const m = vmode(); return m === 'dad' || (m === 'mix' && voiceCtx() !== 'drill'); };
 /* iPhone: let the sound play even when the side switch is on silent */
 const audioMode = t => { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) { } };
 audioMode('playback');
@@ -628,17 +698,51 @@ async function getMic() {
     return null;
   }
 }
-async function playVoice(k) {
-  const a = ac(); const src = VOICE[k]; if (!a || !src) return false;
-  try {
-    if (!VBUF[k]) { const bin = atob(src.split(',')[1]); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); VBUF[k] = await new Promise((res, rej) => a.decodeAudioData(u8.buffer, res, rej)); }
-    const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1.6; n.buffer = VBUF[k]; n.connect(g); g.connect(a.destination); n.start(); return true;
-  } catch (e) { return false; }
+/* Playing dad's voice. Before v39 a failed play fell back to the phone voice without a trace, and that happened often. Now:
+   1. the audio context is resumed, and made again when the iPhone left it "interrupted" (after a call or a locked screen);
+   2. recordings are kept as WAV (the iPhone's own recorder makes MP4 pieces that Web Audio does not always decode);
+   3. if Web Audio still fails, an <audio> element plays the file; only then the phone voice speaks;
+   every fallback is written to the usage log with its reason. */
+const b64buf = src => { const bin = atob(src.split(',')[1]); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return u8.buffer; };
+const decodeIn = (a, src) => new Promise((res, rej) => { try { const p = a.decodeAudioData(b64buf(src), res, rej); if (p && p.catch) p.catch(rej); } catch (e) { rej(e); } });
+async function liveAC() {
+  let a = ac(); if (!a) return null;
+  if (a.state !== 'running') { try { await Promise.race([a.resume(), new Promise(r => setTimeout(r, 400))]); } catch (e) { } }
+  if (a.state === 'interrupted' || a.state === 'closed') { if (a.state !== 'closed') { try { const c = a.close(); if (c && c.catch) c.catch(() => { }); } catch (e) { } } AC = null; a = ac(); try { await Promise.race([a.resume(), new Promise(r => setTimeout(r, 400))]); } catch (e) { } }
+  return a;
 }
-/* say an English word: dad's recording when there is one, else the phone's voice */
+const VFAIL = {};
+function vfail(k, why) { const t = Date.now(); if (VFAIL[k] && t - VFAIL[k] < 5000) return; VFAIL[k] = t; track('vf', { w: k, why: String(why).slice(0, 60), st: (AC && AC.state) || 'none' }); save(); }
+async function playVoice(k, rate) {
+  const src = VOICE[k]; if (!src) return false;
+  if (!rate) {
+    try {
+      const a = await liveAC();
+      if (a && a.state === 'running') {
+        if (!VBUF[k]) VBUF[k] = await decodeIn(a, src);
+        const n = a.createBufferSource(), g = a.createGain(); g.gain.value = 1.6; n.buffer = VBUF[k]; n.connect(g); g.connect(a.destination); n.start();
+        if (!/^data:audio\/wav/.test(src)) toWav(k, VBUF[k]);
+        return true;
+      }
+      vfail(k, 'webaudio ' + (a ? a.state : 'none'));
+    } catch (e) { vfail(k, 'webaudio ' + (e && (e.name || e.message) || e)); }
+  }
+  try { const el = new Audio(src); el.preservesPitch = true; el.webkitPreservesPitch = true; if (rate) el.playbackRate = rate; await el.play(); return true; }
+  catch (e) { vfail(k, 'audio ' + (e && (e.name || e.message) || e)); return false; }
+}
+/* turn a decoded recording into a small WAV, once */
+function toWav(k, buf) { try { VOICE[k] = wavURL(resample(buf.getChannelData(0), buf.sampleRate, VR_SR), VR_SR); saveVoice(); voicePush(k); } catch (e) { } }
+/* at start: convert older MP4 recordings without waiting for a touch (an offline context decodes without sound) */
+async function wavAll() {
+  const ks = Object.keys(VOICE).filter(k => !/^data:audio\/wav/.test(VOICE[k])); if (!ks.length) return;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OAC) return;
+  for (const k of ks) { try { const o = new OAC(1, 1, 44100); const buf = await decodeIn(o, VOICE[k]); VOICE[k] = wavURL(resample(buf.getChannelData(0), buf.sampleRate, VR_SR), VR_SR); delete VBUF[k]; } catch (e) { vfail(k, 'convert ' + (e && (e.name || e.message) || e)); } }
+  saveVoice();
+}
+/* say an English word: dad's recording when there is one (slow = his recording at 70%, same pitch), else the phone's voice */
 function sayWord(w, rate) {
   if (!w) return;
-  if (!rate && hasVoice(w)) { try { if (TTS) TTS.cancel(); } catch (e) { } playVoice(kOf(w)).then(ok => { if (!ok) say(w.en); }); return; }
+  if (hasVoice(w)) { try { if (TTS) TTS.cancel(); } catch (e) { } playVoice(kOf(w), rate ? .7 : 0).then(ok => { if (!ok) say(w.en, 'en', rate); }); return; }
   say(w.en, 'en', rate);
 }
 /* ---------- recording (parent area) ---------- */
@@ -653,7 +757,11 @@ async function recStart(k, onDone) {
   mr.ondataavailable = e => e.data && e.data.size && parts.push(e.data);
   mr.onstop = () => {
     stream.getTracks().forEach(t => t.stop()); audioMode('playback'); const b = new Blob(parts, { type: mr.mimeType || type || 'audio/mp4' });
-    const fr = new FileReader(); fr.onload = () => { VOICE[k] = fr.result; delete VBUF[k]; saveVoice(); voicePush(k); REC = null; onDone && onDone(); playVoice(k); }; fr.readAsDataURL(b);
+    const fr = new FileReader(); fr.onload = async () => {
+      VOICE[k] = fr.result; delete VBUF[k];
+      try { const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; const buf = await decodeIn(new OAC(1, 1, 44100), fr.result); VOICE[k] = splitByMarks(buf.getChannelData(0), buf.sampleRate, [buf.duration], [k])[k] || VOICE[k]; } catch (e) { vfail(k, 'convert ' + (e && e.name || e)); }
+      saveVoice(); voicePush(k); track('rec', { n: 1 }); REC = null; onDone && onDone(); playVoice(k);
+    }; fr.readAsDataURL(b);
   };
   REC = { mr, k, t: setTimeout(recStop, 2600) }; mr.start(); SFX.beep && SFX.beep(); onDone && onDone(true);
 }
@@ -673,24 +781,37 @@ async function voicePull() {
 }
 
 /* ---- romi/src/30-engine.js ---- */
-/* ---------- the practice engine: each word climbs 7 steps, wrong answers step down, learned words come back after 1, 2, 4, 7 days ----------
-   steps: 0 meet the word · 1 meaning (choose) · 2 spelling (choose) · 3 build from letters · 4 hear English, type · 5 hear Hebrew, type English · 6 write the Hebrew meaning
-   bonus lists stop at 6 (no Hebrew writing). */
+/* ---------- the practice engine ----------
+   Two tracks, each with its own progress field per word:
+   - spelling track (field sp; dictation lists and the general review). Romi knows the sound and meaning; the spelling is what she
+     forgets, so each word climbs: 0 meet (look, cover, build) · 1 copy, letter by letter · 2 missing letters (her own mistakes and the
+     tricky part first) · 3 more missing letters · 4 write from the sound · 5 write from the Hebrew · 6 write again on another day ·
+     7 write the Hebrew meaning · 8 star. From 7 she "controls the spelling". A spelling mistake sends the word back to 2.
+     At most 3 words are in work at once, so a word is truly learned before the next one starts.
+   - recognition track (field st; test lists stop at 4, bonus packs at 6): meet, meaning, spot the spelling, build, hear and type, from Hebrew. */
 const STEP_NAMES = ['חדשה', 'פירוש', 'זיהוי', 'הרכבה', 'הכתבה', 'מעברית', 'פירוש בכתב', 'כוכב'];
-const maxSt = l => l && l.kind === 'exam' ? 4 : l && l.he ? 7 : 6;
-function prog(w) { const k = kOf(w); return S.p[k] || (S.p[k] = { st: 0, r: 0, ok: 0, bad: 0, wr: [] }); }
-const stageOf = w => (S.p[kOf(w)] || {}).st || 0;
-const mastered = (w, l) => stageOf(w) >= maxSt(l);
-const pctOf = (w, l) => Math.min(100, Math.round(stageOf(w) / maxSt(l) * 100));
+const STEP_NAMES_SP = ['חדשה', 'העתקה', 'חסרות אותיות', 'חסרות עוד', 'הכתבה מהשמיעה', 'מעברית', 'בדיקה ביום אחר', 'פירוש בכתב', 'כוכב'];
+const isSpell = l => !!l && (l.id === 'review' || (l.src === 'class' && l.kind !== 'exam' && !!l.he));
+const fld = l => isSpell(l) ? 'sp' : 'st';
+const stepNames = l => isSpell(l) ? STEP_NAMES_SP : STEP_NAMES;
+const maxSt = l => isSpell(l) ? 8 : l && l.kind === 'exam' ? 4 : l && l.he ? 7 : 6;
+const SP_OK = 7;   /* from here she controls the spelling */
+function prog(w) { const k = kOf(w); return S.p[k] || (S.p[k] = { st: 0, sp: 0, r: 0, ok: 0, bad: 0, wr: [] }); }
+const stageOf = (w, l) => (S.p[kOf(w)] || {})[fld(l)] || 0;
+const spells = w => ((S.p[kOf(w)] || {}).sp || 0) >= SP_OK;
+const mastered = (w, l) => stageOf(w, l) >= maxSt(l);
+const pctOf = (w, l) => Math.min(100, Math.round(stageOf(w, l) / maxSt(l) * 100));
 const isDue = w => { const q = S.p[kOf(w)]; return !!(q && q.due && q.due <= todayStr()); };
 function listPct(l) { if (!l || !l.words.length) return 0; return Math.round(l.words.reduce((a, w) => a + pctOf(w, l), 0) / l.words.length); }
 const listStars = l => l.words.filter(w => mastered(w, l)).length;
+/* a word that passed "write from the Hebrew" today waits for tomorrow's check (unless the dictation is tomorrow or today) */
+const waitsTomorrow = (w, l) => { if (!isSpell(l)) return false; const q = S.p[kOf(w)] || {}, left = l.date ? dayDiff(todayStr(), l.date) : 99; return q.sp === 6 && q.rd === todayStr() && left > 1; };
 /* which words go into today's session */
 function planSession(list) {
-  if (list.id === 'review') return reviewPlan(list);
+  if (isSpell(list)) return spellPlan(list);
   const t = todayStr(), ws = list.words.slice(), left = list.date ? dayDiff(t, list.date) : 99;
-  const un = ws.filter(w => !mastered(w, list)).sort((a, b) => stageOf(b) - stageOf(a));
-  const started = un.filter(w => stageOf(w) > 0), news = shuffle(un.filter(w => stageOf(w) === 0));
+  const un = ws.filter(w => !mastered(w, list)).sort((a, b) => stageOf(b, list) - stageOf(a, list));
+  const started = un.filter(w => stageOf(w, list) > 0), news = shuffle(un.filter(w => stageOf(w, list) === 0));
   const rev = shuffle(ws.filter(w => mastered(w, list) && (isDue(w) || left <= 1)));
   const cap = list.kind === 'exam' ? 9 : 5;  /* a test list is long and asks only to recognise: more words at once */
   let q = [...shuffle(started), ...news.slice(0, Math.max(2, cap - started.length))];
@@ -699,25 +820,65 @@ function planSession(list) {
   const n = list.kind === 'exam' ? 18 : left <= 1 ? 16 : 14;
   return { q, n };
 }
+function spellPlan(list) {
+  const t = todayStr(), left = list.date ? dayDiff(t, list.date) : 99, M = maxSt(list), st = w => stageOf(w, list);
+  const pool = list.id === 'review' ? reviewPlan(list).q : list.words;
+  const un = pool.filter(w => st(w) < M && !waitsTomorrow(w, list));
+  const active = un.filter(w => st(w) >= 1).sort((a, b) => st(a) - st(b));
+  const news = un.filter(w => st(w) === 0);
+  const q = [...active.slice(0, 3), ...news.slice(0, Math.max(0, 3 - active.length))];
+  const rev = shuffle(list.words.filter(w => st(w) >= M && (isDue(w) || left <= 1)));
+  const all = q.concat(rev.slice(0, q.length ? 2 : 4));
+  return { q: all, n: Math.max(6, Math.min(16, all.length * 5)), waiting: list.words.filter(w => waitsTomorrow(w, list)) };
+}
 function itemType(w, list) {
-  const st = stageOf(w), M = maxSt(list);
+  const st = stageOf(w, list), M = maxSt(list);
+  if (isSpell(list)) { if (st >= M) return pick(['typeEN', 'typeHE2EN']); return ['learn', 'copy', 'fade1', 'fade2', 'typeEN', 'typeHE2EN', 'typeEN', 'writeHE'][st]; }
   if (st >= M) return pick(list.kind === 'exam' ? ['meanEN', 'meanHE', 'pick'] : list.he ? ['typeEN', 'typeHE2EN', 'writeHE'] : ['typeEN', 'typeHE2EN']);
   return ['learn', R() < .5 ? 'meanEN' : 'meanHE', 'pick', 'tiles', 'typeEN', 'typeHE2EN', 'writeHE'][st];
 }
-/* record a result. ok = right on the first try */
+/* record a result. ok = right on the first try. Returns 'up', 'star', 'spell' (just reached spelling control), 'keep' or 'down' */
 function grade(w, list, type, ok, attempt) {
-  const q = prog(w), M = maxSt(list), t = todayStr(); q.last = t;
-  if (type === 'learn') { q.st = Math.max(q.st, 1); return 'up'; }
-  const wasM = q.st >= M;
+  const q = prog(w), M = maxSt(list), t = todayStr(), f = fld(list); q.last = t; q[f] = q[f] || 0;
+  if (type === 'learn') { q[f] = Math.max(q[f], 1); return 'up'; }
+  const wasM = q[f] >= M;
   if (ok) {
     q.ok++;
     if (wasM) { q.r = (q.r || 0) + 1; q.due = addDays(t, [1, 2, 4, 7, 14][Math.min(4, q.r - 1)]); return 'keep'; }
-    q.st++; if (q.st >= M) { q.r = 0; q.due = addDays(t, 1); q.mt = t; return 'star'; }
-    return 'up';
+    q[f]++;
+    if (f === 'sp' && q[f] === 6) q.rd = t;
+    if (q[f] >= M) { q.r = 0; q.due = addDays(t, 1); q.mt = t; return 'star'; }
+    return f === 'sp' && q[f] === SP_OK ? 'spell' : 'up';
   }
-  q.bad++; if (attempt) { q.wr.unshift(attempt); q.wr = q.wr.slice(0, 4); }
-  if (wasM) { q.st = M - 2; q.r = 0; q.due = null; } else q.st = Math.max(1, q.st - 1);
+  q.bad++; if (attempt && type !== 'writeHE') { q.wr.unshift(attempt); q.wr = q.wr.slice(0, 4); }
+  if (f === 'sp') {
+    if (type === 'writeHE') return 'down';                  /* the Hebrew meaning is not a spelling mistake: the word stays at 7 */
+    if (wasM || q[f] >= 4) { q[f] = 2; q.r = 0; q.due = null; } else q[f] = Math.max(1, q[f] - 1);
+    return 'down';
+  }
+  if (wasM) { q[f] = M - 2; q.r = 0; q.due = null; } else q[f] = Math.max(1, q[f] - 1);
   return 'down';
+}
+/* the letters to hide: the tricky part of the word, and the letters she got wrong before */
+function trickyIdx(word) {
+  const lw = word.toLowerCase(), set = new Set(), re = /eigh|igh|tion|gh|ph|kn|wr|wh|ck|ai|ay|ee|ea|oa|ow|ou|oo|ie|ue|([a-z])\1/g; let m;
+  while ((m = re.exec(lw))) for (let i = m.index; i < m.index + m[0].length; i++) set.add(i);
+  if (/[a-z][^aeiou ]e$/.test(lw) && lw.length > 3) set.add(lw.length - 1);   /* magic e */
+  return set;
+}
+function errIdx(w) {
+  const set = new Set();
+  for (const a of arr((S.p[kOf(w)] || {}).wr)) { let j = 0; align(a, w.en).right.forEach(([c, ok]) => { if (!ok) set.add(j); j++; }); }
+  return set;
+}
+function fadeMask(w, level) {
+  const lw = w.en.toLowerCase(), letters = [...lw].map((c, i) => i).filter(i => lw[i] !== ' '), n = letters.length;
+  const hide = new Set([...errIdx(w), ...trickyIdx(w.en)].filter(i => lw[i] && lw[i] !== ' '));
+  const want = level === 1 ? Math.max(2, Math.min(Math.ceil(n * .5), hide.size || 2)) : Math.max(3, Math.round(n * .7));
+  let pick = [...hide].slice(0, want); const rest = shuffle(letters.filter(i => !pick.includes(i) && i !== 0));
+  while (pick.length < want && rest.length) pick.push(rest.shift());
+  if (level === 2 && pick.length >= n) pick = pick.filter(i => i !== 0);
+  return [...lw].map((c, i) => pick.includes(i));
 }
 /* ---------- checking answers ---------- */
 const normEn = s => String(s || '').toLowerCase().replace(/[^a-z' ]/g, '').replace(/\s+/g, ' ').trim();
@@ -781,7 +942,8 @@ function romiSVG(o = {}) {
   <path d="M47.5 37.5 l3 -1.6 M72.5 37.5 l-3 -1.6" stroke="${HAIR2}" stroke-width="1.4" stroke-linecap="round"/>
   <ellipse cx="46.5" cy="51" rx="3.6" ry="2.1" fill="#FF9EB5" opacity=".75"/><ellipse cx="73.5" cy="51" rx="3.6" ry="2.1" fill="#FF9EB5" opacity=".75"/>
   <path d="M54 53 Q60 59 66 53" stroke="#C2185B" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-  if (o.head) return `<svg class="romi head" viewBox="30 6 72 64" aria-hidden="true">${head}</svg>`;
+  const acc = ACC[o.acc !== undefined ? o.acc : S.acc], accHead = acc && !acc.body ? acc.d : '', accBody = acc && acc.body ? acc.d : '';
+  if (o.head) return `<svg class="romi head" viewBox="30 4 72 66" aria-hidden="true">${head}${accHead}</svg>`;
   return `<svg class="romi" viewBox="0 0 120 200" aria-hidden="true"><defs><linearGradient id="lg${n}" x1="0" y1="0" x2="1" y2="1">${stops}</linearGradient></defs>
   <path d="M47 76 L27 30 M73 76 L93 30" stroke="${SKIN}" stroke-width="9" stroke-linecap="round"/><circle cx="26" cy="27" r="6" fill="${SKIN}"/><circle cx="94" cy="27" r="6" fill="${SKIN}"/>
   <path d="M53 126 L49 181 M67 126 L71 181" stroke="${SKIN}" stroke-width="11" stroke-linecap="round"/><ellipse cx="46" cy="186" rx="8" ry="4.5" fill="${SKIN}"/><ellipse cx="74" cy="186" rx="8" ry="4.5" fill="${SKIN}"/>
@@ -789,7 +951,7 @@ function romiSVG(o = {}) {
   <path d="M43 71 Q60 64 77 71 L75 104 Q73 120 68 131 L60 123 L52 131 Q47 120 45 104 Z" fill="url(#lg${n})"/>
   <circle cx="46" cy="75" r="6.5" fill="url(#lg${n})"/><circle cx="74" cy="75" r="6.5" fill="url(#lg${n})"/>
   <path d="M55 86 l1.4 3 3 1.4 -3 1.4 -1.4 3 -1.4 -3 -3 -1.4 3 -1.4z M67 100 l1 2 2 1 -2 1 -1 2 -1 -2 -2 -1 2 -1z" fill="#fff" opacity=".9"/>
-  ${head}</svg>`;
+  ${accBody}${head}${accHead}</svg>`;
 }
 function candySVG(c = '#FF5FA2', s = 22) {
   return `<svg class="candy" width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><path d="M9 20 L1 12 L3 28 Z M31 20 L39 12 L37 28 Z" fill="${c}" opacity=".8"/><ellipse cx="20" cy="20" rx="12" ry="10" fill="${c}"/><path d="M12 15 Q20 22 28 15 M12 24 Q20 30 28 24" stroke="#fff" stroke-width="2.4" fill="none" opacity=".75"/><ellipse cx="15" cy="16" rx="3" ry="2" fill="#fff" opacity=".6"/></svg>`;
@@ -833,6 +995,23 @@ const GIC = {
   rec: pic('<circle cx="16" cy="16" r="8" fill="currentColor"/>'),
 };
 
+/* ---------- the shop: things for Romi to wear, a pet, the mat colour, her celebration trick ---------- */
+const ACC = {
+  none: { t: 'בלי', price: 0, d: '' },
+  clips: { t: 'סיכות כוכב', price: 25, d: '<path d="M42 27l1.3 2.7 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4z M78 25l1.3 2.7 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4z" fill="#FFC229" stroke="#D99A00" stroke-width=".7"/>' },
+  band: { t: 'קשת לשיער', price: 30, d: '<path d="M40 33 C42 15 78 13 81 33" fill="none" stroke="#FF3D8B" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="16.5" r="2.2" fill="#fff"/>' },
+  medal: { t: 'מדליית זהב', price: 40, body: 1, d: '<path d="M53 64 L58 84 M67 64 L62 84" stroke="#2D5BFF" stroke-width="3.5"/><circle cx="60" cy="88" r="6.5" fill="#FFC229" stroke="#D99A00" stroke-width="1.2"/><path d="M60 84.5l1 2.2 2.4.3-1.8 1.6.5 2.4-2.1-1.2-2.1 1.2.5-2.4-1.8-1.6 2.4-.3z" fill="#fff"/>' },
+  shades: { t: 'משקפי שמש', price: 45, d: '<rect x="45" y="38" width="12" height="9" rx="3.5" fill="#1E293B"/><rect x="63" y="38" width="12" height="9" rx="3.5" fill="#1E293B"/><path d="M57 41.5h6" stroke="#1E293B" stroke-width="1.6"/><path d="M47 40.5l3-1.3M65 40.5l3-1.3" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>' },
+  flowers: { t: 'זר פרחים', price: 55, d: '<g stroke="#fff" stroke-width=".6">' + [[43, 26, '#FF5FA2'], [50, 19, '#FFC229'], [60, 16, '#7B61FF'], [70, 19, '#2EC4B6'], [77, 26, '#FF5FA2']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="3.6" fill="${c}"/><circle cx="${x}" cy="${y}" r="1.3" fill="#FFF3B0"/>`).join('') + '</g>' },
+  crown: { t: 'כתר', price: 80, d: '<path d="M45 22 L48 9 L54.5 17 L60 6 L65.5 17 L72 9 L75 22 Z" fill="#FFC229" stroke="#D99A00" stroke-width="1.2" stroke-linejoin="round"/><circle cx="60" cy="16" r="2" fill="#FF3D8B"/><circle cx="51" cy="18.5" r="1.4" fill="#2D5BFF"/><circle cx="69" cy="18.5" r="1.4" fill="#2D5BFF"/>' },
+};
+const PETS = { none: { t: 'בלי', e: '', price: 0 }, bunny: { t: 'ארנבונית', e: '🐰', price: 50 }, kitten: { t: 'חתלתולה', e: '🐱', price: 60 }, puppy: { t: 'כלבלב', e: '🐶', price: 60 }, penguin: { t: 'פינגווין', e: '🐧', price: 70 }, owl: { t: 'ינשוף חכם', e: '🦉', price: 80 }, unicorn: { t: 'חד-קרן', e: '🦄', price: 150 } };
+const MATS = { blue: { t: 'כחול', c: ['#2D5BFF', '#1F44D6'], price: 0 }, pink: { t: 'ורוד', c: ['#F0357F', '#C81E64'], price: 40 }, purple: { t: 'סגול', c: ['#7B61FF', '#5A3FE0'], price: 40 }, teal: { t: 'טורקיז', c: ['#0E9AA7', '#0A7A85'], price: 40 }, sunset: { t: 'שקיעה', c: ['#F2643A', '#D93B6E'], price: 70 }, night: { t: 'לילה', c: ['#2A3570', '#151B45'], price: 70 } };
+const TRICKS = { flip: { t: 'סלטה', price: 0 }, cartwheel: { t: 'גלגלון', price: 50 }, handstand: { t: 'עמידת ידיים', price: 50 }, twist: { t: 'סיבוב באוויר', price: 70 }, double: { t: 'סלטה כפולה', price: 100 } };
+const trickCls = () => 'trick-' + (TRICKS[S.trick] ? S.trick : 'flip');
+const petHTML = (cls = '') => { const p = PETS[S.pet]; return p && p.e ? `<span class="pet ${cls}" aria-hidden="true">${p.e}</span>` : ''; };
+function applyMat() { const m = MATS[S.mat] || MATS.blue, r = document.documentElement.style; r.setProperty('--floor', m.c[0]); r.setProperty('--floor-2', m.c[1]); }
+
 /* ---- romi/src/45-kbd.js ---- */
 /* ---------- keyboards inside the app. The iPhone keyboard "fixes" spelling by itself, and that ruins a dictation, so she never uses it here ----------
    KB holds the open input: { lang, val, onEnter(val), onChange(val), tiles?: [letters], used: [tile indexes], word? } */
@@ -856,12 +1035,35 @@ const tilesHTML = tiles => `<div class="tiles" dir="ltr">${tiles.map((c, i) => `
 /* what she typed so far. With tiles: slots in the shape of the word */
 function typedHTML() {
   if (!KB) return '';
+  /* missing letters: the given letters stay, what she types fills the gaps in order */
+  if (KB.mask) { let j = 0; return `<div class="slots" dir="ltr">${[...KB.mword].map((c, i) => c === ' ' ? '<span class="slot gap"></span>' : !KB.mask[i] ? `<span class="slot given">${esc(c)}</span>` : `<span class="slot blank ${KB.val[j] ? 'full' : ''}">${esc(KB.val[j++] || '')}</span>`).join('')}</div>`; }
+  /* copying: only the right next letter goes in */
+  if (KB.strict) return `<div class="typed en strict" dir="ltr">${esc(KB.val)}<span class="caret"></span></div>`;
   if (KB.word) { let j = 0; const v = KB.val.replace(/ /g, ''); return `<div class="slots" dir="ltr">${[...KB.word].map(c => c === ' ' ? '<span class="slot gap"></span>' : `<span class="slot ${v[j] ? 'full' : ''}">${esc(v[j++] || '')}</span>`).join('')}</div>`; }
   return `<div class="typed ${KB.lang}" dir="${KB.lang === 'he' ? 'rtl' : 'ltr'}">${esc(KB.val)}<span class="caret"></span></div>`;
 }
 function kbRefresh() { const t = app.querySelector('#typed'); if (t) t.innerHTML = typedHTML(); if (KB && KB.onChange) KB.onChange(KB.val); }
 function kbPress(k) {
   if (!KB || KB.lock) return;
+  if (KB.strict) {
+    if (k === 'enter' || k === 'bs') return;
+    const exp = KB.strict[KB.val.length];
+    if (k !== exp) {
+      KB.miss = (KB.miss || 0) + 1; SFX.soft(); const t = app.querySelector('#typed .typed'); if (t) { t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake'); }
+      if (KB.miss >= 2) app.querySelectorAll('.kbd [data-k]').forEach(b => b.classList.toggle('glow', b.dataset.k === exp));
+      return;
+    }
+    KB.miss = 0; app.querySelectorAll('.kbd .glow').forEach(b => b.classList.remove('glow'));
+    KB.val += k; SFX.tap(); kbRefresh(); if (KB.val.length >= KB.strict.length) KB.onEnter(KB.val); return;
+  }
+  if (KB.mask) {
+    const blanks = KB.mask.filter(Boolean).length;
+    if (k === 'bs') { if (KB.val) { KB.val = KB.val.slice(0, -1); SFX.tap(); kbRefresh(); } return; }
+    if (k === 'enter' || k === ' ' || KB.val.length >= blanks) return;
+    KB.val += k; SFX.tap(); kbRefresh();
+    if (KB.val.length >= blanks) { let j = 0; const full = [...KB.mword].map((c, i) => KB.mask[i] ? KB.val[j++] : c).join(''); KB.onEnter(full); }
+    return;
+  }
   if (k === 'enter') { if (KB.val.trim()) KB.onEnter(KB.val); return; }
   if (k === 'bs') {
     if (!KB.val) return;
@@ -917,8 +1119,8 @@ function bindCommon() {
 const topBar = (title, back = 'home') => `<header class="bar"><button class="icon-btn" data-go="${back}" aria-label="חזרה">${IC.back}</button><h2>${title}</h2><span class="pill candy-pill">${CANDY(18)}${S.candy}</span></header>`;
 /* a word: its picture, the word in school letters, and 7 segments, one per step */
 function wordChip(w, l) {
-  const st = Math.min(stageOf(w), maxSt(l)), M = maxSt(l), star = st >= M;
-  return `<button class="wchip ${star ? 'star' : ''}" data-word="${esc(kOf(w))}" data-list="${l.id}"><span class="wem">${w.em || '🔤'}</span><span class="wtx"><span class="w">${EN(w.en)}</span><span class="segs" aria-label="שלב ${st} מתוך ${M}">${Array.from({ length: M }, (_, i) => `<i class="${i < st ? 'on' : ''}"></i>`).join('')}</span></span>${star ? `<span class="st">${IC.star}</span>` : ''}</button>`;
+  const st = Math.min(stageOf(w, l), maxSt(l)), M = maxSt(l), star = st >= M, sp = isSpell(l) && !star && spells(w), wait = waitsTomorrow(w, l);
+  return `<button class="wchip ${star ? 'star' : sp ? 'spelled' : ''}" data-word="${esc(kOf(w))}" data-list="${l.id}"><span class="wem">${w.em || '🔤'}</span><span class="wtx"><span class="w">${EN(w.en)}</span><span class="segs" aria-label="שלב ${st} מתוך ${M}">${Array.from({ length: M }, (_, i) => `<i class="${i < st ? 'on' : ''}"></i>`).join('')}</span></span>${star ? `<span class="st">${IC.star}</span>` : sp ? '<span class="st ok" title="שולטת בכתיב">✓</span>' : wait ? '<span class="st wait" title="בדיקה מחר">⏳</span>' : ''}</button>`;
 }
 function daysStrip(l) {
   const t = todayStr(), left = dayDiff(t, l.date); if (left < 0 || left > 10) return '';
@@ -931,6 +1133,11 @@ function daysStrip(l) {
 }
 function planLine(l) {
   const n = l.words.length, st = listStars(l), left = l.date ? dayDiff(todayStr(), l.date) : 99;
+  if (isSpell(l)) {
+    const sp = l.words.filter(spells).length, wait = l.words.filter(w => waitsTomorrow(w, l)).length;
+    if (sp === n) return st === n ? 'כל המילים בכוכב. אלופה!' : 'את שולטת בכתיב של כל המילים! נשאר רק הפירוש בכתב.';
+    return `שולטת בכתיב: ${sp} מתוך ${n}.${wait ? ` ${wait} מחכות לבדיקה של מחר.` : ''} כל אימון מתמקד ב-3 מילים, עד שהכתיב שלהן נשאר.`;
+  }
   if (st === n) return left >= 0 && left < 99 ? 'כל המילים בכוכב. עכשיו הכתבה לדוגמה, וחזרה קצרה כל יום עד ההכתבה.' : 'כל המילים בכוכב. אלופה!';
   if (left === 0) return 'ההכתבה היום. אימון קצר לחימום, ובהצלחה!';
   return 'אימון אחד ביום, בערך 10 דקות, מספיק כדי להגיע לכוכב בכל המילים.';
@@ -942,7 +1149,7 @@ VIEWS.home = () => {
   const floor = l ? `<section class="floor ${did ? 'did' : ''}"><div class="mat">
     <div class="fl-txt"><div class="eyebrow">${l.kind === 'exam' ? (upcoming ? 'המבחן הבא' : 'המבחן האחרון') : upcoming ? 'ההכתבה הבאה' : 'ההכתבה האחרונה'}</div><div class="fl-date">${l.date ? dateHe(l.date) : esc(l.t)}</div>
     ${upcoming ? `<div class="fl-count">${left === 0 ? '<b>היום</b>' : left === 1 ? '<b>מחר</b>' : `<b>${left}</b><span>ימים</span>`}</div>` : `<button class="chip on-mat" data-go="parent">אבא, יש רשימה חדשה?</button>`}</div>
-    <div class="fl-romi">${romiSVG()}</div></div>${upcoming && l.date ? daysStrip(l) : ''}</section>` : '';
+    <div class="fl-romi">${romiSVG()}${petHTML()}</div></div>${upcoming && l.date ? daysStrip(l) : ''}</section>` : '';
   const routine = l ? `<section class="routine"><div class="sec-h"><h2>המילים</h2><span class="tag">${listStars(l)}/${l.words.length} בכוכב</span></div>
     <div class="wlist">${l.words.map(w => wordChip(w, l)).join('')}</div>
     <button class="btn btn-main big" data-act="today">${did ? 'עוד אימון' : 'האימון של היום'}</button><p class="hint">${planLine(l)}</p></section>`
@@ -983,10 +1190,10 @@ function welcome() {
 /* tap a word: hear it, see it letter by letter, see the steps */
 function wordCard(k, lid) {
   const l = listById(lid) || curList(), w = (l && l.words.find(x => kOf(x) === k)); if (!w) return;
-  const st = stageOf(w), M = maxSt(l);
+  const st = stageOf(w, l), M = maxSt(l), names = stepNames(l);
   const m = modal('', `<div class="wcard"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${letterSpans(w.en)}</div><div class="he">${w.he.map(esc).join(' / ')}</div>
   <div class="row center"><button class="btn btn-ghost" data-s="say">${IC.sound} ${hasVoice(w) ? 'בקול של אבא' : 'שמיעה'}</button><button class="btn btn-ghost" data-s="spell">איות</button>${hasHeVoice() ? '<button class="btn btn-ghost" data-s="he">בעברית</button>' : ''}</div>
-  <div class="steps">${Array.from({ length: M }, (_, i) => `<span class="${i < st ? 'on' : ''}" title="${STEP_NAMES[i]}"></span>`).join('')}</div><div class="small muted center">${st >= M ? 'כוכב! המילה הזאת שלך.' : `שלב ${st + 1} מתוך ${M}: ${STEP_NAMES[st]}`}</div>
+  <div class="steps">${Array.from({ length: M }, (_, i) => `<span class="${i < st ? 'on' : ''}" title="${names[i]}"></span>`).join('')}</div><div class="small muted center">${st >= M ? 'כוכב! המילה הזאת שלך.' : `שלב ${st + 1} מתוך ${M}: ${names[st]}${isSpell(l) && spells(w) ? ' · שולטת בכתיב ✓' : ''}`}</div>
   ${famOf(w.en).map(f => `<p class="tip">${esc(f.tip)}</p>`).join('')}</div>`, [['סגור']]);
   const card = m.querySelector('.wcard');
   m.querySelector('[data-s="say"]').onclick = e => { e.stopPropagation(); sayWord(w); };
@@ -1001,9 +1208,10 @@ let P = null;
 function startPractice(list) {
   if (!list || !list.words || !list.words.length) return toast('אין מילים ברשימה הזאת');
   /* a new class list starts with a short look at all its words, once (to know what the week holds, not to memorise) */
-  if (list.src === 'class' && !S.seen['ov_' + list.id] && list.words.filter(w => stageOf(w) === 0).length * 2 >= list.words.length) { OV = list; S.view = 'overview'; return render(); }
-  const { q, n } = planSession(list);
-  P = { list, q, n, done: 0, ok: 0, candy: 0, words: new Set(), stars: [], last: null, wrongRun: 0, hardShown: false, bonus: list.src !== 'class' && list.id !== 'review' };
+  if (list.src === 'class' && !S.seen['ov_' + list.id] && list.words.filter(w => stageOf(w, list) === 0).length * 2 >= list.words.length) { OV = list; S.view = 'overview'; return render(); }
+  const { q, n, waiting } = planSession(list);
+  if (!q.length) return modal('סיימת להיום!', `<p class="center">${waiting && waiting.length ? `המילים <b dir="ltr">${waiting.map(w => esc(w.en)).join(', ')}</b> מחכות לבדיקה של מחר. ככה בודקים שהכתיב באמת נשאר בזיכרון.` : 'כל המילים כבר בכוכב.'}</p><p class="center small muted">בינתיים אפשר לשחק במשחקים.</p>`, [['טוב!']]);
+  P = { list, q, n, done: 0, ok: 0, candy: 0, words: new Set(), stars: [], spelled: [], last: null, wrongRun: 0, hardShown: false, t0: Date.now(), ty: {}, bonus: list.src !== 'class' && list.id !== 'review' };
   S.view = 'practice'; save(); nextItem();
 }
 function nextItem() {
@@ -1014,6 +1222,8 @@ function nextItem() {
   if (type === 'pick') c.opts = shuffle([w.en.toLowerCase(), ...misspell(w.en)]);
   if (type === 'meanEN' || type === 'meanHE') c.opts = shuffle([w, ...others(w, P.list, 3)]);
   if (type === 'tiles') c.tiles = makeTiles(w.en, prog(w).bad > prog(w).ok ? 0 : 2);
+  if (type === 'fade1' || type === 'fade2') c.mask = fadeMask(w, type === 'fade1' ? 1 : 2);
+  if (type === 'typeEN' && isSpell(P.list) && stageOf(w, P.list) === 6) c.delayed = true;
   P.cur = c; P.words.add(kOf(w)); render(); window.scrollTo(0, 0); autoSay(c);
 }
 function autoSay(c) {
@@ -1028,13 +1238,15 @@ function promptHTML(c) {
     case 'learn':
       if (c.cover === 'look') return `<div class="ask">תסתכלי טוב ותזכרי</div><div class="learn"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${esc(w.en)}</div><div class="timer"><i style="animation-duration:${c.peekMs}ms"></i></div></div>`;
       if (c.cover === 'build') return `<div class="ask">עכשיו מהזיכרון!</div><div class="prompt"><span class="em">${w.em}</span><div class="he">${he}</div>${sayBtn()}<button class="chip" data-act="peek">להציץ שוב</button></div>`;
-      return `<div class="ask">מילה חדשה!</div><div class="learn"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${letterSpans(w.en)}</div><div class="he">${he}</div>
+      return `<div class="ask">מילה חדשה!</div><div class="learn"><div class="em big">${w.em || '🔤'}</div><div class="word" dir="ltr">${isSpell(P.list) ? trickHTML(w.en) : letterSpans(w.en)}</div><div class="he">${he}</div>
       <div class="row center">${sayBtn()}${slowBtn()}<button class="btn btn-ghost" data-act="spell">איות</button></div>${famOf(w.en).map(f => `<p class="tip">${esc(f.tip)}</p>`).join('')}</div>`;
+    case 'copy': return `<div class="ask">${c.fix ? 'עכשיו העתיקי נכון, אות אחרי אות' : 'העתיקי את המילה, אות אחרי אות'}</div><div class="prompt"><span class="em">${w.em}</span><div class="word sp" dir="ltr">${trickHTML(w.en)}</div>${sayBtn()}</div>${c.fix ? '' : famOf(w.en).map(f => `<p class="tip">${esc(f.tip)}</p>`).join('')}`;
+    case 'fade1': case 'fade2': return `<div class="ask">${c.type === 'fade1' ? 'השלימי את האותיות החסרות' : 'השלימי, הפעם חסר יותר'}</div><div class="prompt"><span class="em">${w.em}</span><div class="he">${he}</div>${sayBtn()}</div>`;
     case 'meanEN': return `<div class="ask">מה הפירוש?</div><div class="prompt"><div class="word" dir="ltr">${esc(w.en)}</div>${sayBtn()}</div>`;
     case 'meanHE': return `<div class="ask">איך אומרים באנגלית?</div><div class="prompt"><div class="he big">${he}</div>${hasHeVoice() ? sayBtn('he') : ''}</div>`;
     case 'pick': return `<div class="ask">איך כותבים?</div><div class="prompt"><span class="em">${w.em}</span><div class="he">${he}</div>${sayBtn()}</div>`;
     case 'tiles': return `<div class="ask">הרכיבי את המילה</div><div class="prompt"><span class="em">${w.em}</span><div class="he">${he}</div>${sayBtn()}${slowBtn()}</div>`;
-    case 'typeEN': return `<div class="ask">הקשיבי וכתבי באנגלית</div><div class="prompt">${sayBtn('en', 1)}${hasVoice(w) ? '<span class="dadv">בקול של אבא</span>' : ''}${slowBtn()}${c.hint ? `<span class="em">${w.em}</span><div class="he">${he}</div>` : '<button class="chip" data-act="hint">רמז</button>'}</div>`;
+    case 'typeEN': return `<div class="ask">${c.delayed ? 'בדיקה מאתמול: כתבי מהזיכרון' : 'הקשיבי וכתבי באנגלית'}</div><div class="prompt">${sayBtn('en', 1)}${hasVoice(w) ? '<span class="dadv">בקול של אבא</span>' : ''}${slowBtn()}${c.hint ? `<span class="em">${w.em}</span><div class="he">${he}</div>` : '<button class="chip" data-act="hint">רמז</button>'}</div>`;
     case 'typeHE2EN': return `<div class="ask">כתבי באנגלית</div><div class="prompt"><div class="he big">${he}</div>${hasHeVoice() ? sayBtn('he') : ''}${c.hint ? `<span class="em">${w.em}</span>` : '<button class="chip" data-act="hint">רמז</button>'}</div>`;
     case 'writeHE': return `<div class="ask">כתבי את הפירוש בעברית</div><div class="prompt"><div class="word" dir="ltr">${esc(w.en)}</div>${sayBtn()}</div>`;
   }
@@ -1044,6 +1256,7 @@ function answerHTML(c) {
   if (c.type === 'learn') return c.cover === 'build' ? `<div id="typed"></div>${tilesHTML(c.tiles)}` : c.cover ? '' : `<button class="btn btn-main big" data-act="gotit">הבנתי!</button>`;
   if (c.opts) return `<div class="opts ${c.type === 'meanEN' ? 'he' : 'en'}">${c.opts.map((o, i) => `<button class="opt" data-o="${i}" ${c.type === 'meanEN' ? '' : 'dir="ltr"'}>${c.type === 'pick' ? esc(o) : c.type === 'meanEN' ? esc(o.he[0]) : esc(o.en)}</button>`).join('')}</div>`;
   if (c.type === 'tiles') return `<div id="typed"></div>${tilesHTML(c.tiles)}`;
+  if (c.type === 'copy' || c.type === 'fade1' || c.type === 'fade2') return `<div id="typed"></div>${kbdHTML('en', 'בדיקה')}`;
   return `<div id="typed"></div>${kbdHTML(c.type === 'writeHE' ? 'he' : 'en')}`;
 }
 VIEWS.practice = () => {
@@ -1059,7 +1272,7 @@ VIEWS.practice = () => {
 };
 function bindPractice() {
   const c = P.cur, w = c.w;
-  on('[data-act="quit"]', () => modal('לצאת מהאימון?', 'מה שכבר עשית נשמר.', [['להמשיך להתאמן'], ['לצאת', () => { P = null; go('home'); }]]));
+  on('[data-act="quit"]', () => modal('לצאת מהאימון?', 'מה שכבר עשית נשמר.', [['להמשיך להתאמן'], ['לצאת', () => { track('q', { l: P.list.id, done: Math.round(P.done), n: P.n, ok: P.ok, dur: Math.round((Date.now() - P.t0) / 1000) }); save(); P = null; go('home'); }]]));
   on('[data-say]', b => b.dataset.say === 'he' ? say(w.he[0], 'he') : sayWord(w, b.dataset.say === 'slow' ? .5 : undefined));
   on('[data-act="spell"]', () => spellOut(w.en, app.querySelector('.learn .word')));
   on('[data-act="hint"]', () => { c.hint = true; const keep = KB && KB.val; render(); if (KB && keep) { KB.val = keep; kbRefresh(); } });
@@ -1067,6 +1280,8 @@ function bindPractice() {
   on('[data-act="peek"]', () => { c.peeks++; coverLook(2000); });
   on('[data-o]', b => choose(+b.dataset.o, b));
   if (c.type === 'learn' && c.cover === 'build') bindKbd({ lang: 'en', tiles: c.tiles, word: w.en.toLowerCase(), onEnter: v => coverDone(v) });
+  else if (c.type === 'copy') bindKbd({ lang: 'en', strict: w.en.toLowerCase(), onEnter: () => copyDone() });
+  else if (c.type === 'fade1' || c.type === 'fade2') bindKbd({ lang: 'en', mask: c.mask, mword: w.en.toLowerCase(), onEnter: v => fadeDone(v) });
   else if (c.type === 'tiles') bindKbd({ lang: 'en', tiles: c.tiles, word: w.en.toLowerCase(), onEnter: v => typed(v) });
   else if (!c.opts && c.type !== 'learn') bindKbd({ lang: c.type === 'writeHE' ? 'he' : 'en', onEnter: v => typed(v) });
 }
@@ -1093,6 +1308,12 @@ function typed(v) {
   }
   if (ok) { KB.lock = true; const note = he ? finalNote(v) : ''; return success(note); }
   fail(v);
+  if (!he && isSpell(P.list)) {
+    const a = align(v, w.en);
+    fb(`<div class="fb fb-bad"><div class="cmp"><span class="lbl">כתבת</span><span class="mine" dir="ltr">${alignHTML(a.mine)}</span></div><div class="cmp"><span class="lbl">נכון</span><span class="right" dir="ltr">${alignHTML(a.right)}</span></div><div class="small">המילה חוזרת לתרגול עם אותיות חסרות. עכשיו מעתיקים נכון.</div></div>`);
+    KB.lock = true; sayWord(w);
+    return later(() => { if (!P || P.cur !== c) return; c.type = 'copy'; c.fix = true; render(); }, 2000);
+  }
   c.phase = 'copy'; const pg = app.querySelector('.page'); if (pg) pg.classList.add('fixing');
   const right = he ? w.he[0] : w.en;
   const a = he ? null : align(v, right);
@@ -1115,18 +1336,19 @@ function coverDone(v) {
 }
 function fb(html) { const e = document.getElementById('fb'); if (e) e.innerHTML = html; }
 function shakeTyped() { const t = app.querySelector('#typed'); if (t) { t.classList.add('shake'); later(() => t.classList.remove('shake'), 400); } }
-function hop(cls = 'hop') { const m = document.getElementById('mr'); if (!m) return; m.classList.remove('hop', 'flip', 'wobble'); void m.offsetWidth; m.classList.add(cls); }
+function hop(cls = 'hop') { const m = document.getElementById('mr'); if (!m) return; m.classList.remove('hop', 'flip', 'wobble', ...Object.keys(TRICKS).map(t => 'trick-' + t)); void m.offsetWidth; m.classList.add(cls); }
 function success(note) {
   const c = P.cur, r = grade(c.w, P.list, c.type, true);
   const add = P.bonus ? 2 : 1; addCandy(add); P.candy += add; P.ok++; P.wrongRun = 0;
-  SFX.ok(); hop(r === 'star' ? 'flip' : 'hop');
+  SFX.ok(); hop(r === 'star' || r === 'spell' ? trickCls() : 'hop'); tyCount(c.type, 1);
   if (r === 'star') { P.stars.push(c.w.en); SFX.combo(); }
-  fb(`<div class="fb fb-good">${pick(['מעולה!', 'יפה!', 'בול!', 'אלופה!', 'Great!', 'Perfect!'])} <span class="plus">+${add} ${CANDY(18)}</span>${r === 'star' ? `<div>⭐ <b dir="ltr">${esc(c.w.en)}</b> קיבלה כוכב!</div>` : ''}${note ? `<div class="small">${note}</div>` : ''}</div>`);
+  if (r === 'spell') { P.spelled.push(c.w.en); SFX.combo(); }
+  fb(`<div class="fb fb-good">${pick(['מעולה!', 'יפה!', 'בול!', 'אלופה!', 'Great!', 'Perfect!'])} <span class="plus">+${add} ${CANDY(18)}</span>${r === 'star' ? `<div>⭐ <b dir="ltr">${esc(c.w.en)}</b> קיבלה כוכב!</div>` : ''}${r === 'spell' ? `<div>✍️ את שולטת בכתיב של <b dir="ltr">${esc(c.w.en)}</b>!</div>` : ''}${c.type === 'typeHE2EN' && isSpell(P.list) && stageOf(c.w, P.list) === 6 ? '<div class="small">מחר בודקים אותה שוב, כדי לדעת שהיא באמת נשארה.</div>' : ''}${note ? `<div class="small">${note}</div>` : ''}</div>`);
   app.querySelectorAll('[data-o]').forEach(b => b.disabled = true);
-  save(); later(() => advance(true), r === 'star' ? 1500 : 900);
+  save(); later(() => advance(true), r === 'star' || r === 'spell' || c.type === 'typeHE2EN' ? 1700 : 900);
 }
 function fail(attempt) {
-  const c = P.cur; grade(c.w, P.list, c.type, false, attempt); SFX.no(); hop('wobble');
+  const c = P.cur; grade(c.w, P.list, c.type, false, attempt); SFX.no(); hop('wobble'); tyCount(c.type, 0);
   c.failed = true; P.wrongRun++;
   if (P.wrongRun >= 3 && !P.hardShown) { P.hardShown = true; later(() => toast(`❤️ ${esc(dadLine(true))}`, 4500), 900); }
   save();
@@ -1136,24 +1358,31 @@ function advance(ok) {
   if (!P) return;
   const c = P.cur, w = P.q.shift(); P.last = kOf(c.w); P.done++;
   if (c.failed) P.q.splice(Math.min(2, P.q.length), 0, w);
-  else if (!mastered(w, P.list)) P.q.push(w);
+  else if (!mastered(w, P.list) && !waitsTomorrow(w, P.list)) P.q.push(w);
+  /* spelling track: a word that is done for today (or waits for tomorrow) makes room for the next new word */
+  if (isSpell(P.list) && P.list.id !== 'review') {
+    const inWork = P.q.filter(x => !mastered(x, P.list)).length;
+    if (inWork < 3) { const nx = P.list.words.find(x => stageOf(x, P.list) === 0 && !P.q.includes(x)); if (nx) P.q.push(nx); }
+  }
   nextItem();
 }
 function finishPractice() {
   const p = P; if (!p) return go('home');
   const bonus = p.bonus ? 6 : 3; addCandy(bonus); p.candy += bonus;
   markDay(); S.sessions = (S.sessions || 0) + 1;
+  track('s', { l: p.list.id, n: Math.round(p.done), ok: p.ok, c: p.candy, st: p.stars.length, sp: p.spelled.length, dur: Math.round((Date.now() - p.t0) / 1000), ty: p.ty });
   const low = p.ok < p.done * .6, line = (S.sessions % 3 === 1 || low) ? dadLine(low) : '';
   save(); P = null;
-  S.view = 'pdone'; S.last = { list: p.list.id, candy: p.candy, words: [...p.words], stars: p.stars, line, ok: p.ok }; render(); SFX.win();
+  S.view = 'pdone'; S.last = { list: p.list.id, candy: p.candy, words: [...p.words], stars: p.stars, spelled: p.spelled, line, ok: p.ok }; render(); SFX.win();
 }
 VIEWS.pdone = () => {
   const r = S.last; if (!r) { S.view = 'home'; return VIEWS.home(); }
   const l = listById(r.list) || curList(), ws = l.words.filter(w => r.words.includes(kOf(w)));
   app.innerHTML = `<div class="page done">
-  <div class="big-romi flip">${romiSVG()}</div>
+  <div class="big-romi ${trickCls()} twice">${romiSVG()}${petHTML()}</div>
   <h1 class="center">סיימת את האימון!</h1>
   <div class="center earned">+${r.candy} ${CANDY(28)}</div>
+  ${r.spelled && r.spelled.length ? `<p class="center">✍️ שולטת בכתיב: <b dir="ltr">${r.spelled.map(esc).join(', ')}</b></p>` : ''}
   ${r.stars.length ? `<p class="center">⭐ כוכבים חדשים: <b dir="ltr">${r.stars.map(esc).join(', ')}</b></p>` : ''}
   <div class="wchips">${ws.map(w => wordChip(w, l)).join('')}</div>
   ${r.line ? `<div class="note static"><span class="note-ic">${GIC.heart}</span><span class="grow"><b>מאבא</b><span>${esc(r.line)}</span></span></div>` : ''}
@@ -1175,12 +1404,35 @@ VIEWS.overview = () => {
   on('[data-act="ovgo"]', () => { S.seen['ov_' + l.id] = 1; OV = null; save(); startPractice(l); });
 };
 
+/* per step type: [right on first try, all] for the usage report */
+function tyCount(t, ok) { if (!P) return; const a = P.ty[t] || (P.ty[t] = [0, 0]); a[0] += ok; a[1]++; }
+
+/* ---------- the spelling steps ---------- */
+/* the word with its tricky part marked (the part she must remember to write) */
+function trickHTML(word) { const t = trickyIdx(word); return [...word].map((ch, i) => ch === ' ' ? '<span class="lt sp"> </span>' : `<span class="lt${t.has(i) ? ' tr' : ''}">${esc(ch)}</span>`).join(''); }
+/* copy: only the right letter goes in, so the hand learns the right order */
+function copyDone() {
+  const c = P.cur; KB.lock = true;
+  if (c.fix) { SFX.ok(); hop(); fb(`<div class="fb fb-good">יפה! עכשיו זה נכון.</div>`); return later(() => advance(false), 800); }
+  success();
+}
+/* missing letters: a mistake shows the word, then she copies it letter by letter */
+function fadeDone(v) {
+  const c = P.cur, w = c.w; KB.lock = true;
+  if (checkEn(w, v)) return success();
+  fail(v); SFX.soft();
+  const a = align(v, w.en);
+  fb(`<div class="fb fb-bad"><div class="cmp"><span class="lbl">כתבת</span><span class="mine" dir="ltr">${alignHTML(a.mine)}</span></div><div class="cmp"><span class="lbl">נכון</span><span class="right" dir="ltr">${alignHTML(a.right)}</span></div><div class="small">עכשיו מעתיקים נכון.</div></div>`);
+  sayWord(w);
+  later(() => { if (!P || P.cur !== c) return; c.type = 'copy'; c.fix = true; render(); }, 1800);
+}
+
 /* ---- romi/src/60-test.js ---- */
 /* ---------- mock dictation: like in class. No help during it, a grade at the end ---------- */
 let T = null;
 function startTest(l) {
   if (!l) return;
-  T = { l, items: shuffle(l.words).slice(0, l.kind === 'exam' ? 10 : 99).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en' };
+  T = { l, items: shuffle(l.words).slice(0, l.kind === 'exam' ? 10 : 99).map(w => ({ w, mode: l.he && R() < .5 ? 'he' : 'en', en: '', he: '' })), i: 0, step: 'en', t0: Date.now() };
   S.view = 'test'; save(); render(); testSay();
 }
 function testSay() { const it = T && T.items[T.i]; if (!it) return; if (it.mode === 'he') { if (hasHeVoice()) say(it.w.he[0], 'he'); } else sayWord(it.w); }
@@ -1208,13 +1460,21 @@ function finishTest() {
   t.items.forEach(x => {
     x.enOk = checkEn(x.w, x.en); tot++; if (x.enOk) pts++;
     if (x.mode === 'en' && l.he) { x.heOk = checkHe(x.w, x.he); tot++; if (x.heOk) pts++; }
-    const q = prog(x.w), M = maxSt(l);
-    if (x.enOk) { if (q.st < 5) q.st = 5; else if (q.st >= M) { q.r = (q.r || 0) + 1; q.due = addDays(todayStr(), 2); } }
+    const q = prog(x.w), M = maxSt(l), t0 = todayStr();
+    if (isSpell(l)) {
+      /* the mock dictation is a real check of the spelling: right = written from memory; on another day it also counts as the next-day check */
+      q.sp = q.sp || 0;
+      if (x.enOk) { if (q.sp < 6) { q.sp = 6; q.rd = t0; } else if (q.sp === 6 && q.rd !== t0) q.sp = 7; else if (q.sp >= M) { q.r = (q.r || 0) + 1; q.due = addDays(t0, 2); } }
+      else grade(x.w, l, 'typeEN', false, x.en);
+      if (x.heOk && q.sp === 7) { q.sp = 8; q.r = 0; q.due = addDays(t0, 1); }
+      return;
+    }
+    if (x.enOk) { if (q.st < 5) q.st = 5; else if (q.st >= M) { q.r = (q.r || 0) + 1; q.due = addDays(t0, 2); } }
     else grade(x.w, l, 'typeEN', false, x.en);
-    if (x.heOk && q.st === 6) { q.st = 7; q.r = 0; q.due = addDays(todayStr(), 1); }
+    if (x.heOk && q.st === 6) { q.st = 7; q.r = 0; q.due = addDays(t0, 1); }
     if (x.heOk === false && q.st >= 7) q.st = 6;
   });
-  const score = Math.round(pts / tot * 100), candy = Math.round(score / 10) + (score === 100 ? 10 : 0);
+  const score = Math.round(pts / tot * 100); track('t', { l: l.id, sc: score, n: t.items.length, dur: Math.round((Date.now() - t.t0) / 1000) }); const candy = Math.round(score / 10) + (score === 100 ? 10 : 0);
   addCandy(candy); markDay();
   S.tests.push({ list: l.id, d: todayStr(), score, wrong: t.items.filter(x => !x.enOk || x.heOk === false).map(x => x.w.en) }); S.tests = S.tests.slice(-40);
   let sticker = false; if (score === 100 && !S.stickers.some(s => s.id === l.id)) { S.stickers.push({ id: l.id, em: l.words[0].em || '⭐', t: l.t, d: todayStr() }); sticker = true; }
@@ -1247,11 +1507,11 @@ function gameWords(n) {
   return out;
 }
 function setBest(k, v) { const b = S.best[k]; const better = b == null || (BEST_LOW[k] ? v < b : v > b); if (better) S.best[k] = v; return better; }
-function startGame(k) { G = GAMES[k].init(); G.k = k; S.view = 'game'; save(); render(); if (GAMES[k].start) GAMES[k].start(); }
+function startGame(k) { G = GAMES[k].init(); G.k = k; G.t0 = Date.now(); S.view = 'game'; save(); render(); if (GAMES[k].start) GAMES[k].start(); }
 VIEWS.game = () => { if (!G || G.over) { G = null; S.view = 'home'; return VIEWS.home(); } GAMES[G.k].view(); on('[data-act="gquit"]', () => { G = null; go('home'); }); };
 const gBar = (t, right) => `<header class="bar"><button class="icon-btn" data-act="gquit" aria-label="יציאה">${IC.x}</button><h2>${t}</h2><span class="pill">${right}</span></header>`;
 function gameOver(title, html, candy, again) {
-  if (G) G.over = 1; clearTimers(); KB = null;
+  if (G) { G.over = 1; track('g', { g: G.k, sc: G.k === 'memory' ? G.moves : (G.score != null ? G.score : (G.sc || null)), dur: Math.round((Date.now() - G.t0) / 1000) }); } clearTimers(); KB = null;
   addCandy(candy); markDay(); save();
   modal(title, `${html}<div class="center earned">+${candy} ${CANDY(26)}</div>`, [['עוד פעם', again], ['למסך הבית', () => { G = null; go('home'); }]]);
 }
@@ -1463,19 +1723,39 @@ VIEWS.lists = () => {
   on('[data-pr]', b => startPractice(listById(b.dataset.pr)));
   on('[data-ts]', b => startTest(listById(b.dataset.ts)));
 };
+/* the shop: real rewards from dad first, then what Romi wears, her pet, the mat, her trick, ribbons, and the sticker album */
+const SHOP = { leo: LEOS, rib: RIBS, acc: ACC, pet: PETS, mat: MATS, trick: TRICKS };
+let SHOP_TAB = 'dad';
 VIEWS.shop = () => {
   const jar = Math.min(100, Math.round((S.candyAll || 0) % 100));
-  const item = (kind, k, o) => { const own = S.own[kind].includes(k), cur = S[kind] === k; return `<button class="shopit ${cur ? 'cur' : ''}" data-buy="${kind}:${k}"><span class="sw" style="background:${kind === 'leo' ? `linear-gradient(135deg,${o.c.join(',')})` : o.c}"></span><b>${o.t}</b><span class="small">${cur ? 'עכשיו' : own ? 'שלך' : `${o.price} ${CANDY(14)}`}</span></button>`; };
+  const look = (kind, k, o) => kind === 'leo' ? `<span class="sw" style="background:linear-gradient(135deg,${o.c.join(',')})"></span>` : kind === 'rib' ? `<span class="sw" style="background:${o.c}"></span>`
+    : kind === 'mat' ? `<span class="sw msw" style="background:linear-gradient(160deg,${o.c.join(',')})"></span>` : kind === 'acc' ? `<span class="sw face">${romiSVG({ head: 1, acc: k })}</span>`
+    : kind === 'pet' ? `<span class="sw pe">${o.e || '·'}</span>` : `<span class="sw tr">${GIC.tramp.replace('width="30" height="30"', 'width="26" height="26"')}</span>`;
+  const item = (kind, k, o) => { const own = S.own[kind].includes(k), cur = S[kind] === k; return `<button class="shopit ${cur ? 'cur' : ''}" data-buy="${kind}:${k}">${look(kind, k, o)}<b>${o.t}</b><span class="small">${cur ? 'עכשיו' : own ? 'שלך' : `${o.price} ${CANDY(14)}`}</span></button>`; };
+  const grid = kind => `<div class="shopgrid">${Object.entries(SHOP[kind]).filter(([k, o]) => !o.gift || S.own[kind].includes(k)).map(([k, o]) => item(kind, k, o)).join('')}</div>`;
+  const tabs = [['dad', 'פרסים מאבא'], ['leo', 'בגד'], ['acc', 'אביזרים'], ['pet', 'חיה'], ['mat', 'מזרן'], ['trick', 'תרגיל'], ['rib', 'סרט'], ['album', 'מדבקות']];
+  const wait = S.vouchers.filter(v => v.state === 'wait');
+  const body = SHOP_TAB === 'dad' ? `<p class="small muted">דברים אמיתיים! קונים בממתקים, ואבא מאשר כשזה קורה.</p>
+    <div class="rewards">${S.rewards.map((r, i) => `<div class="reward"><span class="grow"><b>${esc(r.t)}</b><span class="small">${r.p} ${CANDY(14)}</span></span><button class="btn ${S.candy >= r.p ? 'btn-main' : 'btn-ghost'}" data-rw="${i}">קנייה</button></div>`).join('') || '<p class="small muted">אבא עוד לא הוסיף פרסים.</p>'}</div>
+    ${wait.length ? `<h3 class="sec">מחכים לאבא</h3><div class="rewards">${wait.map(v => `<div class="reward wait"><span class="grow"><b>${esc(v.t)}</b><span class="small">נקנה ב-${+v.d.slice(8)}.${+v.d.slice(5, 7)}</span></span><span class="tag">מחכה</span></div>`).join('')}</div>` : ''}`
+    : SHOP_TAB === 'album' ? `<section class="card"><div class="album">${S.stickers.map(s => `<span class="sticker" title="${esc(s.t)}">${esc(s.em)}<small>${esc(s.t)}</small></span>`).join('') || '<p class="small muted">מקבלים מדבקה על 100 בהכתבה לדוגמה.</p>'}</div></section>`
+    : `${SHOP_TAB === 'trick' ? '<p class="small muted">התרגיל שרומי עושה כשמילה מקבלת כוכב ובסוף אימון. לחיצה על תרגיל שלך מראה אותו.</p>' : ''}${grid(SHOP_TAB)}`;
   app.innerHTML = `<div class="page">${topBar('החנות של רומי')}
-  <section class="card shoptop"><div class="big-romi">${romiSVG()}</div><div class="grow"><div class="jar"><i style="height:${jar}%"></i><span>${S.candy}</span></div><div class="small muted center">ממתקים לבזבז</div></div></section>
-  <h3 class="sec">בגד התעמלות</h3><div class="shopgrid">${Object.entries(LEOS).filter(([k, o]) => !o.gift || S.own.leo.includes(k)).map(([k, o]) => item('leo', k, o)).join('')}</div>
-  <h3 class="sec">סרט לשיער</h3><div class="shopgrid">${Object.entries(RIBS).map(([k, o]) => item('rib', k, o)).join('')}</div>
-  <h3 class="sec">אלבום מדבקות</h3><section class="card"><div class="album">${S.stickers.map(s => `<span class="sticker" title="${esc(s.t)}">${esc(s.em)}<small>${esc(s.t)}</small></span>`).join('') || '<p class="small muted">מקבלים מדבקה על 100 בהכתבה לדוגמה.</p>'}</div></section></div>`;
+  <section class="card shoptop"><div class="big-romi" id="shopromi">${romiSVG()}${petHTML()}</div><div class="grow"><div class="jar"><i style="height:${jar}%"></i><span>${S.candy}</span></div><div class="small muted center">ממתקים לבזבז</div></div></section>
+  <nav class="tabs" role="tablist">${tabs.map(([k, t]) => `<button class="tab ${SHOP_TAB === k ? 'on' : ''}" data-tab="${k}" role="tab">${t}${k === 'dad' && wait.length ? ` <span class="dot">${wait.length}</span>` : ''}</button>`).join('')}</nav>
+  ${body}</div>`;
+  on('[data-tab]', b => { SHOP_TAB = b.dataset.tab; SFX.tap(); render(); });
+  on('[data-rw]', b => {
+    const r = S.rewards[+b.dataset.rw]; if (!r) return;
+    if (S.candy < r.p) return toast(`חסרים עוד ${r.p - S.candy} ממתקים`);
+    modal(`לקנות: ${esc(r.t)}?`, `זה עולה ${r.p} ממתקים. אחרי הקנייה מראים לאבא, והוא מאשר כשזה קורה.`, [['קנייה', () => { S.candy -= r.p; S.vouchers.push({ id: Date.now().toString(36), t: r.t, p: r.p, d: todayStr(), state: 'wait' }); track('buy', { item: 'reward', t: r.t, p: r.p }); save(); confetti(); SFX.win(); render(); }], ['לא עכשיו']]);
+  });
   on('[data-buy]', b => {
-    const [kind, k] = b.dataset.buy.split(':'), o = (kind === 'leo' ? LEOS : RIBS)[k];
-    if (S.own[kind].includes(k)) { S[kind] = k; save(); SFX.tap(); return render(); }
+    const [kind, k] = b.dataset.buy.split(':'), o = SHOP[kind][k];
+    const preview = () => { if (kind !== 'trick') return; const r = document.getElementById('shopromi'); if (!r) return; Object.keys(TRICKS).forEach(t => r.classList.remove('trick-' + t)); void r.offsetWidth; r.classList.add('trick-' + k); };
+    if (S.own[kind].includes(k)) { S[kind] = k; save(); SFX.tap(); if (kind === 'mat') applyMat(); render(); return later(preview, 50); }
     if (S.candy < o.price) return toast(`חסרים עוד ${o.price - S.candy} ממתקים`);
-    modal(`לקנות ${o.t}?`, `זה עולה ${o.price} ממתקים.`, [['קנייה', () => { S.candy -= o.price; S.own[kind].push(k); S[kind] = k; save(); SFX.win(); render(); }], ['לא עכשיו']]);
+    modal(`לקנות ${o.t}?`, `זה עולה ${o.price} ממתקים.`, [['קנייה', () => { S.candy -= o.price; S.own[kind].push(k); S[kind] = k; track('buy', { item: kind + ':' + k, p: o.price }); save(); if (kind === 'mat') applyMat(); SFX.win(); render(); later(preview, 50); }], ['לא עכשיו']]);
   });
 };
 
@@ -1504,7 +1784,7 @@ function reviewList() {
   return { id: 'review', t: 'חזרה כללית', src: 'review', he: true, words };
 }
 function reviewPlan(list) {
-  const t = todayStr(), need = w => { const q = S.p[kOf(w)] || {}; return (q.due && q.due <= t ? 100 : 0) + (q.st >= maxSt(list) ? 0 : 50) + ((q.bad || 0) - (q.ok || 0)) * 3 + (q.last ? Math.min(30, dayDiff(q.last, t)) : 40); };
+  const t = todayStr(), need = w => { const q = S.p[kOf(w)] || {}; return (q.due && q.due <= t ? 100 : 0) + (stageOf(w, list) >= maxSt(list) ? 0 : 50) + ((q.bad || 0) - (q.ok || 0)) * 3 + (q.last ? Math.min(30, dayDiff(q.last, t)) : 40); };
   const q = list.words.slice().sort((a, b) => need(b) - need(a)).slice(0, 8);
   return { q: shuffle(q), n: 12 };
 }
@@ -1581,8 +1861,11 @@ VIEWS.parent = () => {
   <details class="small"><summary class="muted">או להדביק או לכתוב כאן</summary><textarea class="txt" id="paste" rows="5" placeholder="1. Neighbor – שכן / שכנה 🏡&#10;2. Flower – פרח 🌷"></textarea><button class="btn btn-ghost" data-act="parse">קריאת הרשימה</button></details>
   <div id="draft">${draftHTML()}</div></section>
   <section class="card stack"><h3>הרשימות</h3>${lists.map(l => { const t = arr(D.tests).filter(x => x.list === l.id).slice(-1)[0]; return `<div class="lrow"><div class="grow"><b>${esc(l.t)}</b><div class="small muted">${l.date ? dateHe(l.date) + ' · ' : ''}${l.words.length} מילים · ${pctWith(D, l)}% מוכן${t ? ` · הכתבה לדוגמה: ${t.score}` : ''}</div></div><button class="chip" data-edit="${l.id}">עריכה</button><button class="chip" data-del="${l.id}">מחיקה</button></div>`; }).join('') || '<p class="small muted">אין רשימות.</p>'}</section>
+  ${vouchersHTML(D)}
+  ${reportHTML(D)}
   ${progressHTML(D, lists[0] && lists.find(l => l.id === (curListOf(D) || {}).id) || lists[0])}
   ${voiceHTML(lists.find(l => l.id === (curListOf(D) || {}).id) || lists[0])}
+  ${rewardsHTML(D)}
   <section class="card stack"><h3>הודעה לרומי</h3><p class="small muted">מופיעה פעם אחת במסך הבית שלה.</p><input class="txt" id="note" maxlength="140" placeholder="רומי, ראיתי שהתאמנת היום. כל הכבוד!"><button class="btn btn-ghost" data-act="note">שלח</button></section>
   <section class="card stack"><h3>הודעות מאבא</h3><p class="small muted">מופיעות מדי פעם בסוף אימון, ופעם אחת כשיש רצף טעויות. שורה לכל הודעה.</p><textarea class="txt" id="dadmsgs" rows="6">${esc(((dad ? arr((PDOC || {}).dadMsgs) : S.dadMsgs) || DAD_DEF).join('\n'))}</textarea><button class="btn btn-ghost" data-act="dadsave">שמור</button></section>
   ${dad ? '' : settingsHTML()}
@@ -1614,12 +1897,12 @@ function pinGate() {
   });
 }
 const curListOf = D => { const t = todayStr(), c = arr(D.lists).filter(l => l.src === 'class'); return c.filter(l => l.date && l.date >= t).sort((a, b) => a.date < b.date ? -1 : 1)[0] || c[c.length - 1]; };
-function pctWith(D, l) { const M = maxSt(l); return Math.round(l.words.reduce((a, w) => a + Math.min(1, ((D.p || {})[kOf(w)] || {}).st / M || 0), 0) / (l.words.length || 1) * 100); }
+function pctWith(D, l) { const M = maxSt(l), f = fld(l); return Math.round(l.words.reduce((a, w) => a + Math.min(1, ((D.p || {})[kOf(w)] || {})[f] / M || 0), 0) / (l.words.length || 1) * 100); }
 function progressHTML(D, l) {
   if (!l) return '';
-  const M = maxSt(l), wk = Object.keys(D.days || {}).filter(d => dayDiff(d, todayStr()) < 7).length;
-  return `<section class="card stack"><h3>ההתקדמות: ${esc(l.t)}</h3><p class="small muted">${wk} ימי אימון השבוע. השלבים: פירוש ← זיהוי ← הרכבה ← הכתבה ← מעברית ← פירוש בכתב ← כוכב.</p>
-  <table class="ptab"><tr><th>מילה</th><th>שלב</th><th>טעויות</th><th>מה כתבה</th></tr>${l.words.map(w => { const q = (D.p || {})[kOf(w)] || {}; return `<tr><td dir="ltr">${esc(w.en)}</td><td>${Math.min(q.st || 0, M)}/${M}${(q.st || 0) >= M ? ' ⭐' : ''}</td><td>${q.bad || 0}</td><td dir="ltr" class="small">${arr(q.wr).map(esc).join(', ')}</td></tr>`; }).join('')}</table></section>`;
+  const M = maxSt(l), f = fld(l), sp = isSpell(l), names = stepNames(l), wk = Object.keys(D.days || {}).filter(d => dayDiff(d, todayStr()) < 7).length;
+  return `<section class="card stack"><h3>ההתקדמות: ${esc(l.t)}</h3><p class="small muted">${wk} ימי אימון השבוע. השלבים: ${names.slice(1).join(' ← ')}.${sp ? ' "שולטת בכתיב" רק אחרי כתיבה נכונה מהזיכרון גם ביום אחר. טעות בכתיב מחזירה את המילה לאותיות חסרות.' : ''}</p>
+  <div class="tscroll"><table class="ptab"><tr><th>מילה</th><th>שלב</th>${sp ? '<th>כתיב</th>' : ''}<th>טעויות</th><th>מה כתבה</th></tr>${l.words.map(w => { const q = (D.p || {})[kOf(w)] || {}, st = Math.min(q[f] || 0, M); return `<tr><td dir="ltr">${esc(w.en)}</td><td>${st}/${M} <span class="small muted">${st >= M ? '⭐' : esc(names[st])}</span></td>${sp ? `<td>${(q.sp || 0) >= SP_OK ? '✓' : q.sp === 6 ? '⏳' : ''}</td>` : ''}<td>${q.bad || 0}</td><td dir="ltr" class="small">${arr(q.wr).map(esc).join(', ')}</td></tr>`; }).join('')}</table></div></section>`;
 }
 function draftHTML() {
   if (!DRAFT) return '';
@@ -1643,7 +1926,7 @@ function bindParent() {
     document.getElementById('paste').value = t; readPaste();
   });
   const pa = document.getElementById('paste'); if (pa) pa.addEventListener('paste', () => setTimeout(readPaste, 60));
-  bindVoice();
+  bindVoice(); bindRewards();
   on('[data-act="parse"]', () => readPaste());
   function readPaste() {
     const r = parseList(document.getElementById('paste').value);
@@ -1666,7 +1949,8 @@ function bindParent() {
   });
   on('[data-act="note"]', async () => { const t = document.getElementById('note').value.trim(); if (!t) return; if (dad) { PDOC.note = { id: Date.now(), t }; if (!await pPut(cloudCfg(), PDOC)) return toast('השליחה נכשלה'); } else { S.dadNote = t; save(); } toast('נשלח'); document.getElementById('note').value = ''; });
   on('[data-act="dadsave"]', async () => { const l = document.getElementById('dadmsgs').value.split('\n').map(s => s.trim()).filter(Boolean); if (dad) { PDOC.dadMsgs = l; PDOC.mv = Date.now(); if (!await pPut(cloudCfg(), PDOC)) return toast('השמירה נכשלה'); } else S.dadMsgs = l.length ? l : null; save(); toast('נשמר'); });
-  on('[data-act="dv"]', () => { S.dadVoice = S.dadVoice === 0 ? 1 : 0; save(); render(); });
+  on('[data-vm]', b => { S.vmode = b.dataset.vm; save(); render(); });
+  const ev = document.getElementById('envoice'); if (ev) ev.onchange = () => { S.enVoice = ev.value; save(); say('Neighbor, flower, mountain, between'); };
   on('[data-act="pinchg"]', () => { S.pin = ''; PIN_TRY = null; PARENT_OK = false; save(); render(); });
   on('[data-act="wagain"]', () => { S.seen.welcome = 0; S.seen.wDefer = 1; save(); toast('ההודעה תופיע כשרומי תפתח את האפליקציה בפעם הבאה'); render(); });
   on('[data-act="snd"]', () => { S.sound = S.sound ? 0 : 1; save(); render(); });
@@ -1691,10 +1975,12 @@ function settingsHTML() {
   <div class="row"><span class="grow">קוד ההורים</span><button class="chip" data-act="pinchg">שינוי</button></div>
   <div class="row"><span class="grow">הודעת הפתיחה לרומי</span><button class="chip" data-act="wagain">${S.seen.welcome ? 'להציג שוב' : 'תופיע לה'}</button></div>
   <div class="row"><span class="grow">צלילים</span><button class="chip" data-act="snd">${S.sound ? 'פועלים' : 'כבויים'}</button></div>
-  <div class="row"><span class="grow">הקול של אבא במקום קול הטלפון</span><button class="chip" data-act="dv">${S.dadVoice === 0 ? 'כבוי' : 'פועל'}</button></div>
+  <div class="stack" style="gap:6px"><span>מי מקריא את המילים באנגלית</span><div class="row">${[['dad', 'אבא'], ['native', 'קול אנגלי'], ['mix', 'משולב']].map(([k, t]) => `<button class="chip ${vmode() === k ? 'on' : ''}" data-vm="${k}">${t}</button>`).join('')}</div>
+  <p class="small muted" style="margin:0">משולב: אבא בכרטיס "מילה חדשה" ובהכתבה לדוגמה, הקול האנגלי בתרגול ובמשחקים. ככה היא שומעת הגייה של דובר אנגלית, ועדיין שומעת את אבא.</p></div>
+  <label class="small">הקול האנגלי<select class="txt" id="envoice">${voiceOptions()}</select></label>
   <div class="row"><span class="grow">מהירות הקראה</span>${[[.7, 'איטית'], [.85, 'רגילה'], [1, 'מהירה']].map(([r, t]) => `<button class="chip ${S.rate === r ? 'on' : ''}" data-rate="${r}">${t}</button>`).join('')}</div>
   <div class="row"><button class="chip" data-act="ten">בדיקה באנגלית</button><button class="chip" data-act="the">בדיקה בעברית</button></div>
-  <p class="small muted">קול באנגלית: ${ve ? esc(ve.name) : 'לא נמצא'} · בעברית: ${vh ? esc(vh.name) : 'לא נמצא (אז העברית מוצגת בכתב)'}.<br>באייפון: הגדרות ← נגישות ← תוכן מוקרא ← קולות, אפשר להוריד קול איכותי יותר (Enhanced).</p></section>
+  <p class="small muted">קול באנגלית: ${ve ? esc(ve.name) : 'לא נמצא'} · בעברית: ${vh ? esc(vh.name) : 'לא נמצא (אז העברית מוצגת בכתב)'}.<br>קולות טובים יותר באייפון: הגדרות ← נגישות ← תוכן מוקרא ← קולות ← אנגלית, ומורידים קול שכתוב לידו Premium או Enhanced (למשל Ava, Zoe או Evan). אחרי ההורדה הוא מופיע כאן, והאפליקציה בוחרת אותו לבד.</p></section>
   <section class="card stack"><h3>התקנה באייפון של רומי</h3><ol class="small" style="margin:0;padding-inline-start:18px;line-height:1.8"><li>פותחים בספארי: <span dir="ltr">${APP_URL}</span></li><li>כפתור השיתוף ← "הוספה למסך הבית".</li><li>פותחים מהאייקון "סלטה". ככה הנתונים נשמרים, וכדאי לחבר גם ענן לגיבוי.</li></ol>
   <button class="chip" data-act="upd">בדיקת עדכון</button></section>`;
 }
@@ -1717,6 +2003,90 @@ function bindVoice() {
   on('[data-rec]', b => recStart(b.dataset.rec, started => { if (started) b.classList.add('on'); else render(); }));
   on('[data-play]', b => playVoice(b.dataset.play));
   on('[data-vdel]', b => { voiceDel(b.dataset.vdel); render(); });
+}
+
+/* ---------- real rewards: the list (dad edits) and what Romi bought (dad approves when it happens) ---------- */
+function rewardsHTML(D) {
+  const list = isDad() ? (arr((PDOC || {}).rewards).length ? arr(PDOC.rewards) : arr(D.rewards)) : S.rewards;
+  return `<section class="card stack"><h3>פרסים אמיתיים בחנות</h3><p class="small muted">רומי קונה אותם בממתקים, ואתה מאשר כשזה קורה. שורה לכל פרס: שם | מחיר בממתקים. היום היא מרוויחה בערך 15 עד 25 ממתקים ביום אימון.</p>
+  <textarea class="txt" id="rwtxt" rows="5">${esc(list.map(r => `${r.t} | ${r.p}`).join('\n'))}</textarea><button class="btn btn-ghost" data-act="rwsave">שמירת הפרסים</button></section>`;
+}
+function vouchersHTML(D) {
+  const v = arr(D.vouchers), dec = (PDOC || {}).dec || {}, wait = v.filter(x => x.state === 'wait' && !(isDad() && dec[x.id]));
+  if (!wait.length) return '';
+  return `<section class="card stack hi"><h3>רומי קנתה ומחכה לך</h3>${wait.map(x => `<div class="lrow"><div class="grow"><b>${esc(x.t)}</b><div class="small muted">${x.p} ממתקים · ${+x.d.slice(8)}.${+x.d.slice(5, 7)}</div></div><button class="chip on" data-vok="${x.id}">קרה ✓</button><button class="chip" data-vno="${x.id}">ביטול</button></div>`).join('')}
+  <p class="small muted">ביטול מחזיר לה את הממתקים.</p></section>`;
+}
+function voucherDecide(id, ok) {
+  if (isDad()) { PDOC.dec = PDOC.dec || {}; PDOC.dec[id] = ok ? 'ok' : 'no'; return pPut(cloudCfg(), PDOC).then(r => { toast(r ? 'נשלח לטלפון של רומי' : 'השליחה נכשלה'); render(); }); }
+  applyVoucher(id, ok); save(); render();
+}
+function applyVoucher(id, ok) {
+  const v = S.vouchers.find(x => x.id === id); if (!v || v.state !== 'wait') return null;
+  v.state = ok ? 'done' : 'cancel'; v.dd = todayStr(); if (!ok) addCandy(v.p); track('vok', { t: v.t, ok: ok ? 1 : 0 }); return v;
+}
+function bindRewards() {
+  on('[data-vok]', b => voucherDecide(b.dataset.vok, true));
+  on('[data-vno]', b => voucherDecide(b.dataset.vno, false));
+  on('[data-act="rwsave"]', async () => {
+    const list = document.getElementById('rwtxt').value.split('\n').map(s => s.split('|')).filter(x => x.length >= 2).map(([t, p]) => ({ t: t.trim(), p: Math.max(1, parseInt(p, 10) || 0) })).filter(r => r.t && r.p);
+    if (isDad()) { PDOC.rewards = list; PDOC.rv = Date.now(); toast(await pPut(cloudCfg(), PDOC) ? 'נשלח לטלפון של רומי' : 'השליחה נכשלה'); }
+    else { S.rewards = list; save(); toast('נשמר'); }
+  });
+  on('[data-act="repcopy"]', async () => { const t = reportText(isDad() ? RKID : S); try { await navigator.clipboard.writeText(t); toast(`הדוח הועתק. אפשר להדביק אותו בצ'אט.`); } catch (e) { const ta = document.getElementById('reptxt'); if (ta) { ta.hidden = false; ta.value = t; ta.select(); } toast('סמנו את הטקסט והעתיקו'); } });
+}
+/* ---------- the usage report: the last 14 days from the log ---------- */
+const NAMES = { meanEN: 'פירוש (בחירה)', meanHE: 'מעברית לאנגלית (בחירה)', pick: 'זיהוי איות', tiles: 'הרכבה מאותיות', typeEN: 'כתיבה מהשמיעה', typeHE2EN: 'כתיבה מעברית', writeHE: 'פירוש בכתב', tramp: 'טרמפולינה', memory: 'זיכרון', rain: 'גשם היסודות', teach: 'המורה רומי', duel: 'דו-קרב', speak: 'תגידי את זה', wand: 'שרביט ה-E' };
+function usage(D) {
+  const log = arr((D || {}).log), since = Date.now() - 14 * 864e5, L = log.filter(e => e.t >= since), days = {};
+  const dayOf = t => todayStr(new Date(t));
+  for (let i = 13; i >= 0; i--) { const d = addDays(todayStr(), -i); days[d] = { min: 0, s: 0, ok: 0, n: 0, g: 0, t: [], a: ((D || {}).days || {})[d] || 0 }; }   /* a: finished activities, counted since the first version */
+  const ty = {}, games = {}, vf = [], buys = [], hours = [0, 0, 0];
+  L.forEach(e => {
+    const d = days[dayOf(e.t)]; if (!d) return;
+    if (e.dur) d.min += e.dur / 60;
+    if (e.k === 's') { d.s++; d.ok += e.ok || 0; d.n += e.n || 0; for (const [k, v] of Object.entries(e.ty || {})) { const a = ty[k] || (ty[k] = [0, 0]); a[0] += v[0]; a[1] += v[1]; } const h = new Date(e.t).getHours(); hours[h < 13 ? 0 : h < 18 ? 1 : 2]++; }
+    if (e.k === 'g') { d.g++; (games[e.g] = games[e.g] || []).push(e.sc); }
+    if (e.k === 't') d.t.push(e.sc);
+    if (e.k === 'vf') vf.push(e);
+    if (e.k === 'buy') buys.push(e);
+  });
+  const words = Object.entries((D || {}).p || {}).map(([k, q]) => ({ k, bad: q.bad || 0, ok: q.ok || 0, wr: arr(q.wr) })).filter(x => x.bad > 0).sort((a, b) => (b.bad - b.ok / 2) - (a.bad - a.ok / 2)).slice(0, 8);
+  const active = Object.values(days).filter(d => d.a || d.min > 0 || d.s).length, totMin = Math.round(Object.values(days).reduce((a, d) => a + d.min, 0));
+  const S2 = Object.values(days).reduce((a, d) => (a.ok += d.ok, a.n += d.n, a.s += d.s, a), { ok: 0, n: 0, s: 0 });
+  return { days, ty, games, vf, buys, words, active, totMin, acc: S2.n ? Math.round(S2.ok / S2.n * 100) : null, sessions: S2.s, hours, opens: L.filter(e => e.k === 'open').length, quits: L.filter(e => e.k === 'q').length, since: log.length ? dayOf(log[0].t) : null };
+}
+function reportHTML(D) {
+  const u = usage(D); if (!u.since && !Object.values(u.days).some(d => d.a)) return `<section class="card stack"><h3>דוח שימוש</h3><p class="small muted">עוד אין נתונים. הדוח מתמלא מהאימונים, המשחקים וההכתבות.</p></section>`;
+  const rows = Object.entries(u.days).filter(([d, x]) => x.a || x.min || x.s || x.g || x.t.length).map(([d, x]) => `<tr><td>${'אבגדהוש'[new Date(d + 'T12:00').getDay()]}' ${+d.slice(8)}.${+d.slice(5, 7)}</td><td>${x.a}</td><td>${x.min ? Math.round(x.min) : '—'}</td><td>${x.s}</td><td>${x.n ? Math.round(x.ok / x.n * 100) + '%' : '—'}</td><td>${x.g}</td><td>${x.t.join(', ') || '—'}</td></tr>`).join('');
+  const tys = Object.entries(u.ty).filter(([k]) => NAMES[k]).map(([k, [ok, n]]) => `<span class="tag">${NAMES[k]} ${Math.round(ok / n * 100)}%</span>`).join(' ');
+  return `<section class="card stack"><h3>דוח שימוש: 14 הימים האחרונים</h3><p class="small muted">דקות, דיוק וסוגי תרגיל נאספים מגרסה 39. פעילויות שהסתיימו נספרות מההתחלה.</p>
+  <div class="kpis"><div><b>${u.active}</b><span>ימים פעילים</span></div><div><b>${u.totMin}</b><span>דקות</span></div><div><b>${u.sessions}</b><span>אימונים</span></div><div><b>${u.acc == null ? '—' : u.acc + '%'}</b><span>נכון בניסיון ראשון</span></div></div>
+  ${rows ? `<div class="tscroll"><table class="ptab"><tr><th>יום</th><th>פעילויות</th><th>דק׳</th><th>אימונים</th><th>דיוק</th><th>משחקים</th><th>בוחן</th></tr>${rows}</table></div>` : ''}
+  ${tys ? `<div class="small">לפי סוג תרגיל: ${tys}</div>` : ''}
+  ${u.words.length ? `<div class="small">מילים קשות: ${u.words.map(w => `<b dir="ltr">${esc(w.k)}</b>${w.wr.length ? ` <span class="muted" dir="ltr">(${w.wr.slice(0, 2).map(esc).join(', ')})</span>` : ''}`).join(' · ')}</div>` : ''}
+  ${Object.keys(u.games).length ? `<div class="small">משחקים: ${Object.entries(u.games).map(([g, s]) => `${NAMES[g] || g} ×${s.length}`).join(' · ')}</div>` : ''}
+  ${u.vf.length ? `<div class="small bad">הקול של אבא לא הושמע ${u.vf.length} פעמים (אחרונה: ${esc(u.vf[u.vf.length - 1].why)})</div>` : ''}
+  <button class="btn btn-ghost" data-act="repcopy">העתקת הדוח (להדבקה בצ'אט)</button><textarea class="txt" id="reptxt" rows="4" hidden></textarea></section>`;
+}
+function reportText(D) {
+  const u = usage(D), lines = [`סלטה למוח · דוח שימוש · ${todayStr()} · גרסה ${APP_VER}`, `14 ימים: ${u.active} ימים פעילים, ${u.totMin} דקות, ${u.sessions} אימונים, ${u.quits} יציאות באמצע, נכון בניסיון ראשון ${u.acc == null ? '-' : u.acc + '%'}, פתיחות ${u.opens}. שעות האימונים: בוקר ${u.hours[0]}, צהריים ${u.hours[1]}, ערב ${u.hours[2]}.`];
+  Object.entries(u.days).forEach(([d, x]) => { if (x.a || x.min || x.s || x.g || x.t.length) lines.push(`${d}: ${x.a} פעילויות, ${Math.round(x.min)} דק', ${x.s} אימונים, דיוק ${x.n ? Math.round(x.ok / x.n * 100) + '%' : '-'}, ${x.g} משחקים${x.t.length ? ', בוחן ' + x.t.join('/') : ''}`); });
+  lines.push('לפי סוג תרגיל: ' + Object.entries(u.ty).map(([k, [ok, n]]) => `${k} ${ok}/${n}`).join(', '));
+  lines.push('מילים קשות: ' + u.words.map(w => `${w.k} (${w.bad} טעויות${w.wr.length ? ': ' + w.wr.join(', ') : ''})`).join('; '));
+  lines.push('משחקים: ' + Object.entries(u.games).map(([g, s]) => `${g} ${s.length}× [${s.join(',')}]`).join('; '));
+  lines.push('קול של אבא, כשלים: ' + (u.vf.map(e => `${e.w} ${e.why} (${e.st})`).join('; ') || 'אין') + ` · מילים מוקלטות: ${Object.keys(VOICE).length}`);
+  lines.push('קניות: ' + (u.buys.map(e => `${e.t || e.item} ${e.p}`).join('; ') || 'אין') + ` · ממתקים עכשיו ${(D || {}).candy || 0}`);
+  const l = curList(); if (l) lines.push(`${l.t}: ` + l.words.map(w => `${w.en} ${Math.min(stageOf(w, l), maxSt(l))}/${maxSt(l)}${isSpell(l) && spells(w) ? ' כתיב✓' : ''}`).join(', '));
+  return lines.join('\n');
+}
+
+/* the English voices on this phone, best first */
+function voiceOptions() {
+  const vs = (VOICES || []).filter(v => /^en/i.test(v.lang)), q = v => (/premium|enhanced|neural|natural/i.test(v.name) ? 0 : 1) + (/US/i.test(v.lang) ? 0 : /GB/i.test(v.lang) ? .1 : .2);
+  if (!vs.length) return '<option value="">הקולות עוד נטענים...</option>';
+  const best = voiceFor('en');
+  return `<option value="">אוטומטי (${esc(best ? best.name : '')})</option>` + vs.slice().sort((a, b) => q(a) - q(b)).map(v => `<option value="${esc(v.name)}" ${S.enVoice === v.name ? 'selected' : ''}>${esc(v.name)} · ${esc(v.lang)}</option>`).join('');
 }
 
 /* ---- romi/src/82-vrec.js ---- */
@@ -1813,7 +2183,7 @@ function wavURL(x, sr) {
 async function playClip(url) { const k = '__clip'; VOICE[k] = url; delete VBUF[k]; await playVoice(k); delete VOICE[k]; delete VBUF[k]; }
 async function vrSave() {
   const ks = Object.keys(VR.clips);
-  ks.forEach(k => { VOICE[k] = VR.clips[k]; delete VBUF[k]; }); saveVoice();
+  ks.forEach(k => { VOICE[k] = VR.clips[k]; delete VBUF[k]; }); saveVoice(); track('rec', { n: ks.length, of: VR.l.words.length }); save();
   toast(`נשמרו ${ks.length} מילים בקול שלך`); const l = VR.l; VR = null; go('parent');
   for (const k of ks) await voicePush(k);
 }
@@ -1855,6 +2225,8 @@ async function kidPull(force) {
   if (P.mv && P.mv !== S.pmv) { S.dadMsgs = arr(P.dadMsgs); if (!S.dadMsgs.length) S.dadMsgs = null; S.pmv = P.mv; ch = true; }
   if (P.note && P.note.id !== S.noteId) { S.noteId = P.note.id; S.dadNote = P.note.t; ch = true; }
   if (P.vv && P.vv !== S.pvv) { S.pvv = P.vv; ch = true; voicePull(); }
+  if (P.rv && P.rv !== S.prv) { S.rewards = arr(P.rewards); S.prv = P.rv; ch = true; }
+  for (const [id, d] of Object.entries(P.dec || {})) { const v = applyVoucher(id, d === 'ok'); if (v) { ch = true; msgs.push(d === 'ok' ? `אבא אישר: ${esc(v.t)} ✓` : `${esc(v.t)} בוטל, הממתקים חזרו`); } }
   if (P.gift && P.gift.id !== S.giftId) { S.giftId = P.gift.id; addCandy(P.gift.n | 0); msgs.push(`אבא שלח לך ${P.gift.n} ממתקים!`); ch = true; }
   if (ch) { save(); if (['home', 'lists', 'shop'].includes(S.view) && !document.querySelector('.modal')) render(); }
   if (msgs.length) toast(msgs.join('<br>'), 4500);
@@ -1913,7 +2285,10 @@ function bindCloud() {
 function boot() {
   if (!['home', 'lists', 'shop'].includes(S.view)) S.view = 'home';
   if (S.seen.wDefer) { delete S.seen.wDefer; save(); }   /* dad asked to show the welcome again: it waits for the next opening */   /* a session is not resumed after the app closes */
+  applyMat();
+  { const last = S.log && S.log.length ? S.log[S.log.length - 1] : null; if (!last || Date.now() - last.t > 20 * 60000) { track('open'); save(); } }
   render();
+  setTimeout(wavAll, 2500);
   kidPull(true); if (isKidCloud() && !Object.keys(VOICE).length) voicePull();
   if (isDad()) dadLoad();
   later(autoUpdate, 1500);

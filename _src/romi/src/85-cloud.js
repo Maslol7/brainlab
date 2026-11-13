@@ -34,6 +34,8 @@ async function kidPull(force) {
   if (P.mv && P.mv !== S.pmv) { S.dadMsgs = arr(P.dadMsgs); if (!S.dadMsgs.length) S.dadMsgs = null; S.pmv = P.mv; ch = true; }
   if (P.note && P.note.id !== S.noteId) { S.noteId = P.note.id; S.dadNote = P.note.t; ch = true; }
   if (P.vv && P.vv !== S.pvv) { S.pvv = P.vv; ch = true; voicePull(); }
+  if (P.rv && P.rv !== S.prv) { S.rewards = arr(P.rewards); S.prv = P.rv; ch = true; }
+  for (const [id, d] of Object.entries(P.dec || {})) { const v = applyVoucher(id, d === 'ok'); if (v) { ch = true; msgs.push(d === 'ok' ? `אבא אישר: ${esc(v.t)} ✓` : `${esc(v.t)} בוטל, הממתקים חזרו`); } }
   if (P.gift && P.gift.id !== S.giftId) { S.giftId = P.gift.id; addCandy(P.gift.n | 0); msgs.push(`אבא שלח לך ${P.gift.n} ממתקים!`); ch = true; }
   if (ch) { save(); if (['home', 'lists', 'shop'].includes(S.view) && !document.querySelector('.modal')) render(); }
   if (msgs.length) toast(msgs.join('<br>'), 4500);

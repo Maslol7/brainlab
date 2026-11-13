@@ -26,18 +26,30 @@ const { chromium, devices } = require('playwright');
       const i = await p.evaluate(() => P.cur.opts.findIndex(o => P.cur.type === 'pick' ? o === P.cur.w.en.toLowerCase() : kOf(o) === kOf(P.cur.w)));
       await p.click(`[data-o="${i}"]`); await p.waitForTimeout(1000); continue;
     }
+    if (st.t === 'copy') {
+      // copying: a wrong letter does not go in
+      await p.click('.kbd [data-k="z"]'); ok(await p.evaluate(() => KB.val === ''), 'copy: a wrong letter is refused');
+      for (const ch of st.en.toLowerCase()) await p.click(`.kbd [data-k="${ch}"]`); await p.waitForTimeout(1100); continue;
+    }
+    if (st.t === 'fade1' || st.t === 'fade2') {
+      const miss = await p.evaluate(() => [...P.cur.w.en.toLowerCase()].filter((c, i) => P.cur.mask[i]).join(''));
+      ok(miss.length >= 2 && await p.evaluate(() => document.querySelectorAll('.slot.given').length > 0), 'missing letters: some letters given, some blank');
+      for (const ch of miss) await p.click(`.kbd [data-k="${ch}"]`); await p.waitForTimeout(1100); continue;
+    }
     const word = st.t === 'writeHE' ? st.he : st.en.toLowerCase();
     if (st.t === 'tiles') { for (const c of word.replace(/ /g, '')) { const i = await p.evaluate(c => KB.tiles.findIndex((x, j) => x === c && !KB.used.includes(j)), c); await p.click(`[data-ti="${i}"]`); } }
     else { for (const c of word) await p.click(`.kbd [data-k="${c}"]`); await p.click('.kbd [data-k="enter"]'); }
     await p.waitForTimeout(1600);
   }
   ok(await p.evaluate(() => S.view === 'pdone'), 'practice reaches the end screen');
-  ok(await p.evaluate(() => S.candy > 5 && Object.values(S.p).some(q => q.st >= 2)), 'candies and progress saved');
+  ok(await p.evaluate(() => S.candy > 5 && Object.values(S.p).some(q => q.sp >= 3)), 'candies and progress saved');
   // a wrong answer leads to the copy step
   await p.click('[data-act="again"]');
   await p.evaluate(() => { const c = P.cur; c.type = 'typeEN'; delete c.opts; render(); });
   for (const c of 'xyz') await p.click(`.kbd [data-k="${c}"]`); await p.click('.kbd [data-k="enter"]'); await p.waitForTimeout(800);
-  ok(await p.evaluate(() => P.cur.phase === 'copy' && !!document.querySelector('.fixing .fb-bad')), 'wrong answer shows the correction');
+  ok(await p.evaluate(() => !!document.querySelector('.fb-bad .right')), 'wrong answer shows the correction');
+  await p.waitForTimeout(2300);
+  ok(await p.evaluate(() => P.cur.type === 'copy' && P.cur.fix && (S.p[kOf(P.cur.w)].sp || 0) <= 2), 'a spelling mistake: copy letter by letter, the word goes back to missing letters');
   await p.click('[data-act="quit"]'); await p.click('.modal [data-mi="1"]');
   // mock dictation
   await p.click('[data-act="mock"]');
@@ -71,8 +83,15 @@ const { chromium, devices } = require('playwright');
   ok(await p.evaluate(() => /ניצחה/.test(document.querySelector('.modal h3').textContent)), 'duel: a winner');
   await p.click('.modal [data-mi="1"]');
   // shop
-  await p.evaluate(() => { S.candy = 100; save(); }); await p.click('.foot [data-go="shop"]'); await p.click('[data-buy="leo:mint"]'); await p.click('.modal [data-mi="0"]');
+  await p.evaluate(() => { S.candy = 100; save(); }); await p.click('.foot [data-go="shop"]'); await p.click('[data-tab="leo"]'); await p.click('[data-buy="leo:mint"]'); await p.click('.modal [data-mi="0"]');
   ok(await p.evaluate(() => S.leo === 'mint' && S.candy === 75), 'buy a leotard');
+  // more in the shop: an accessory, a pet, the mat colour, a trick, and a real reward from dad
+  await p.evaluate(() => { S.candy = 500; save(); render(); });
+  for (const [tab, it] of [['acc', 'crown'], ['pet', 'bunny'], ['mat', 'pink'], ['trick', 'cartwheel']]) { await p.click(`[data-tab="${tab}"]`); await p.click(`[data-buy="${tab}:${it}"]`); await p.click('.modal [data-mi="0"]'); }
+  ok(await p.evaluate(() => S.acc === 'crown' && S.pet === 'bunny' && S.mat === 'pink' && S.trick === 'cartwheel' && S.candy === 500 - 80 - 50 - 40 - 50 && getComputedStyle(document.documentElement).getPropertyValue('--floor').trim().toUpperCase() === '#F0357F'), 'accessory, pet, mat and trick bought and applied');
+  ok(await p.evaluate(() => /<path d="M45 22 L48 9/.test(romiSVG()) && !!document.querySelector('#shopromi .pet')), 'crown drawn on Romi, pet beside her');
+  await p.click('[data-tab="dad"]'); await p.click('[data-rw="0"]'); await p.click('.modal [data-mi="0"]');
+  ok(await p.evaluate(() => S.vouchers.length === 1 && S.vouchers[0].state === 'wait' && S.candy === 280 - 80), 'a real reward bought, waiting for dad');
   // parent: PIN, paste a list, it becomes a class list
   await p.click('[data-go="home"]'); await p.click('.foot [data-go="parent"]'); await p.fill('#pin', '1234'); await p.click('[data-act="pin"]'); await p.fill('#pin', '1234'); await p.click('[data-act="pin"]');
   await p.evaluate(() => { const d = document.querySelector('.newlist details'); if (d) d.open = true; });
@@ -88,6 +107,12 @@ const { chromium, devices } = require('playwright');
   const q = await p.evaluate(() => document.querySelector('.modal b').textContent.split('×').map(Number)); await p.fill('#fq', String(q[0] * q[1])); await p.click('.modal [data-mi="0"]');
   ok(await p.evaluate(() => S.pin === '' && !!document.querySelector('#pin')), 'forgot the code: reset after the right answer');
   await p.fill('#pin', '1234'); await p.click('[data-act="pin"]'); await p.fill('#pin', '1234'); await p.click('[data-act="pin"]');
+  // dad approves the reward; the usage report is there and copies
+  ok(await p.evaluate(() => !!document.querySelector('[data-vok]') && !!document.querySelector('.kpis')), 'parent area shows the reward to approve and the usage report');
+  await p.click('[data-vok]');
+  ok(await p.evaluate(() => S.vouchers[0].state === 'done' && S.log.some(e => e.k === 'vok') && S.log.some(e => e.k === 's') && S.log.some(e => e.k === 't') && S.log.some(e => e.k === 'g') && S.log.some(e => e.k === 'buy')), 'approved; the log has sessions, a test, games and purchases');
+  await p.click('[data-act="repcopy"]'); await p.waitForTimeout(300);
+  ok(await p.evaluate(async () => /דוח שימוש/.test(await navigator.clipboard.readText())), 'usage report copied');
   // one-tap paste from WhatsApp (the clipboard)
   await p.evaluate(() => navigator.clipboard.writeText('הכתבה ב-9.12\n1. Kitchen – מטבח 🍳\n2. Garden – גינה 🌻'));
   await p.click('[data-act="clip"]'); await p.waitForTimeout(300);

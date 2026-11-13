@@ -20,12 +20,35 @@ const tilesHTML = tiles => `<div class="tiles" dir="ltr">${tiles.map((c, i) => `
 /* what she typed so far. With tiles: slots in the shape of the word */
 function typedHTML() {
   if (!KB) return '';
+  /* missing letters: the given letters stay, what she types fills the gaps in order */
+  if (KB.mask) { let j = 0; return `<div class="slots" dir="ltr">${[...KB.mword].map((c, i) => c === ' ' ? '<span class="slot gap"></span>' : !KB.mask[i] ? `<span class="slot given">${esc(c)}</span>` : `<span class="slot blank ${KB.val[j] ? 'full' : ''}">${esc(KB.val[j++] || '')}</span>`).join('')}</div>`; }
+  /* copying: only the right next letter goes in */
+  if (KB.strict) return `<div class="typed en strict" dir="ltr">${esc(KB.val)}<span class="caret"></span></div>`;
   if (KB.word) { let j = 0; const v = KB.val.replace(/ /g, ''); return `<div class="slots" dir="ltr">${[...KB.word].map(c => c === ' ' ? '<span class="slot gap"></span>' : `<span class="slot ${v[j] ? 'full' : ''}">${esc(v[j++] || '')}</span>`).join('')}</div>`; }
   return `<div class="typed ${KB.lang}" dir="${KB.lang === 'he' ? 'rtl' : 'ltr'}">${esc(KB.val)}<span class="caret"></span></div>`;
 }
 function kbRefresh() { const t = app.querySelector('#typed'); if (t) t.innerHTML = typedHTML(); if (KB && KB.onChange) KB.onChange(KB.val); }
 function kbPress(k) {
   if (!KB || KB.lock) return;
+  if (KB.strict) {
+    if (k === 'enter' || k === 'bs') return;
+    const exp = KB.strict[KB.val.length];
+    if (k !== exp) {
+      KB.miss = (KB.miss || 0) + 1; SFX.soft(); const t = app.querySelector('#typed .typed'); if (t) { t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake'); }
+      if (KB.miss >= 2) app.querySelectorAll('.kbd [data-k]').forEach(b => b.classList.toggle('glow', b.dataset.k === exp));
+      return;
+    }
+    KB.miss = 0; app.querySelectorAll('.kbd .glow').forEach(b => b.classList.remove('glow'));
+    KB.val += k; SFX.tap(); kbRefresh(); if (KB.val.length >= KB.strict.length) KB.onEnter(KB.val); return;
+  }
+  if (KB.mask) {
+    const blanks = KB.mask.filter(Boolean).length;
+    if (k === 'bs') { if (KB.val) { KB.val = KB.val.slice(0, -1); SFX.tap(); kbRefresh(); } return; }
+    if (k === 'enter' || k === ' ' || KB.val.length >= blanks) return;
+    KB.val += k; SFX.tap(); kbRefresh();
+    if (KB.val.length >= blanks) { let j = 0; const full = [...KB.mword].map((c, i) => KB.mask[i] ? KB.val[j++] : c).join(''); KB.onEnter(full); }
+    return;
+  }
   if (k === 'enter') { if (KB.val.trim()) KB.onEnter(KB.val); return; }
   if (k === 'bs') {
     if (!KB.val) return;
